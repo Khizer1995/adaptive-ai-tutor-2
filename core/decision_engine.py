@@ -1,26 +1,41 @@
 class DecisionEngine:
-    def decide_next_step(self, student_state: dict) -> str:
+    def decide_next_step(self, student_state: dict) -> dict:
         """
-        Decide which agent should handle the next step.
+        Decide which node in the LangGraph should execute next.
         """
 
         score = student_state.get("last_score", 0)
         engagement = student_state.get("engagement", "medium")
 
-        # Rule 1: Low engagement
+        # Low engagement → more support
         if engagement == "low":
-            return "tutor_agent"
+            return {
+                "next_node": "education_crew",
+                "action": "increase_support"
+            }
 
-        # Rule 2: Low score
+        # Low score → scaffold more
         if score < 0.5:
-            return "tutor_agent"
+            return {
+                "next_node": "education_crew",
+                "action": "adjust_learning_path"
+            }
 
-        # Rule 3: Medium score
+        # Medium score → practical reinforcement
         if 0.5 <= score <= 0.75:
-            return "practical_agent"
+            return {
+                "next_node": "education_crew",
+                "action": "adjust_quiz"
+            }
 
-        # Rule 4: High score
+        # High score → reduce support
         if score > 0.75:
-            return "monitor_agent"
+            return {
+                "next_node": "monitor_agent",
+                "action": "reduce_support"
+            }
 
-        return "tutor_agent"
+        return {
+            "next_node": "education_crew",
+            "action": "default_adjustment"
+        }

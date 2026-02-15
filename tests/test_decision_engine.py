@@ -10,4 +10,5 @@ test_cases = [
 ]
 
 for case in test_cases:
-    print(case, "→", engine.decide_next_step(case))
+    decision = engine.decide_next_step(case)
+    print(case, "→", decision)
