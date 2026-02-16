@@ -1,49 +1,62 @@
+from core.tutor_agent import TutorAgent
+from core.practical_agent import PracticalAgent
+from core.teacher_persona_agent import TeacherPersonaAgent
+
+
 class EducationCrew:
     """
-    Represents the Education Crew node in LangGraph.
-    Internally composed of:
-        - Tutor Agent
-        - Practical Agent
-        - Teacher Persona Agent
+    Education Crew Node (Extensible Orchestrator)
     """
 
-    def execute(self, decision_output: dict, student_state: dict) -> dict:
-        """
-        Executes action based on Decision Engine directive.
-        """
+    def __init__(self):
 
-        action = decision_output.get("action")
+        # Register agents
+        self.agents = [
+            TutorAgent(),
+            PracticalAgent(),
+            TeacherPersonaAgent()
+        ]
+        # CrewAI role definitions (metadata only)
+        self.crew_roles = [
+                        {"role": "Tutor", "goal": "Generate learning paths"},
+                        {"role": "Practical", "goal": "Generate quizzes"},
+                        {"role": "Teacher Persona", "goal": "Define teaching style"}
+]
 
-        if action == "adjust_learning_path":
-            return self._tutor_agent(student_state)
 
-        elif action == "adjust_quiz":
-            return self._practical_agent(student_state)
+    def run(self, state: dict):
+        decision_output = state["decision"]
+        student_state = state["student_state"]
 
-        elif action == "increase_support":
-            return self._teacher_persona_agent(student_state)
 
-        else:
-            return {"status": "no_action"}
 
-    # -------------------------
-    # Internal Agents (Stubs)
-    # -------------------------
-
-    def _tutor_agent(self, student_state: dict) -> dict:
-        return {
-            "agent": "tutor_agent",
-            "message": "Learning path adjusted based on student performance."
+        result = {
+            "learning_path": [],
+            "quiz": [],
+            "teacher_style": ""
         }
 
-    def _practical_agent(self, student_state: dict) -> dict:
-        return {
-            "agent": "practical_agent",
-            "message": "Quiz adjusted to match current understanding."
-        }
+        # Iterate through agents
+        for agent in self.agents:
 
-    def _teacher_persona_agent(self, student_state: dict) -> dict:
-        return {
-            "agent": "teacher_persona_agent",
-            "message": "Teacher persona adapted for increased support."
-        }
+            # Tutor Agent
+            if hasattr(agent, "generate_learning_path"):
+                result["learning_path"] = agent.generate_learning_path(
+                    decision_output,
+                    student_state
+                )
+
+            # Practical Agent
+            if hasattr(agent, "generate_quiz"):
+                result["quiz"] = agent.generate_quiz(
+                    decision_output,
+                    student_state
+                )
+
+            # Teacher Persona Agent
+            if hasattr(agent, "apply_persona"):
+                result["teacher_style"] = agent.apply_persona(
+                    student_state
+                )
+        state["crew_output"] = result
+        return state

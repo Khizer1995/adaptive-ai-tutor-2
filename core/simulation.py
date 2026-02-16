@@ -23,7 +23,15 @@ class AdaptiveLearningSimulation:
 
         # 2. Education Crew (if routed there)
         if decision["next_node"] == "education_crew":
-            crew_output = self.education_crew.execute(decision, student_state)
+            state = {
+                    "decision": decision,
+                    "student_state": student_state
+                    }
+
+            state = self.education_crew.run(state)
+            crew_output = state["crew_output"]
+
+            
         else:
             crew_output = {"agent": "monitor_agent", "message": "No crew action required."}
 
