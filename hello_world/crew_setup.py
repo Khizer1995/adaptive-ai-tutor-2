@@ -1,7 +1,8 @@
 from crewai import Crew, Process
-from monitoring_crew import MonitoringSkeleton
 import re
+from monitoring_crew import MonitoringSkeleton
 from profile_manager import ProfileManager
+
 
 def run_monitoring_check(chat_logs):
     # Initialize your skeleton

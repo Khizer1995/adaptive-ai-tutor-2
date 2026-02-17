@@ -5,7 +5,7 @@ from core.monitor_agent import MonitorAgent
 
 class AdaptiveLearningSimulation:
     """
-    Simulates the LangGraph workflow loop.
+    Simulates the adaptive workflow loop.
     """
 
     def __init__(self):
@@ -21,19 +21,14 @@ class AdaptiveLearningSimulation:
         decision = self.decision_engine.decide_next_step(student_state)
         print("Decision:", decision)
 
-        # 2. Education Crew (if routed there)
+        # 2. Education Crew
         if decision["next_node"] == "education_crew":
-            state = {
-                    "decision": decision,
-                    "student_state": student_state
-                    }
-
-            state = self.education_crew.run(state)
-            crew_output = state["crew_output"]
-
-            
+            crew_output = self.education_crew.execute(
+                decision,
+                student_state
+            )
         else:
-            crew_output = {"agent": "monitor_agent", "message": "No crew action required."}
+            crew_output = {"message": "No crew action required."}
 
         print("Crew Output:", crew_output)
 
@@ -42,3 +37,26 @@ class AdaptiveLearningSimulation:
         print("Monitor Output:", monitor_output)
 
         return monitor_output["updated_student_state"]
+
+
+# 🔥 ENTRY POINT ADDED
+if __name__ == "__main__":
+
+    simulation = AdaptiveLearningSimulation()
+
+    # Initial student state
+    student_state = {
+    "level": "beginner",
+    "current_topic": None,
+    "progress": [],
+    "engagement": "normal",
+    "last_score": 0.3,
+    "learning_history": []
+}
+
+
+    # Run 3 adaptive cycles
+    for _ in range(3):
+        student_state = simulation.run_cycle(student_state)
+
+    print("\nFinal Student State:", student_state)

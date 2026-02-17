@@ -1,5 +1,6 @@
 import os
-from models import StudentProfile
+from hello_world.models import StudentProfile
+
 
 class ProfileManager:
     def __init__(self, storage_dir="profiles"):

@@ -3,29 +3,24 @@ import random
 
 class MonitorAgent:
     """
-    Monitor Agent
-
-    Responsibilities:
-    - Simulate student interaction feedback
-    - Update engagement and performance
-    - Maintain learning memory (history of topics + scores)
+    Monitor Agent:
+    - Simulates performance
+    - Updates engagement
+    - Tracks progress
+    - Promotes level when appropriate
     """
 
     def interact(self, crew_output: dict, student_state: dict) -> dict:
-        """
-        Receives educational output and updates student state.
-        """
 
-        # ----------------------------------
-        # Simulate student performance
-        # ----------------------------------
-
-        # Random score simulation (you can replace later)
+        # ---------------------------
+        # Simulate student score
+        # ---------------------------
         new_score = round(random.uniform(0.5, 1.0), 2)
-
         student_state["last_score"] = new_score
 
-        # Update engagement based on score
+        # ---------------------------
+        # Update engagement
+        # ---------------------------
         if new_score < 0.5:
             student_state["engagement"] = "low"
         elif new_score < 0.8:
@@ -33,33 +28,35 @@ class MonitorAgent:
         else:
             student_state["engagement"] = "high"
 
-        # ----------------------------------
-        # Learning Memory Tracking (FINAL UPGRADE)
-        # ----------------------------------
-
-        topic = None
-
-        if "learning_path" in crew_output and crew_output["learning_path"]:
-            first_step = crew_output["learning_path"][0]
-
-            # Extract topic safely
-            if "of " in first_step:
-                topic = first_step.split("of ", 1)[1]
-            else:
-                topic = first_step
+        # ---------------------------
+        # Track topic properly
+        # ---------------------------
+        topic = student_state.get("current_topic")
 
         history = student_state.get("learning_history", [])
-
         history.append({
             "topic": topic,
             "score": new_score
         })
-
         student_state["learning_history"] = history
 
-        # ----------------------------------
-        # Return result
-        # ----------------------------------
+        # ---------------------------
+        # Progress tracking
+        # ---------------------------
+        if new_score > 0.75:
+            progress = student_state.get("progress", [])
+            if topic and topic not in progress:
+                progress.append(topic)
+                student_state["progress"] = progress
+
+        # ---------------------------
+        # Level progression logic
+        # ---------------------------
+        if student_state["engagement"] == "high" and new_score > 0.85:
+            if student_state["level"] == "beginner":
+                student_state["level"] = "intermediate"
+            elif student_state["level"] == "intermediate":
+                student_state["level"] = "advanced"
 
         return {
             "delivered_by": "monitor_agent",

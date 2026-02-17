@@ -10,25 +10,36 @@ class EducationCrew:
 
     def __init__(self):
 
-        # Register agents
         self.agents = [
             TutorAgent(),
             PracticalAgent(),
             TeacherPersonaAgent()
         ]
-        # CrewAI role definitions (metadata only)
+
         self.crew_roles = [
-                        {"role": "Tutor", "goal": "Generate learning paths"},
-                        {"role": "Practical", "goal": "Generate quizzes"},
-                        {"role": "Teacher Persona", "goal": "Define teaching style"}
-]
+            {"role": "Tutor", "goal": "Generate learning paths"},
+            {"role": "Practical", "goal": "Generate quizzes"},
+            {"role": "Teacher Persona", "goal": "Define teaching style"}
+        ]
 
+    # 🔥 NEW STANDARD INTERFACE
+    def execute(self, decision_output: dict, student_state: dict):
+        """
+        Standard interface used by tests and simulation.
+        """
+        state = {
+            "decision": decision_output,
+            "student_state": student_state
+        }
 
+        state = self.run(state)
+        return state["crew_output"]
+
+    # Internal orchestration method
     def run(self, state: dict):
+
         decision_output = state["decision"]
         student_state = state["student_state"]
-
-
 
         result = {
             "learning_path": [],
@@ -36,27 +47,24 @@ class EducationCrew:
             "teacher_style": ""
         }
 
-        # Iterate through agents
         for agent in self.agents:
 
-            # Tutor Agent
             if hasattr(agent, "generate_learning_path"):
                 result["learning_path"] = agent.generate_learning_path(
                     decision_output,
                     student_state
                 )
 
-            # Practical Agent
             if hasattr(agent, "generate_quiz"):
                 result["quiz"] = agent.generate_quiz(
                     decision_output,
                     student_state
                 )
 
-            # Teacher Persona Agent
             if hasattr(agent, "apply_persona"):
                 result["teacher_style"] = agent.apply_persona(
                     student_state
                 )
+
         state["crew_output"] = result
         return state

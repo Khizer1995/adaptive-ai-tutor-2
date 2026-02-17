@@ -1,5 +1,6 @@
-from models import StudentProfile
-from profile_manager import ProfileManager
+from hello_world.models import StudentProfile
+from hello_world.profile_manager import ProfileManager
+
 
 # 1. Setup the manager
 manager = ProfileManager()
