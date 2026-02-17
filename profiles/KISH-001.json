@@ -1,0 +1,13 @@
+{
+    "student_id": "KISH-001",
+    "name": "Kishore",
+    "knowledge_level": "intermediate",
+    "current_topic": null,
+    "completed_topics": [
+        "Introduction to LLMs"
+    ],
+    "frustration_level": 0,
+    "engagement_score": 5,
+    "learning_style": "balanced",
+    "last_active": "2026-02-16T12:11:39.973736"
+}
