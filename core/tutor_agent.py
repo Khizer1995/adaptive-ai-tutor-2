@@ -1,9 +1,14 @@
+from core.rag.retriever import Retriever
+
+
 class TutorAgent:
     """
-    Context-aware adaptive tutor.
-    Uses student history to avoid repetition
-    and escalate curriculum intelligently.
+    Context-aware adaptive RAG tutor.
+    Uses curriculum progression + retrieval.
     """
+
+    def __init__(self):
+        self.retriever = Retriever()
 
     curriculum = [
         "Python variables",
@@ -37,37 +42,17 @@ class TutorAgent:
 
         if not topic:
             topic = self.get_next_topic(student_state)
-            student_state["current_topic"] = topic  # Persist topic
+            student_state["current_topic"] = topic
 
-        # Only regenerate full learning path if adjusting path
-        if action == "adjust_learning_path":
-
-            if level == "beginner":
-                path = [
-                    f"Concept overview of {topic}",
-                    f"Simple examples of {topic}",
-                    f"Guided practice for {topic}"
-                ]
-
-            elif level == "intermediate":
-                path = [
-                    f"Deep dive into {topic}",
-                    f"Edge cases in {topic}",
-                    f"Problem solving exercises for {topic}"
-                ]
-
-            else:
-                path = [
-                    f"Advanced patterns using {topic}",
-                    f"Optimization techniques in {topic}",
-                    f"Real-world applications of {topic}"
-                ]
-
-        else:
-            # If not adjusting path, keep minimal structure
-            path = [f"Continued practice for {topic}"]
-
+        # 🔥 Build adaptive query for RAG
         if action == "increase_support":
-            path.insert(0, f"Fundamental recap of {topic}")
+            query = f"Explain {topic} in simple terms for beginner with examples"
+        elif level == "advanced":
+            query = f"Provide deep technical explanation and edge cases for {topic}"
+        else:
+            query = f"Explain {topic} for {level} level student with examples"
 
-        return path
+        # 🔥 Retrieve from vector DB
+        retrieved_chunks = self.retriever.retrieve(query, k=3)
+
+        return retrieved_chunks

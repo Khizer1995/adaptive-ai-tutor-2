@@ -1,6 +1,6 @@
 import uuid
 from pypdf import PdfReader
-from core.rag.embedding_model import GeminiEmbeddingModel
+from core.rag.embedding_model import LocalEmbeddingModel
 from core.rag.vector_store import VectorStore
 
 
@@ -8,7 +8,8 @@ class PDFIngestionService:
 
     def __init__(self, pdf_path):
         self.pdf_path = pdf_path
-        self.embedder = GeminiEmbeddingModel()
+        self.embedder = LocalEmbeddingModel()
+
         self.vector_store = VectorStore()
 
     def extract_text(self):

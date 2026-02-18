@@ -5,8 +5,10 @@ from chromadb.config import Settings
 class VectorStore:
 
     def __init__(self, persist_directory="data/vector_db"):
-        self.client = chromadb.Client(
-            Settings(persist_directory=persist_directory)
+
+        # 🔥 Use PersistentClient (VERY IMPORTANT)
+        self.client = chromadb.PersistentClient(
+            path=persist_directory
         )
 
         self.collection = self.client.get_or_create_collection(
