@@ -2,32 +2,14 @@
     "student_id": "KISH-001",
     "name": "Student",
     "level": "beginner",
-    "current_topic": "Control flow (if/else)",
-    "progress": [
-        "Python variables"
-    ],
+    "current_topic": "Python variables",
+    "progress": [],
     "engagement": "medium",
     "last_score": 0.62,
     "learning_history": [
         {
             "topic": "Python variables",
-            "score": 0.39
-        },
-        {
-            "topic": "Python variables",
-            "score": 0.44
-        },
-        {
-            "topic": "Python variables",
-            "score": 0.56
-        },
-        {
-            "topic": "Python variables",
-            "score": 0.56
-        },
-        {
-            "topic": "Python variables",
-            "score": 0.6
+            "score": 0.47
         },
         {
             "topic": "Python variables",
@@ -35,78 +17,34 @@
         },
         {
             "topic": "Python variables",
-            "score": 0.58
+            "score": 0.66
         },
         {
             "topic": "Python variables",
-            "score": 0.68
+            "score": 0.64
         },
         {
             "topic": "Python variables",
-            "score": 0.72
-        },
-        {
-            "topic": "Python variables",
-            "score": 0.72
-        },
-        {
-            "topic": "Python variables",
-            "score": 0.67
-        },
-        {
-            "topic": "Python variables",
-            "score": 0.76
-        },
-        {
-            "topic": "Control flow (if/else)",
-            "score": 0.63
-        },
-        {
-            "topic": "Control flow (if/else)",
-            "score": 0.67
-        },
-        {
-            "topic": "Control flow (if/else)",
             "score": 0.62
         }
     ],
     "frustration_level": 0,
     "engagement_score": 5,
     "learning_style": "balanced",
-    "last_active": "2026-03-30T09:10:36.907574+00:00",
+    "last_active": "2026-03-30T09:44:08.222074+00:00",
     "accuracy_history": [
         0.0,
         0.0,
         0.0,
         0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.0,
-        0.08333333333333333,
-        0.07692307692307693,
-        0.07142857142857142,
-        0.06666666666666667
+        0.0
     ],
     "learning_gain_history": [
         0.0,
-        0.04999999999999999,
-        0.12000000000000005,
-        0.0,
-        0.039999999999999925,
-        -0.030000000000000027,
-        0.010000000000000009,
-        0.10000000000000009,
-        0.039999999999999925,
-        0.0,
-        -0.04999999999999993,
-        0.08999999999999997,
-        -0.13,
-        0.040000000000000036,
-        -0.050000000000000044
+        0.09999999999999998,
+        0.09000000000000008,
+        -0.020000000000000018,
+        -0.020000000000000018
     ],
     "engagement_score_history": [
         6,

@@ -6,6 +6,7 @@ from core.validation_agent import ValidationAgent
 from core.monitor_agent import MonitorAgent
 from core.file_manager_agent import FileManagerAgent
 from core.student_profile_agent import StudentProfileAgent
+from core.teacher_review_agent import TeacherReviewAgent
 from core.logging_utils import trace_event
 
 
@@ -19,6 +20,7 @@ validation_agent = ValidationAgent()
 monitor_agent = MonitorAgent()
 file_manager_agent = FileManagerAgent()
 student_profile_agent = StudentProfileAgent()
+teacher_review_agent = TeacherReviewAgent()
 
 
 # ---------------------------------------------------
@@ -69,6 +71,21 @@ def validation_node(state: dict):
     )
     trace_event("node_exit", {"node": "validation"})
 
+    return state
+
+
+def teacher_review_node(state: dict):
+    """
+    Teacher Review Node
+    Uses JSON review queue to approve/reject content.
+    """
+    trace_event("node_enter", {"node": "teacher_review"})
+    review = teacher_review_agent.review(
+        state.get("crew_output", {}),
+        state.get("student_state", {})
+    )
+    state["teacher_review"] = review
+    trace_event("node_exit", {"node": "teacher_review"})
     return state
 
 
@@ -149,6 +166,14 @@ def route_after_profile(state: dict):
     return "end_learning"
 
 
+def route_after_teacher_review(state: dict):
+    review = state.get("teacher_review", {})
+    status = review.get("review_status", "pending")
+    if status == "approved":
+        return "approved"
+    return "halt"
+
+
 
 # ---------------------------------------------------
 # BUILD LANGGRAPH
@@ -161,6 +186,7 @@ builder.add_node("file_manager", file_manager_node)
 builder.add_node("decision", decision_node)
 builder.add_node("education_crew", education_crew_node)
 builder.add_node("validation", validation_node)
+builder.add_node("teacher_review", teacher_review_node)
 builder.add_node("monitor", monitor_node)
 builder.add_node("student_profile", profile_node)
 
@@ -180,6 +206,15 @@ builder.add_conditional_edges(
 )
 
 builder.add_conditional_edges(
+    "teacher_review",
+    route_after_teacher_review,
+    {
+        "approved": "monitor",
+        "halt": END
+    }
+)
+
+builder.add_conditional_edges(
     "student_profile",
     route_after_profile,
     {
@@ -191,7 +226,7 @@ builder.add_conditional_edges(
 
 # Remaining edges
 builder.add_edge("education_crew", "validation")
-builder.add_edge("validation", "monitor")
+builder.add_edge("validation", "teacher_review")
 builder.add_edge("monitor", "student_profile")
 
 

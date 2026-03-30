@@ -35,7 +35,8 @@ def main():
         },
         "decision": {},
         "crew_output": {},
-        "rag_status": {}
+        "rag_status": {},
+        "teacher_review": {}
     }
 
     print("\nInitial Student State:")

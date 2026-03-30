@@ -6,6 +6,8 @@ load_dotenv()
 from .decision_engine import DecisionEngine
 from .education_crew import EducationCrew
 from .monitor_agent import MonitorAgent
+from .validation_agent import ValidationAgent
+from .teacher_review_agent import TeacherReviewAgent
 from .profile_manager import ProfileManager
 from .file_manager_agent import FileManagerAgent
 from .evaluation import evaluate_cycle
@@ -22,6 +24,8 @@ class AdaptiveLearningSimulation:
         self.education_crew = EducationCrew()
         self.monitor = MonitorAgent()
         self.profile_manager = ProfileManager()
+        self.validation = ValidationAgent()
+        self.teacher_review = TeacherReviewAgent()
 
     def run_cycle(self, student_state: dict) -> dict:
         print("\n--- New Cycle ---")
@@ -51,7 +55,16 @@ class AdaptiveLearningSimulation:
             snippet = synthesis[:300]
             print(f"\n[LLM Synthesis]\n{snippet}...\n")
 
-        # 3. Monitor Interaction
+        # 3. Validation
+        crew_output = self.validation.validate_content(crew_output)
+
+        # 4. Teacher review (CLI)
+        review = self.teacher_review.review(crew_output, student_state)
+        if review.get("review_status") != "approved":
+            print("Teacher rejected the content. Ending cycle.")
+            return student_state
+
+        # 5. Monitor Interaction
         t_monitor = Timer()
         monitor_output = self.monitor.interact(
             {"decision": decision, **crew_output},
