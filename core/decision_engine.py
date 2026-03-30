@@ -1,15 +1,21 @@
+from core.logging_utils import get_logger, trace_event
+
+
 class DecisionEngine:
     """
-    Adaptive Decision Engine (Upgraded)
+    Adaptive Decision Engine
 
     Features:
     - Performance-based adaptation
     - Engagement-aware routing
     - Learning trend analysis
-    - Continuous learning (no dead states)
+    - Weighted decision-making
     """
 
-    def analyze_learning_trend(self, student_state: dict):
+    def __init__(self):
+        self.logger = get_logger("decision_engine", "decision_engine.log")
+
+    def analyze_learning_trend(self, student_state: dict) -> str:
         history = student_state.get("learning_history", [])
 
         if len(history) < 3:
@@ -29,137 +35,85 @@ class DecisionEngine:
         score = student_state.get("last_score", 0)
         engagement = student_state.get("engagement", "medium")
         trend = self.analyze_learning_trend(student_state)
+        style = student_state.get("learning_style", "balanced")
 
-        # -------------------------------
-        # 1. Critical states (priority)
-        # -------------------------------
+        actions = [
+            "increase_support",
+            "reinforce_basics",
+            "adjust_quiz",
+            "increase_challenge",
+            "challenge_with_variation",
+            "advance_topic",
+            "reduce_support",
+        ]
+        weights = {a: 0 for a in actions}
 
+        # Engagement-based weighting
         if engagement == "low":
-            return {
-                "next_node": "education_crew",
-                "action": "increase_support"
-            }
+            weights["increase_support"] += 3
+            weights["reinforce_basics"] += 2
+        elif engagement == "high":
+            weights["increase_challenge"] += 2
+            weights["advance_topic"] += 2
 
+        # Trend-based weighting
         if trend == "declining":
-            return {
-                "next_node": "education_crew",
-                "action": "reinforce_basics"
-            }
+            weights["reinforce_basics"] += 3
+            weights["increase_support"] += 2
+        elif trend == "improving":
+            weights["advance_topic"] += 2
+            weights["challenge_with_variation"] += 2
 
-        # -------------------------------
-        # 2. Adaptive learning logic
-        # -------------------------------
-
-        # Weak performance
+        # Score-based weighting
         if score < 0.5:
-            return {
-                "next_node": "education_crew",
-                "action": "increase_support"
-            }
-
-        # Moderate performance
-        if 0.5 <= score <= 0.75:
+            weights["increase_support"] += 3
+            weights["reinforce_basics"] += 2
+        elif 0.5 <= score <= 0.75:
+            weights["adjust_quiz"] += 2
             if trend == "improving":
-                return {
-                    "next_node": "education_crew",
-                    "action": "increase_challenge"
-                }
-            return {
-                "next_node": "education_crew",
-                "action": "adjust_quiz"
-            }
-
-        # -------------------------------
-        # 3. High performance (IMPROVED)
-        # -------------------------------
-
-        if score > 0.75:
-            if trend == "improving":
-                return {
-                    "next_node": "education_crew",   # ✅ KEEP LEARNING
-                    "action": "advance_topic"
-                }
-
-            if trend == "fluctuating":
-                return {
-                    "next_node": "education_crew",
-                    "action": "challenge_with_variation"
-                }
-
-            # Stable high → light monitoring
-            return {
-                "next_node": "monitor_agent",
-                "action": "reduce_support"
-            }
-
-        # -------------------------------
-        # Default fallback
-        # -------------------------------
-
-        return {
-            "next_node": "education_crew",
-            "action": "default_adjustment"
-        }
-        def decide_next_step(self, student_state: dict) -> dict:
-            score = student_state.get("last_score", 0)
-            engagement = student_state.get("engagement", "medium")
-            trend = self.analyze_learning_trend(student_state)
-            style = student_state.get("learning_style", "balanced")
-
-            # --- Weighted adaptive reasoning ---
-            actions = [
-                "increase_support",
-                "reinforce_basics",
-                "adjust_quiz",
-                "increase_challenge",
-                "challenge_with_variation",
-                "advance_topic",
-                "reduce_support"
-            ]
-            weights = {a: 0 for a in actions}
-
-            # Engagement-based weighting
-            if engagement == "low":
-                weights["increase_support"] += 3
-                weights["reinforce_basics"] += 2
-            elif engagement == "high":
                 weights["increase_challenge"] += 2
-                weights["advance_topic"] += 2
-
-            # Trend-based weighting
-            if trend == "declining":
-                weights["reinforce_basics"] += 3
-                weights["increase_support"] += 2
-            elif trend == "improving":
-                weights["advance_topic"] += 2
+        elif score > 0.75:
+            weights["advance_topic"] += 3
+            if trend == "improving":
                 weights["challenge_with_variation"] += 2
+            else:
+                weights["reduce_support"] += 1
 
-            # Score-based weighting
-            if score < 0.5:
-                weights["increase_support"] += 3
-                weights["reinforce_basics"] += 2
-            elif 0.5 <= score <= 0.75:
-                weights["adjust_quiz"] += 2
-                if trend == "improving":
-                    weights["increase_challenge"] += 2
-            elif score > 0.75:
-                weights["advance_topic"] += 3
-                if trend == "improving":
-                    weights["challenge_with_variation"] += 2
+        # Learning style influence (problem-solver prefers challenge)
+        if style == "problem-solver":
+            weights["increase_challenge"] += 1
+            weights["challenge_with_variation"] += 1
+        elif style == "visual":
+            weights["adjust_quiz"] += 1
 
-            # Learning style influence (example: problem-solver prefers challenge)
-            if style == "problem-solver":
-                weights["increase_challenge"] += 1
-                weights["challenge_with_variation"] += 1
-            elif style == "visual":
-                weights["adjust_quiz"] += 1
+        best_action = max(weights, key=lambda k: weights[k])
+        next_node = "education_crew"
+        if best_action == "reduce_support":
+            next_node = "monitor_agent"
 
-            # Select action with highest weight
-            best_action = max(weights, key=lambda k: weights[k])
+        decision = {
+            "next_node": next_node,
+            "action": best_action,
+            "weights": weights,
+            "reason": (
+                f"Selected '{best_action}' based on score={score}, "
+                f"engagement={engagement}, trend={trend}, style={style}"
+            ),
+        }
 
-            return {
-                "next_node": "education_crew",
+        self.logger.info(
+            f"score={score} engagement={engagement} trend={trend} "
+            f"style={style} action={best_action} next_node={next_node}"
+        )
+        trace_event(
+            "decision_made",
+            {
+                "score": score,
+                "engagement": engagement,
+                "trend": trend,
+                "style": style,
                 "action": best_action,
-                "weights": weights,
-                "reason": f"Selected '{best_action}' based on score={score}, engagement={engagement}, trend={trend}, style={style}"
-            }
+                "next_node": next_node,
+            },
+        )
+        return decision

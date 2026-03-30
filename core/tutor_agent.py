@@ -1,5 +1,6 @@
 from core.rag.retriever import Retriever
 from core.rag.query_engineering import RAGQueryEngineer
+from core.logging_utils import get_logger, trace_event, Timer
 from typing import Dict, Any, List, cast
 import os
 from dotenv import load_dotenv
@@ -23,6 +24,7 @@ class TutorAgent:
     def __init__(self):
         self.retriever = Retriever()
         self.query_engineer = RAGQueryEngineer()
+        self.logger = get_logger("tutor_agent", "crew.log")
 
         api_key = os.getenv("GEMINI_API_KEY")
         if not api_key:
@@ -40,6 +42,7 @@ class TutorAgent:
 
 
     def generate_learning_path(self, decision_output: dict, student_state: dict):
+        timer = Timer()
         level = student_state.get("level", "beginner")
         action = decision_output.get("action", "default")
         style = student_state.get("learning_style", "balanced")
@@ -96,8 +99,26 @@ class TutorAgent:
             else:
                 llm_response = self._fallback_response(topic, level, style)
 
-        except Exception:
+        except Exception as exc:
+            self.logger.error(f"llm_error={exc}")
             llm_response = self._fallback_response(topic, level, style)
+
+        duration_ms = round(timer.elapsed_ms(), 2)
+        self.logger.info(
+            f"topic='{topic}' level={level} style={style} action={action} "
+            f"rag_chunks={len(retrieved_chunks)} duration_ms={duration_ms}"
+        )
+        trace_event(
+            "tutor_generated",
+            {
+                "topic": topic,
+                "level": level,
+                "style": style,
+                "action": action,
+                "rag_chunks": len(retrieved_chunks),
+                "duration_ms": duration_ms,
+            },
+        )
 
         return {
             "rag_chunks": cast(List[str], retrieved_chunks),

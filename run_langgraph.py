@@ -13,6 +13,8 @@ load_dotenv()
 
 from typing import Dict, Any, cast
 from core.langgraph_flow import adaptive_graph
+from core.evaluation import evaluate_cycle
+from core.logging_utils import Timer
 
 
 def main():
@@ -32,7 +34,8 @@ def main():
             "learning_history": []
         },
         "decision": {},
-        "crew_output": {}
+        "crew_output": {},
+        "rag_status": {}
     }
 
     print("\nInitial Student State:")
@@ -42,7 +45,9 @@ def main():
     print("\nRunning LangGraph adaptive flow...\n")
 
     try:
+        t_flow = Timer()
         final_state = adaptive_graph.invoke(initial_state)
+        flow_ms = round(t_flow.elapsed_ms(), 2)
 
         print("\n" + "=" * 60)
         print("FINAL STUDENT STATE:")
@@ -67,6 +72,14 @@ def main():
                 snippet = "".join(snippet_chars)
                 print(f"\n--- LLM Synthesis (first 500 chars) ---")
                 print(snippet)
+
+        # Lightweight evaluation summary for report logs
+        evaluate_cycle(
+            final_state.get("student_state", {}),
+            final_state.get("decision", {}),
+            final_state.get("crew_output", {}),
+            {"langgraph_flow_ms": flow_ms},
+        )
     except Exception as e:
         print(f"\n[ERROR] LangGraph flow failed: {e}")
         raise

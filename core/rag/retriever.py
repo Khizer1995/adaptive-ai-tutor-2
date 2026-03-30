@@ -1,6 +1,7 @@
 from typing import List, Dict, Any, cast
 from core.rag.embedding_model import LocalEmbeddingModel
 from core.rag.vector_store import VectorStore
+from core.logging_utils import get_logger, trace_event, Timer
 
 
 
@@ -12,12 +13,14 @@ class Retriever:
     def __init__(self) -> None:
         self.embedder = LocalEmbeddingModel()
         self.vector_store = VectorStore()
+        self.logger = get_logger("rag", "rag.log")
 
     def retrieve(self, query: str, k: int = 3, feedback: Dict[str, float] = None) -> List[str]:
         """
         Retrieve and re-rank chunks. Optionally use feedback to penalize poor chunks.
         feedback: dict mapping chunk text to penalty score (lower is better)
         """
+        timer = Timer()
         query_embedding: List[float] = cast(List[float], self.embedder.embed(query))
         results: Dict[str, Any] = cast(Dict[str, Any], self.vector_store.query(query_embedding, k*2))
         documents: Any = results.get("documents", [])
@@ -35,4 +38,17 @@ class Retriever:
             chunks = sorted(chunks, key=feedback_score)
 
         # Simple: return top-k after re-ranking
-        return chunks[:k]
+        selected = chunks[:k]
+        duration_ms = round(timer.elapsed_ms(), 2)
+        self.logger.info(
+            f"query_len={len(query)} k={k} retrieved={len(selected)} duration_ms={duration_ms}"
+        )
+        trace_event(
+            "rag_retrieve",
+            {
+                "k": k,
+                "retrieved": len(selected),
+                "duration_ms": duration_ms,
+            },
+        )
+        return selected

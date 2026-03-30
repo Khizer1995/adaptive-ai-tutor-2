@@ -4,6 +4,9 @@ from core.decision_engine import DecisionEngine
 from core.education_crew import EducationCrew
 from core.validation_agent import ValidationAgent
 from core.monitor_agent import MonitorAgent
+from core.file_manager_agent import FileManagerAgent
+from core.student_profile_agent import StudentProfileAgent
+from core.logging_utils import trace_event
 
 
 # ---------------------------------------------------
@@ -14,6 +17,8 @@ decision_engine = DecisionEngine()
 education_crew = EducationCrew()
 validation_agent = ValidationAgent()
 monitor_agent = MonitorAgent()
+file_manager_agent = FileManagerAgent()
+student_profile_agent = StudentProfileAgent()
 
 
 # ---------------------------------------------------
@@ -26,12 +31,14 @@ def decision_node(state: dict):
     Determines next step in adaptive workflow.
     """
 
+    trace_event("node_enter", {"node": "decision"})
     decision = decision_engine.decide_next_step(
         state["student_state"]
     )
 
     state["decision"] = decision
 
+    trace_event("node_exit", {"node": "decision"})
     return state
 
 
@@ -41,7 +48,13 @@ def education_crew_node(state: dict):
     Runs internal multi-agent logic.
     """
 
-    return education_crew.run(state)
+    trace_event("node_enter", {"node": "education_crew"})
+    state = education_crew.run(state)
+    # Ensure monitor has access to decision context
+    if "crew_output" in state:
+        state["crew_output"]["decision"] = state.get("decision", {})
+    trace_event("node_exit", {"node": "education_crew"})
+    return state
 
 
 def validation_node(state: dict):
@@ -50,9 +63,11 @@ def validation_node(state: dict):
     Ensures generated content meets rules.
     """
 
+    trace_event("node_enter", {"node": "validation"})
     state["crew_output"] = validation_agent.validate_content(
         state["crew_output"]
     )
+    trace_event("node_exit", {"node": "validation"})
 
     return state
 
@@ -63,13 +78,38 @@ def monitor_node(state: dict):
     Updates student state based on interaction.
     """
 
+    trace_event("node_enter", {"node": "monitor"})
     monitor_output = monitor_agent.interact(
-        state["crew_output"],
-        state["student_state"]
+        state.get("crew_output", {}),
+        state.get("student_state", {})
     )
 
     state["student_state"] = monitor_output["updated_student_state"]
 
+    trace_event("node_exit", {"node": "monitor"})
+    return state
+
+
+def file_manager_node(state: dict):
+    """
+    File Manager Node
+    Prepares RAG knowledge base before learning loop.
+    """
+    trace_event("node_enter", {"node": "file_manager"})
+    status = file_manager_agent.prepare_knowledge_base()
+    state["rag_status"] = status
+    trace_event("node_exit", {"node": "file_manager"})
+    return state
+
+
+def profile_node(state: dict):
+    """
+    Student Profile Node
+    Persists student state after monitoring.
+    """
+    trace_event("node_enter", {"node": "student_profile"})
+    state["student_state"] = student_profile_agent.persist(state["student_state"])
+    trace_event("node_exit", {"node": "student_profile"})
     return state
 
 
@@ -93,7 +133,7 @@ def route_from_decision(state: dict):
     # fallback safety
     return "education_crew"
 
-def route_after_monitor(state: dict):
+def route_after_profile(state: dict):
     """
     Decide whether to continue learning loop
     or finish execution.
@@ -117,13 +157,17 @@ def route_after_monitor(state: dict):
 builder = StateGraph(dict)
 
 # Add nodes
+builder.add_node("file_manager", file_manager_node)
 builder.add_node("decision", decision_node)
 builder.add_node("education_crew", education_crew_node)
 builder.add_node("validation", validation_node)
 builder.add_node("monitor", monitor_node)
+builder.add_node("student_profile", profile_node)
 
 # Entry point
-builder.set_entry_point("decision")
+builder.set_entry_point("file_manager")
+
+builder.add_edge("file_manager", "decision")
 
 # Conditional routing from decision node
 builder.add_conditional_edges(
@@ -136,8 +180,8 @@ builder.add_conditional_edges(
 )
 
 builder.add_conditional_edges(
-    "monitor",
-    route_after_monitor,
+    "student_profile",
+    route_after_profile,
     {
         "continue_learning": "decision",
         "end_learning": END
@@ -148,6 +192,7 @@ builder.add_conditional_edges(
 # Remaining edges
 builder.add_edge("education_crew", "validation")
 builder.add_edge("validation", "monitor")
+builder.add_edge("monitor", "student_profile")
 
 
 # Compile graph

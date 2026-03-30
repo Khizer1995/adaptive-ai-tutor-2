@@ -8,8 +8,13 @@ class PDFIngestionService:
 
     def __init__(self, pdf_path, collection_name="python_course"):
         self.pdf_path = pdf_path
-        self.embedder = LocalEmbeddingModel()
+        self.embedder = None
         self.vector_store = VectorStore(collection_name=collection_name)
+
+    def _get_embedder(self):
+        if self.embedder is None:
+            self.embedder = LocalEmbeddingModel()
+        return self.embedder
 
     def extract_text(self):
         reader = PdfReader(self.pdf_path)
@@ -49,7 +54,7 @@ class PDFIngestionService:
 
         for i, chunk in enumerate(chunks):
             print(f"  Embedding chunk {i + 1}/{len(chunks)}...", end="\r")
-            embedding = self.embedder.embed(chunk)
+            embedding = self._get_embedder().embed(chunk)
             ids.append(str(uuid.uuid4()))
             embeddings.append(embedding)
             documents.append(chunk)

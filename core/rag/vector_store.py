@@ -1,18 +1,25 @@
 import chromadb
 
 
-
 class VectorStore:
 
-    def __init__(self, persist_directory="data/vector_db"):
+    def __init__(
+        self,
+        persist_directory: str = "data/vector_db",
+        collection_name: str = "python_course",
+        in_memory: bool = False,
+    ):
 
-        # Use PersistentClient for persistent storage
-        self.client = chromadb.PersistentClient(
-            path=persist_directory
-        )
+        if in_memory:
+            self.client = chromadb.Client()
+        else:
+            # Use PersistentClient for persistent storage
+            self.client = chromadb.PersistentClient(
+                path=persist_directory
+            )
 
         self.collection = self.client.get_or_create_collection(
-            name="python_course"
+            name=collection_name
         )
 
     def add_documents(self, ids, embeddings, documents, metadatas):

@@ -5,6 +5,9 @@ class PracticalAgent:
     """
 
     def generate_quiz(self, decision_output: dict, student_state: dict):
+        from core.logging_utils import get_logger, trace_event
+        logger = get_logger("practical_agent", "crew.log")
+
         topic = student_state.get("current_topic", "Python variables")
         level = student_state.get("level", "beginner")
         style = student_state.get("learning_style", "balanced")
@@ -40,4 +43,9 @@ class PracticalAgent:
                     f"Discuss performance trade-offs in {topic}.",
                     f"Design a system using {topic}."
                 ]
+        logger.info(f"topic='{topic}' level={level} style={style} quiz_len={len(quiz)}")
+        trace_event(
+            "quiz_generated",
+            {"topic": topic, "level": level, "style": style, "quiz_len": len(quiz)},
+        )
         return quiz

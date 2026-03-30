@@ -7,6 +7,9 @@ from .decision_engine import DecisionEngine
 from .education_crew import EducationCrew
 from .monitor_agent import MonitorAgent
 from .profile_manager import ProfileManager
+from .file_manager_agent import FileManagerAgent
+from .evaluation import evaluate_cycle
+from .logging_utils import Timer
 
 
 class AdaptiveLearningSimulation:
@@ -28,15 +31,19 @@ class AdaptiveLearningSimulation:
         print(f"Engagement : {student_state.get('engagement')}")
 
         # 1. Decision Engine
+        t_decision = Timer()
         decision = self.decision_engine.decide_next_step(student_state)
+        decision_ms = round(t_decision.elapsed_ms(), 2)
         print(f"Decision   : {decision}")
 
         # 2. Education Crew
+        t_crew = Timer()
         crew_output = (
             self.education_crew.execute(decision, student_state)
             if decision.get("next_node") == "education_crew"
             else {"message": "No crew action required."}
         )
+        crew_ms = round(t_crew.elapsed_ms(), 2)
 
         # Show LLM synthesis snippet (clean slicing)
         synthesis = crew_output.get("learning_path", "")
@@ -45,10 +52,12 @@ class AdaptiveLearningSimulation:
             print(f"\n[LLM Synthesis]\n{snippet}...\n")
 
         # 3. Monitor Interaction
+        t_monitor = Timer()
         monitor_output = self.monitor.interact(
             {"decision": decision, **crew_output},
             student_state
         )
+        monitor_ms = round(t_monitor.elapsed_ms(), 2)
         print(f"Monitor    : {monitor_output.get('feedback')}")
 
         # --- Metrics Calculation ---
@@ -80,6 +89,17 @@ class AdaptiveLearningSimulation:
         print(f"Accuracy (so far): {accuracy:.2f}")
         print(f"Engagement Score (this cycle): {engagement_score}")
 
+        evaluate_cycle(
+            updated_state,
+            decision,
+            crew_output,
+            {
+                "decision_ms": decision_ms,
+                "crew_ms": crew_ms,
+                "monitor_ms": monitor_ms,
+            },
+        )
+
         return updated_state
 
 
@@ -106,6 +126,9 @@ def load_or_initialize_profile(pm: ProfileManager):
 def main():
     simulation = AdaptiveLearningSimulation()
     pm = ProfileManager()
+    file_manager = FileManagerAgent()
+
+    file_manager.prepare_knowledge_base()
 
     student_state = load_or_initialize_profile(pm)
 

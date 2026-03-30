@@ -210,4 +210,5 @@ __marimo__/
 data/vector_db/
 __pycache__/
 *.pyc
+logs/
 

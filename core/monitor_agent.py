@@ -1,4 +1,5 @@
 import random
+from core.logging_utils import get_logger, trace_event, Timer
 
 
 class MonitorAgent:
@@ -12,6 +13,8 @@ class MonitorAgent:
     """
 
     def interact(self, crew_output: dict, student_state: dict) -> dict:
+        timer = Timer()
+        logger = get_logger("monitor_agent", "monitor.log")
 
         decision = crew_output.get("decision", {})
         action = decision.get("action", "default")
@@ -100,6 +103,22 @@ class MonitorAgent:
             feedback = "Student progressing steadily."
         else:
             feedback = "Student performing strongly — ready for challenge."
+
+        duration_ms = round(timer.elapsed_ms(), 2)
+        logger.info(
+            f"action={action} score={new_score} engagement={student_state.get('engagement')} "
+            f"topic='{topic}' duration_ms={duration_ms}"
+        )
+        trace_event(
+            "monitor_update",
+            {
+                "action": action,
+                "score": new_score,
+                "engagement": student_state.get("engagement"),
+                "topic": topic,
+                "duration_ms": duration_ms,
+            },
+        )
 
         return {
             "delivered_by": "monitor_agent",

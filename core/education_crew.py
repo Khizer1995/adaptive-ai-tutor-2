@@ -1,6 +1,7 @@
 from core.tutor_agent import TutorAgent
 from core.practical_agent import PracticalAgent
 from core.teacher_persona_agent import TeacherPersonaAgent
+from core.logging_utils import get_logger, trace_event, Timer
 
 
 class EducationCrew:
@@ -14,6 +15,7 @@ class EducationCrew:
         self.tutor = TutorAgent()
         self.practical = PracticalAgent()
         self.persona = TeacherPersonaAgent()
+        self.logger = get_logger("education_crew", "crew.log")
 
     def execute(self, decision_output: dict, student_state: dict):
         state = {
@@ -25,6 +27,7 @@ class EducationCrew:
         return state["crew_output"]
 
     def run(self, state: dict):
+        timer = Timer()
 
         decision = state["decision"]
         student_state = state["student_state"]
@@ -35,7 +38,8 @@ class EducationCrew:
             "quiz": [],
             "teacher_style": "",
             "rag_chunks": [],
-            "engineered_query": ""
+            "engineered_query": "",
+            "decision": decision,
         }
 
         # -----------------------------------
@@ -84,6 +88,20 @@ class EducationCrew:
             result.update(self._extract_learning(lp))
 
         state["crew_output"] = result
+        duration_ms = round(timer.elapsed_ms(), 2)
+        self.logger.info(
+            f"action={action} topic='{student_state.get('current_topic')}' "
+            f"quiz_len={len(result.get('quiz', []))} duration_ms={duration_ms}"
+        )
+        trace_event(
+            "crew_completed",
+            {
+                "action": action,
+                "topic": student_state.get("current_topic"),
+                "quiz_len": len(result.get("quiz", [])),
+                "duration_ms": duration_ms,
+            },
+        )
         return state
 
     # -----------------------------------
