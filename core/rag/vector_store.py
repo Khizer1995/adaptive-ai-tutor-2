@@ -1,12 +1,12 @@
 import chromadb
-from chromadb.config import Settings
+
 
 
 class VectorStore:
 
     def __init__(self, persist_directory="data/vector_db"):
 
-        # 🔥 Use PersistentClient (VERY IMPORTANT)
+        # Use PersistentClient for persistent storage
         self.client = chromadb.PersistentClient(
             path=persist_directory
         )
