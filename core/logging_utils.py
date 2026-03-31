@@ -47,6 +47,10 @@ def trace_event(event_type: str, payload: Optional[Dict[str, Any]] = None) -> No
     )
 
 
+def log_learning_record(payload: Dict[str, Any]) -> None:
+    log_jsonl("learning_records.jsonl", payload)
+
+
 class Timer:
     def __init__(self):
         self.start = perf_counter()

@@ -20,7 +20,7 @@ class StudentProfile:
     name            : Display name
     level           : "beginner" | "intermediate" | "advanced"
     current_topic   : Topic currently being studied (None if fresh)
-    progress        : List of topics the student has mastered (score > 0.75)
+    progress        : List of topics the student has mastered (score >= 0.65, engagement >= medium)
     engagement      : "low" | "medium" | "high"
     last_score      : Float 0–1 from the last quiz/interaction
     learning_history: List of {topic, score} dicts (chronological)

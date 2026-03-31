@@ -12,6 +12,7 @@ from .profile_manager import ProfileManager
 from .file_manager_agent import FileManagerAgent
 from .evaluation import evaluate_cycle
 from .logging_utils import Timer
+from .learning_record import log_state_learning_record
 
 
 class AdaptiveLearningSimulation:
@@ -49,20 +50,21 @@ class AdaptiveLearningSimulation:
         )
         crew_ms = round(t_crew.elapsed_ms(), 2)
 
-        # Show LLM synthesis snippet (clean slicing)
-        synthesis = crew_output.get("learning_path", "")
-        if isinstance(synthesis, str) and synthesis:
-            snippet = synthesis[:300]
-            print(f"\n[LLM Synthesis]\n{snippet}...\n")
-
         # 3. Validation
         crew_output = self.validation.validate_content(crew_output)
 
         # 4. Teacher review (CLI)
         review = self.teacher_review.review(crew_output, student_state)
         if review.get("review_status") != "approved":
-            print("Teacher rejected the content. Ending cycle.")
             return student_state
+        log_state_learning_record(
+            {
+                "student_state": student_state,
+                "crew_output": crew_output,
+                "decision": decision,
+                "teacher_review": review,
+            }
+        )
 
         # 5. Monitor Interaction
         t_monitor = Timer()
@@ -101,6 +103,7 @@ class AdaptiveLearningSimulation:
         print(f"Learning Gain (this cycle): {gain:.2f}")
         print(f"Accuracy (so far): {accuracy:.2f}")
         print(f"Engagement Score (this cycle): {engagement_score}")
+
 
         evaluate_cycle(
             updated_state,

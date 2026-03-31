@@ -77,7 +77,7 @@ class MonitorAgent:
         # 4. Progress Tracking
         # -----------------------------------
 
-        if new_score > 0.75:
+        if new_score >= 0.65 and student_state.get("engagement") in ("medium", "high"):
             progress = student_state.get("progress", [])
             if topic and topic not in progress:
                 progress.append(topic)

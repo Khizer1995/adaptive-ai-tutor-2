@@ -72,7 +72,6 @@ class ProfileManager:
         path = self._path(student_id)
         with open(path, "w", encoding="utf-8") as f:
             json.dump(state, f, indent=4)
-        print(f"[ProfileManager] Saved profile → {path}")
 
     def create_profile(
         self,
@@ -98,7 +97,6 @@ class ProfileManager:
         path = self._path(student_id)
         with open(path, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=4)
-        print(f"[ProfileManager] Created new profile → {path}")
         return data
 
     def list_profiles(self) -> List[str]:

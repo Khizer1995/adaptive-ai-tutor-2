@@ -8,6 +8,7 @@ from core.file_manager_agent import FileManagerAgent
 from core.student_profile_agent import StudentProfileAgent
 from core.teacher_review_agent import TeacherReviewAgent
 from core.logging_utils import trace_event
+from core.learning_record import log_state_learning_record
 
 
 # ---------------------------------------------------
@@ -85,6 +86,8 @@ def teacher_review_node(state: dict):
         state.get("student_state", {})
     )
     state["teacher_review"] = review
+    if review.get("review_status") == "approved":
+        log_state_learning_record(state)
     trace_event("node_exit", {"node": "teacher_review"})
     return state
 

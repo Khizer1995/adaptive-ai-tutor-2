@@ -64,16 +64,20 @@ class DecisionEngine:
             weights["advance_topic"] += 2
             weights["challenge_with_variation"] += 2
 
-        # Score-based weighting
-        if score < 0.5:
+        # Score-based weighting (updated thresholds)
+        if score < 0.4:
             weights["increase_support"] += 3
             weights["reinforce_basics"] += 2
-        elif 0.5 <= score <= 0.75:
+        elif 0.4 <= score < 0.65:
             weights["adjust_quiz"] += 2
             if trend == "improving":
-                weights["increase_challenge"] += 2
-        elif score > 0.75:
-            weights["advance_topic"] += 3
+                weights["increase_challenge"] += 1
+        else:
+            # score >= 0.65
+            if engagement in ("medium", "high"):
+                weights["advance_topic"] += 4
+            else:
+                weights["adjust_quiz"] += 2
             if trend == "improving":
                 weights["challenge_with_variation"] += 2
             else:
