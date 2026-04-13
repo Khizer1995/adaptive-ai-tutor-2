@@ -1,12 +1,8 @@
 from core.rag.retriever import Retriever
 from core.rag.query_engineering import RAGQueryEngineer
+from core.llm.router import ModelRouterAgent
 from core.logging_utils import get_logger, trace_event, Timer
 from typing import Dict, Any, List, cast
-import os
-from dotenv import load_dotenv
-from google import genai
-
-load_dotenv()
 
 class TutorAgent:
     curriculum = [
@@ -24,13 +20,8 @@ class TutorAgent:
     def __init__(self):
         self.retriever = Retriever()
         self.query_engineer = RAGQueryEngineer()
+        self.router = ModelRouterAgent()
         self.logger = get_logger("tutor_agent", "crew.log")
-
-        api_key = os.getenv("GEMINI_API_KEY")
-        if not api_key:
-            raise ValueError("GEMINI_API_KEY not set in .env")
-
-        self.client = genai.Client(api_key=api_key)
 
     def get_next_topic(self, student_state: Dict[str, Any]) -> str:
         progress = cast(List[str], student_state.get("progress", []))
@@ -46,6 +37,7 @@ class TutorAgent:
         level = student_state.get("level", "beginner")
         action = decision_output.get("action", "default")
         style = student_state.get("learning_style", "balanced")
+        macro_decision = student_state.get("macro_decision", {}) or {}
 
         # Advance topic if action is 'advance_topic'
         if action == "advance_topic":
@@ -71,34 +63,38 @@ class TutorAgent:
             base_query = f"Explain {topic} for {level} level student with examples"
 
         engineered_query = self.query_engineer.engineer(base_query, student_state)
-
-        retrieved_chunks = self.retriever.retrieve(engineered_query, k=3)
+        concept_scope = ""
+        target_concepts = macro_decision.get("target_concepts", [])
+        if target_concepts:
+            concept_scope = str(target_concepts[0])
+        source_priority = student_state.get("preferred_source_type", "")
+        subject = student_state.get("subject", "")
+        retrieved_chunks = self.retriever.retrieve(
+            engineered_query,
+            k=3,
+            concept_scope=concept_scope,
+            source_priority=source_priority,
+            subject=subject,
+        )
         context = "\n\n".join(retrieved_chunks) if retrieved_chunks else "No curriculum content found."
 
-        llm_prompt = (
-            f"You are a helpful Python tutor.\n"
-            f"Student level: {level}. Topic: {topic}.\n"
-            f"Learning style: {style}.\n"
-            f"Learning goal: {base_query}\n\n"
-            f"Relevant curriculum content:\n{context}\n\n"
-            f"Give structured explanation with:\n"
-            f"- Simple explanation\n"
-            f"- Code examples\n"
-            f"- Key takeaways\n"
-        )
-
-        USE_LLM = True  # change to True if quota available
-
         try:
-            if USE_LLM:
-                response = self.client.models.generate_content(
-                    model="gemini-2.0-flash-lite",
-                    contents=llm_prompt
-                )
-                llm_response = response.text
-            else:
+            routed = self.router.route(
+                task_type="concept_explanation",
+                user_query=(
+                    f"Explain topic '{topic}' for a {level} learner with learning style '{style}'. "
+                    "Include misconception correction tips and examples."
+                ),
+                context=context,
+                output_schema={
+                    "simple_explanation": "2-4 short paragraphs",
+                    "code_examples": "at least one Python code block",
+                    "key_takeaways": "3 concise bullet points",
+                },
+            )
+            llm_response = routed.get("content", "")
+            if not llm_response:
                 llm_response = self._fallback_response(topic, level, style)
-
         except Exception as exc:
             self.logger.error(f"llm_error={exc}")
             llm_response = self._fallback_response(topic, level, style)

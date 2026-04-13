@@ -6,7 +6,7 @@ DecisionEngine reads.
 """
 
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import Dict, List, Optional, Any
 
 
 @dataclass
@@ -46,6 +46,8 @@ class StudentProfile:
     # --- Metrics tracking fields ---
     accuracy_history: List[float] = field(default_factory=list)
     learning_gain_history: List[float] = field(default_factory=list)
+    knowledge_state: Dict[str, Any] = field(default_factory=lambda: {"concepts": {}, "version": 1})
+    knowledge_events: List[dict] = field(default_factory=list)
 
     def to_dict(self) -> dict:
         """Serialise to dict for JSON storage and agent consumption."""
@@ -64,6 +66,8 @@ class StudentProfile:
             "last_active": self.last_active,
             "accuracy_history": self.accuracy_history,
             "learning_gain_history": self.learning_gain_history,
+            "knowledge_state": self.knowledge_state,
+            "knowledge_events": self.knowledge_events,
         }
 
     @classmethod
@@ -84,4 +88,6 @@ class StudentProfile:
             last_active=data.get("last_active"),
             accuracy_history=data.get("accuracy_history", []),
             learning_gain_history=data.get("learning_gain_history", []),
+            knowledge_state=data.get("knowledge_state", {"concepts": {}, "version": 1}),
+            knowledge_events=data.get("knowledge_events", []),
         )

@@ -4,54 +4,29 @@ from core.logging_utils import get_logger, trace_event, Timer
 
 class MonitorAgent:
     """
-    Adaptive Monitor Agent (Upgraded)
+    Execution monitor.
 
-    - Simulates realistic performance
-    - Uses decision action to influence score
-    - Updates engagement dynamically
-    - Tracks progress + level progression
+    This agent records interaction outcomes only.
+    It does not make pedagogical routing or adaptation decisions.
     """
 
     def interact(self, crew_output: dict, student_state: dict) -> dict:
         timer = Timer()
         logger = get_logger("monitor_agent", "monitor.log")
 
-        decision = crew_output.get("decision", {})
-        action = decision.get("action", "default")
-
         prev_score = student_state.get("last_score", 0.5)
+        selected_owner = crew_output.get("owner_agent", "unknown")
+        challenge_level = crew_output.get("challenge_level", "medium")
 
-        # -----------------------------------
-        # 1. Adaptive Score Simulation
-        # -----------------------------------
-
-        if action in ["increase_support", "reinforce_basics"]:
-            # Support improves performance
+        if challenge_level == "low":
             new_score = prev_score + random.uniform(0.05, 0.2)
-
-        elif action in ["increase_challenge", "challenge_with_variation"]:
-            # Challenge may reduce score slightly
+        elif challenge_level == "high":
             new_score = prev_score - random.uniform(0.0, 0.15)
-
-        elif action == "advance_topic":
-            # New topic → slight drop (learning curve)
-            new_score = prev_score - random.uniform(0.05, 0.2)
-
-        elif action == "adjust_quiz":
-            # Stable performance
+        else:
             new_score = prev_score + random.uniform(-0.05, 0.1)
 
-        else:
-            # Default randomness
-            new_score = random.uniform(0.3, 0.9)
-
-        # Clamp score between 0 and 1
         new_score = round(max(0.0, min(1.0, new_score)), 2)
         student_state["last_score"] = new_score
-
-        # -----------------------------------
-        # 2. Engagement Update (less rigid)
-        # -----------------------------------
 
         if new_score < 0.4:
             student_state["engagement"] = "low"
@@ -60,59 +35,28 @@ class MonitorAgent:
         else:
             student_state["engagement"] = "high"
 
-        # -----------------------------------
-        # 3. Learning History
-        # -----------------------------------
-
         topic = student_state.get("current_topic")
-
         history = student_state.get("learning_history", [])
-        history.append({
-            "topic": topic,
-            "score": new_score
-        })
+        history.append({"topic": topic, "score": new_score})
         student_state["learning_history"] = history
 
-        # -----------------------------------
-        # 4. Progress Tracking
-        # -----------------------------------
-
-        if new_score >= 0.65 and student_state.get("engagement") in ("medium", "high"):
-            progress = student_state.get("progress", [])
-            if topic and topic not in progress:
-                progress.append(topic)
-                student_state["progress"] = progress
-
-        # -----------------------------------
-        # 5. Level Progression (smarter)
-        # -----------------------------------
-
-        if new_score > 0.9 and student_state["engagement"] == "high":
-            if student_state["level"] == "beginner":
-                student_state["level"] = "intermediate"
-            elif student_state["level"] == "intermediate":
-                student_state["level"] = "advanced"
-
-        # -----------------------------------
-        # 6. Feedback (IMPROVED)
-        # -----------------------------------
-
         if new_score < 0.5:
-            feedback = "Student struggling — additional support recommended."
+            feedback = "Observed low performance in this interaction."
         elif new_score < 0.8:
-            feedback = "Student progressing steadily."
+            feedback = "Observed steady performance in this interaction."
         else:
-            feedback = "Student performing strongly — ready for challenge."
+            feedback = "Observed strong performance in this interaction."
 
         duration_ms = round(timer.elapsed_ms(), 2)
         logger.info(
-            f"action={action} score={new_score} engagement={student_state.get('engagement')} "
-            f"topic='{topic}' duration_ms={duration_ms}"
+            f"owner={selected_owner} challenge={challenge_level} score={new_score} "
+            f"engagement={student_state.get('engagement')} topic='{topic}' duration_ms={duration_ms}"
         )
         trace_event(
             "monitor_update",
             {
-                "action": action,
+                "owner": selected_owner,
+                "challenge_level": challenge_level,
                 "score": new_score,
                 "engagement": student_state.get("engagement"),
                 "topic": topic,
@@ -123,5 +67,12 @@ class MonitorAgent:
         return {
             "delivered_by": "monitor_agent",
             "feedback": feedback,
-            "updated_student_state": student_state
+            "execution_feedback": {
+                "topic": topic,
+                "observed_score": new_score,
+                "observed_engagement": student_state.get("engagement"),
+                "selected_owner": selected_owner,
+                "challenge_level": challenge_level,
+            },
+            "updated_student_state": student_state,
         }

@@ -34,7 +34,12 @@ def main():
             "learning_history": []
         },
         "decision": {},
+        "macro_decision": {},
         "crew_output": {},
+        "crew_proposals": [],
+        "execution_feedback": {},
+        "decision_trace": [],
+        "arbitration_trace": {},
         "rag_status": {},
         "teacher_review": {}
     }

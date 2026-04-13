@@ -15,6 +15,49 @@ class DecisionEngine:
     def __init__(self):
         self.logger = get_logger("decision_engine", "decision_engine.log")
 
+    def _knowledge_snapshot(self, student_state: dict) -> tuple[float, float, str]:
+        knowledge_state = student_state.get("knowledge_state", {}) or {}
+        concepts = knowledge_state.get("concepts", {}) or {}
+        if not concepts:
+            topic = student_state.get("current_topic") or "general"
+            return 0.0, 0.0, topic
+        concept_items = list(concepts.items())
+        avg_mastery = sum(v.get("mastery", 0.0) for _, v in concept_items) / len(concept_items)
+        avg_confidence = sum(v.get("confidence", 0.0) for _, v in concept_items) / len(concept_items)
+        weakest_concept = min(concept_items, key=lambda item: item[1].get("mastery", 0.0))[0]
+        return avg_mastery, avg_confidence, weakest_concept
+
+    def decide_macro_plan(self, student_state: dict) -> dict:
+        score = student_state.get("last_score", 0.0)
+        engagement = student_state.get("engagement", "medium")
+        trend = self.analyze_learning_trend(student_state)
+        avg_mastery, avg_confidence, weakest_concept = self._knowledge_snapshot(student_state)
+
+        if score < 0.45 or trend == "declining":
+            macro_action = "stabilize_foundations"
+            scaffold_policy = "high"
+        elif avg_mastery > 0.75 and avg_confidence > 0.7:
+            macro_action = "advance_concepts"
+            scaffold_policy = "low"
+        else:
+            macro_action = "guided_progression"
+            scaffold_policy = "medium"
+
+        if engagement == "low" and scaffold_policy != "high":
+            scaffold_policy = "medium"
+
+        macro_plan = {
+            "macro_action": macro_action,
+            "target_concepts": [weakest_concept],
+            "scaffold_policy": scaffold_policy,
+            "reason": (
+                f"macro_action={macro_action} based on score={score}, trend={trend}, "
+                f"avg_mastery={round(avg_mastery, 2)}, avg_confidence={round(avg_confidence, 2)}"
+            ),
+        }
+        trace_event("macro_decision_made", macro_plan)
+        return macro_plan
+
     def analyze_learning_trend(self, student_state: dict) -> str:
         history = student_state.get("learning_history", [])
 
@@ -36,6 +79,8 @@ class DecisionEngine:
         engagement = student_state.get("engagement", "medium")
         trend = self.analyze_learning_trend(student_state)
         style = student_state.get("learning_style", "balanced")
+        macro_plan = student_state.get("macro_decision", {}) or {}
+        scaffold_policy = macro_plan.get("scaffold_policy", "medium")
 
         actions = [
             "increase_support",
@@ -90,6 +135,14 @@ class DecisionEngine:
         elif style == "visual":
             weights["adjust_quiz"] += 1
 
+        # Macro policy nudges micro action without replacing baseline behavior.
+        if scaffold_policy == "high":
+            weights["increase_support"] += 2
+            weights["reinforce_basics"] += 1
+        elif scaffold_policy == "low":
+            weights["advance_topic"] += 1
+            weights["increase_challenge"] += 1
+
         best_action = max(weights, key=lambda k: weights[k])
         next_node = "education_crew"
         if best_action == "reduce_support":
@@ -121,3 +174,63 @@ class DecisionEngine:
             },
         )
         return decision
+
+    def arbitrate_crew_proposals(
+        self,
+        decision: dict,
+        crew_proposals: list[dict],
+        student_state: dict,
+    ) -> dict:
+        if not crew_proposals:
+            fallback = {
+                "proposal_id": "fallback",
+                "owner_agent": "system",
+                "learning_path": "",
+                "quiz": [],
+                "teacher_style": "",
+                "rag_chunks": [],
+                "engineered_query": "",
+                "confidence": 0.0,
+                "challenge_level": "medium",
+                "execution_cost": 1.0,
+                "decision": decision,
+            }
+            trace_event("arbitration_selected", {"selected": fallback["proposal_id"], "score": 0.0})
+            return fallback
+
+        action = decision.get("action", "adjust_quiz")
+        style = student_state.get("learning_style", "balanced")
+        low_support_actions = {"increase_challenge", "challenge_with_variation", "advance_topic"}
+
+        def _proposal_score(proposal: dict) -> float:
+            confidence = float(proposal.get("confidence", 0.5))
+            cost = float(proposal.get("execution_cost", 1.0))
+            challenge = str(proposal.get("challenge_level", "medium"))
+            owner = proposal.get("owner_agent", "unknown")
+
+            score = confidence * 0.6 - cost * 0.15
+            if action in low_support_actions and challenge in ("medium", "high"):
+                score += 0.2
+            if action in ("increase_support", "reinforce_basics") and challenge == "low":
+                score += 0.2
+            if style == "visual" and owner == "teacher_persona":
+                score += 0.1
+            if style == "problem-solver" and owner == "practical_agent":
+                score += 0.1
+            return score
+
+        scored = [
+            {"proposal_id": p.get("proposal_id"), "owner_agent": p.get("owner_agent"), "score": round(_proposal_score(p), 4)}
+            for p in crew_proposals
+        ]
+        selected = max(crew_proposals, key=_proposal_score).copy()
+        selected["decision"] = decision
+        trace_event(
+            "arbitration_selected",
+            {
+                "selected": selected.get("proposal_id"),
+                "owner_agent": selected.get("owner_agent"),
+                "scores": scored,
+            },
+        )
+        return selected

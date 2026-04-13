@@ -30,8 +30,13 @@ class VectorStore:
             metadatas=metadatas
         )
 
-    def query(self, query_embedding, k=3):
+    def query(self, query_embedding, k=3, where=None):
+        kwargs = {
+            "query_embeddings": [query_embedding],
+            "n_results": k,
+        }
+        if where:
+            kwargs["where"] = where
         return self.collection.query(
-            query_embeddings=[query_embedding],
-            n_results=k
+            **kwargs
         )

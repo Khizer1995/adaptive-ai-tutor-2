@@ -13,6 +13,7 @@ from .file_manager_agent import FileManagerAgent
 from .evaluation import evaluate_cycle
 from .logging_utils import Timer
 from .learning_record import log_state_learning_record
+from .knowledge_state_updater import apply_execution_feedback, ensure_knowledge_state
 
 
 class AdaptiveLearningSimulation:
@@ -35,7 +36,11 @@ class AdaptiveLearningSimulation:
         print(f"Score      : {student_state.get('last_score')}")
         print(f"Engagement : {student_state.get('engagement')}")
 
-        # 1. Decision Engine
+        student_state = ensure_knowledge_state(student_state)
+
+        # 1. Macro + micro decisions
+        macro = self.decision_engine.decide_macro_plan(student_state)
+        student_state["macro_decision"] = macro
         t_decision = Timer()
         decision = self.decision_engine.decide_next_step(student_state)
         decision_ms = round(t_decision.elapsed_ms(), 2)
@@ -43,11 +48,15 @@ class AdaptiveLearningSimulation:
 
         # 2. Education Crew
         t_crew = Timer()
-        crew_output = (
-            self.education_crew.execute(decision, student_state)
-            if decision.get("next_node") == "education_crew"
-            else {"message": "No crew action required."}
-        )
+        crew_output = {"message": "No crew action required."}
+        if decision.get("next_node") == "education_crew":
+            crew_state = self.education_crew.run(
+                {"decision": decision, "student_state": student_state}
+            )
+            proposals = crew_state.get("crew_proposals", [])
+            crew_output = self.decision_engine.arbitrate_crew_proposals(
+                decision, proposals, student_state
+            )
         crew_ms = round(t_crew.elapsed_ms(), 2)
 
         # 3. Validation
@@ -69,7 +78,7 @@ class AdaptiveLearningSimulation:
         # 5. Monitor Interaction
         t_monitor = Timer()
         monitor_output = self.monitor.interact(
-            {"decision": decision, **crew_output},
+            crew_output,
             student_state
         )
         monitor_ms = round(t_monitor.elapsed_ms(), 2)
@@ -77,6 +86,11 @@ class AdaptiveLearningSimulation:
 
         # --- Metrics Calculation ---
         updated_state = monitor_output.get("updated_student_state", student_state)
+        updated_state = apply_execution_feedback(
+            updated_state,
+            monitor_output.get("execution_feedback", {}),
+            macro,
+        )
 
         # Learning Gain: difference between last two scores
         lh = updated_state.get("learning_history", [])

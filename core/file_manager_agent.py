@@ -15,8 +15,10 @@ class FileManagerAgent:
     - Logs ingestion and validation status
     """
 
-    def __init__(self, pdf_path: str = None):
+    def __init__(self, pdf_path: str = None, source_type: str = "teacher_pdf", subject: str = "python_general"):
         self.pdf_path = pdf_path or os.path.join("data", "raw", "Python_Programming.pdf")
+        self.source_type = source_type
+        self.subject = subject
         self.logger = get_logger("file_manager", "file_manager.log")
 
     def prepare_knowledge_base(self, force_reingest: bool = False) -> Dict[str, Any]:
@@ -39,7 +41,11 @@ class FileManagerAgent:
         store = VectorStore()
         existing = store.collection.count()
         if existing == 0 or force_reingest:
-            service = PDFIngestionService(self.pdf_path)
+            service = PDFIngestionService(
+                self.pdf_path,
+                source_type=self.source_type,
+                subject=self.subject,
+            )
             service.ingest(force_reingest=force_reingest)
             status = "ingested"
             store = VectorStore()

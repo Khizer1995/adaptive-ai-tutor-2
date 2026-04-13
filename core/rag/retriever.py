@@ -15,14 +15,32 @@ class Retriever:
         self.vector_store = VectorStore()
         self.logger = get_logger("rag", "rag.log")
 
-    def retrieve(self, query: str, k: int = 3, feedback: Dict[str, float] = None) -> List[str]:
+    def retrieve(
+        self,
+        query: str,
+        k: int = 3,
+        feedback: Dict[str, float] = None,
+        concept_scope: str = "",
+        source_priority: str = "",
+        subject: str = "",
+    ) -> List[str]:
         """
         Retrieve and re-rank chunks. Optionally use feedback to penalize poor chunks.
         feedback: dict mapping chunk text to penalty score (lower is better)
         """
         timer = Timer()
         query_embedding: List[float] = cast(List[float], self.embedder.embed(query))
-        results: Dict[str, Any] = cast(Dict[str, Any], self.vector_store.query(query_embedding, k*2))
+        where = {}
+        if concept_scope:
+            where["concept"] = concept_scope
+        if source_priority:
+            where["source_type"] = source_priority
+        if subject:
+            where["subject"] = subject
+        results: Dict[str, Any] = cast(
+            Dict[str, Any],
+            self.vector_store.query(query_embedding, k * 2, where=where if where else None),
+        )
         documents: Any = results.get("documents", [])
         chunks = []
         if isinstance(documents, list) and len(documents) > 0:
@@ -41,7 +59,8 @@ class Retriever:
         selected = chunks[:k]
         duration_ms = round(timer.elapsed_ms(), 2)
         self.logger.info(
-            f"query_len={len(query)} k={k} retrieved={len(selected)} duration_ms={duration_ms}"
+            f"query_len={len(query)} k={k} concept={concept_scope} source={source_priority} "
+            f"subject={subject} retrieved={len(selected)} duration_ms={duration_ms}"
         )
         trace_event(
             "rag_retrieve",

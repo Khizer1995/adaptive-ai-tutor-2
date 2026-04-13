@@ -43,6 +43,8 @@ def build_learning_record(state: Dict[str, Any]) -> Dict[str, Any]:
     crew_output = state.get("crew_output", {}) or {}
     decision = crew_output.get("decision") or state.get("decision", {}) or {}
     review = state.get("teacher_review", {}) or {}
+    macro_decision = state.get("macro_decision", {}) or {}
+    arbitration_trace = state.get("arbitration_trace", {}) or {}
 
     learning_path = crew_output.get("learning_path") or ""
     if not isinstance(learning_path, str):
@@ -59,6 +61,9 @@ def build_learning_record(state: Dict[str, Any]) -> Dict[str, Any]:
             "next_node": decision.get("next_node"),
             "reason": decision.get("reason"),
         },
+        "macro_decision": macro_decision,
+        "decision_trace": state.get("decision_trace", []),
+        "arbitration_trace": arbitration_trace,
         "teacher_style": crew_output.get("teacher_style"),
         "validation_status": crew_output.get("validation_status"),
         "review_status": review.get("review_status"),
