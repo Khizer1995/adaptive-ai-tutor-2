@@ -87,8 +87,8 @@ class ModelRouterAgent:
             return "gemini"
         if task_type in self.GROQ_TASKS:
             return "groq"
-        # Safe default to Gemini for non-trivial unknown tasks.
-        return "gemini"
+        # Safe default to Groq for unknown tasks to preserve Gemini quota.
+        return "groq"
 
     def _build_prompt(
         self,

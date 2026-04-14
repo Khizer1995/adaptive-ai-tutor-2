@@ -1,10 +1,11 @@
 {
     "student_id": "KISH-001",
-    "level": "beginner",
+    "name": "Student",
+    "level": "intermediate",
     "current_topic": "Python variables",
     "progress": [],
     "engagement": "medium",
-    "last_score": 0.54,
+    "last_score": 0.65,
     "learning_history": [
         {
             "topic": "Python variables",
@@ -13,26 +14,92 @@
         {
             "topic": "Python variables",
             "score": 0.54
+        },
+        {
+            "topic": "Python variables",
+            "score": 0.5
+        },
+        {
+            "topic": "Python variables",
+            "score": 0.46
+        },
+        {
+            "topic": "Python variables",
+            "score": 0.54
+        },
+        {
+            "topic": "Python variables",
+            "score": 0.52
+        },
+        {
+            "topic": "Python variables",
+            "score": 0.51
+        },
+        {
+            "topic": "Python variables",
+            "score": 0.62
+        },
+        {
+            "topic": "Python variables",
+            "score": 0.72
+        },
+        {
+            "topic": "Python variables",
+            "score": 0.6
+        },
+        {
+            "topic": "Python variables",
+            "score": 0.6
+        },
+        {
+            "topic": "Python variables",
+            "score": 0.67
+        },
+        {
+            "topic": "Python variables",
+            "score": 0.65
         }
+    ],
+    "frustration_level": 0,
+    "engagement_score": 5,
+    "learning_style": "balanced",
+    "last_active": "2026-04-14T04:53:48.746114+00:00",
+    "accuracy_history": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+    ],
+    "learning_gain_history": [
+        -0.040000000000000036,
+        -0.03999999999999998,
+        0.08000000000000002,
+        -0.020000000000000018,
+        -0.010000000000000009,
+        0.10999999999999999,
+        0.09999999999999998,
+        -0.12,
+        0.0,
+        0.07000000000000006,
+        -0.020000000000000018
     ],
     "knowledge_state": {
         "concepts": {
             "Python variables": {
-                "mastery": 0.263,
-                "confidence": 0.536,
-                "scaffold_level": "high",
-                "attempts": 2
+                "mastery": 0.624,
+                "confidence": 0.594,
+                "scaffold_level": "medium",
+                "attempts": 13
             }
         },
         "version": 1
-    },
-    "macro_decision": {
-        "macro_action": "guided_progression",
-        "target_concepts": [
-            "Python variables"
-        ],
-        "scaffold_policy": "medium",
-        "reason": "macro_action=guided_progression based on score=0.48, trend=stable, avg_mastery=0.14, avg_confidence=0.52"
     },
     "knowledge_events": [
         {
@@ -48,7 +115,95 @@
             "confidence": 0.536,
             "scaffold_level": "high",
             "observed_score": 0.54
+        },
+        {
+            "topic": "Python variables",
+            "mastery": 0.334,
+            "confidence": 0.549,
+            "scaffold_level": "high",
+            "observed_score": 0.5
+        },
+        {
+            "topic": "Python variables",
+            "mastery": 0.372,
+            "confidence": 0.559,
+            "scaffold_level": "high",
+            "observed_score": 0.46
+        },
+        {
+            "topic": "Python variables",
+            "mastery": 0.422,
+            "confidence": 0.567,
+            "scaffold_level": "high",
+            "observed_score": 0.54
+        },
+        {
+            "topic": "Python variables",
+            "mastery": 0.451,
+            "confidence": 0.574,
+            "scaffold_level": "medium",
+            "observed_score": 0.52
+        },
+        {
+            "topic": "Python variables",
+            "mastery": 0.469,
+            "confidence": 0.579,
+            "scaffold_level": "medium",
+            "observed_score": 0.51
+        },
+        {
+            "topic": "Python variables",
+            "mastery": 0.514,
+            "confidence": 0.583,
+            "scaffold_level": "high",
+            "observed_score": 0.62
+        },
+        {
+            "topic": "Python variables",
+            "mastery": 0.576,
+            "confidence": 0.586,
+            "scaffold_level": "medium",
+            "observed_score": 0.72
+        },
+        {
+            "topic": "Python variables",
+            "mastery": 0.583,
+            "confidence": 0.589,
+            "scaffold_level": "medium",
+            "observed_score": 0.6
+        },
+        {
+            "topic": "Python variables",
+            "mastery": 0.588,
+            "confidence": 0.591,
+            "scaffold_level": "medium",
+            "observed_score": 0.6
+        },
+        {
+            "topic": "Python variables",
+            "mastery": 0.613,
+            "confidence": 0.593,
+            "scaffold_level": "medium",
+            "observed_score": 0.67
+        },
+        {
+            "topic": "Python variables",
+            "mastery": 0.624,
+            "confidence": 0.594,
+            "scaffold_level": "medium",
+            "observed_score": 0.65
         }
     ],
-    "last_active": "2026-04-13T15:17:18.484985+00:00"
+    "macro_decision": {
+        "macro_action": "guided_progression",
+        "target_concepts": [
+            "Python variables"
+        ],
+        "scaffold_policy": "medium",
+        "reason": "macro_action=guided_progression based on score=0.67, trend=fluctuating, avg_mastery=0.61, avg_confidence=0.59"
+    },
+    "engagement_score_history": [
+        6,
+        6
+    ]
 }

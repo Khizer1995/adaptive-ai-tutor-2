@@ -9,7 +9,7 @@ load_dotenv()
 # 2. Define the Gemini LLM correctly for CrewAI
 # Use the prefix 'gemini/' so the underlying engine knows the provider.
 gemini_llm = LLM(
-    model="gemini-1.5-flash",
+    model="gemini-3-flash-preview",
     api_key=os.getenv("GEMINI_API_KEY"),
     temperature=0.2  # Low temperature for more deterministic monitoring
 )
