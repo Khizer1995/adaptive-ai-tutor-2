@@ -2,10 +2,13 @@
     "student_id": "KISH-001",
     "name": "Student",
     "level": "intermediate",
-    "current_topic": "Python variables",
-    "progress": [],
-    "engagement": "medium",
-    "last_score": 0.65,
+    "current_topic": "Loops",
+    "progress": [
+        "Python variables",
+        "Control flow (if/else)"
+    ],
+    "engagement": "high",
+    "last_score": 0.99,
     "learning_history": [
         {
             "topic": "Python variables",
@@ -58,12 +61,66 @@
         {
             "topic": "Python variables",
             "score": 0.65
+        },
+        {
+            "topic": "concepts",
+            "score": 1.0,
+            "question": "**Quiz Generation for Python Variables at Intermediate Level**"
+        },
+        {
+            "topic": "Python variables",
+            "score": 1.0
+        },
+        {
+            "topic": "concepts",
+            "score": 1.0,
+            "question": "**Quiz Generation for Python Variables at Intermediate Level**"
+        },
+        {
+            "topic": "Control flow (if/else)",
+            "score": 0.94
+        },
+        {
+            "topic": "concepts",
+            "score": 1.0,
+            "question": "What is a key concept in concepts?"
+        },
+        {
+            "topic": "Control flow (if/else)",
+            "score": 0.86
+        },
+        {
+            "topic": "concepts",
+            "score": 1.0,
+            "question": "What is the purpose of the 'self' parameter in a Python class method?"
+        },
+        {
+            "topic": "Control flow (if/else)",
+            "score": 0.9
+        },
+        {
+            "topic": "Python variables",
+            "score": 1.0,
+            "question": "What is the difference between 'is' and '==' operators in Python variables?"
+        },
+        {
+            "topic": "Control flow (if/else)",
+            "score": 0.95
+        },
+        {
+            "topic": "Python variables",
+            "score": 1.0,
+            "question": "What happens when you use the 'del' statement on a Python variable?"
+        },
+        {
+            "topic": "Loops",
+            "score": 0.99
         }
     ],
     "frustration_level": 0,
     "engagement_score": 5,
     "learning_style": "balanced",
-    "last_active": "2026-04-14T04:53:48.746114+00:00",
+    "last_active": "2026-04-15T14:03:10.850130+00:00",
     "accuracy_history": [
         0.0,
         0.0,
@@ -75,7 +132,13 @@
         0.0,
         0.0,
         0.0,
-        0.0
+        0.0,
+        0.13333333333333333,
+        0.23529411764705882,
+        0.3157894736842105,
+        0.38095238095238093,
+        0.43478260869565216,
+        0.48
     ],
     "learning_gain_history": [
         -0.040000000000000036,
@@ -88,15 +151,33 @@
         -0.12,
         0.0,
         0.07000000000000006,
-        -0.020000000000000018
+        -0.020000000000000018,
+        0.0,
+        -0.06000000000000005,
+        -0.14,
+        -0.09999999999999998,
+        -0.050000000000000044,
+        -0.010000000000000009
     ],
     "knowledge_state": {
         "concepts": {
             "Python variables": {
-                "mastery": 0.624,
-                "confidence": 0.594,
+                "mastery": 0.737,
+                "confidence": 0.635,
                 "scaffold_level": "medium",
-                "attempts": 13
+                "attempts": 14
+            },
+            "Control flow (if/else)": {
+                "mastery": 0.697,
+                "confidence": 0.677,
+                "scaffold_level": "medium",
+                "attempts": 4
+            },
+            "Loops": {
+                "mastery": 0.297,
+                "confidence": 0.56,
+                "scaffold_level": "high",
+                "attempts": 1
             }
         },
         "version": 1
@@ -192,18 +273,59 @@
             "confidence": 0.594,
             "scaffold_level": "medium",
             "observed_score": 0.65
+        },
+        {
+            "topic": "Python variables",
+            "mastery": 0.737,
+            "confidence": 0.635,
+            "scaffold_level": "medium",
+            "observed_score": 1.0
+        },
+        {
+            "topic": "Control flow (if/else)",
+            "mastery": 0.282,
+            "confidence": 0.56,
+            "scaffold_level": "high",
+            "observed_score": 0.94
+        },
+        {
+            "topic": "Control flow (if/else)",
+            "mastery": 0.455,
+            "confidence": 0.608,
+            "scaffold_level": "medium",
+            "observed_score": 0.86
+        },
+        {
+            "topic": "Control flow (if/else)",
+            "mastery": 0.589,
+            "confidence": 0.646,
+            "scaffold_level": "medium",
+            "observed_score": 0.9
+        },
+        {
+            "topic": "Control flow (if/else)",
+            "mastery": 0.697,
+            "confidence": 0.677,
+            "scaffold_level": "medium",
+            "observed_score": 0.95
+        },
+        {
+            "topic": "Loops",
+            "mastery": 0.297,
+            "confidence": 0.56,
+            "scaffold_level": "high",
+            "observed_score": 0.99
         }
     ],
     "macro_decision": {
         "macro_action": "guided_progression",
         "target_concepts": [
-            "Python variables"
+            "Control flow (if/else)"
         ],
         "scaffold_policy": "medium",
-        "reason": "macro_action=guided_progression based on score=0.67, trend=fluctuating, avg_mastery=0.61, avg_confidence=0.59"
+        "reason": "macro_action=guided_progression based on score=1.0, trend=fluctuating, avg_mastery=0.72, avg_confidence=0.66"
     },
     "engagement_score_history": [
-        6,
-        6
+        9
     ]
 }
