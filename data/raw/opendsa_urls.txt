@@ -1,0 +1,36 @@
+# OpenDSA URL list for layered KB ingestion
+# Verified on 2026-04-15 (Asia/Calcutta): all URLs return HTTP 200 with content.
+
+# 1) Arrays & Linear Structures
+https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/BinarySearch.html
+https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/ListADT.html
+https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/ListArray.html
+https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/ListAnalysis.html
+
+# 2) Linked Lists
+https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/ListIntro.html
+https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/ListLinked.html
+https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/ListDouble.html
+https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/ListElement.html
+https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/Links1.html
+
+# 3) Stacks
+https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/StackArray.html
+https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/StackLinked.html
+https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/StackRecur.html
+
+# 4) Queues
+https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/Queue.html
+https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/QueueLinked.html
+# Shared linear-structures summary (covers list/stack/queue review)
+https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/ListSumm.html
+
+# 5) Hash Tables
+https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/HashIntro.html
+https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/HashFunc.html
+https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/HashCImproved.html
+https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/BucketHash.html
+https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/OpenHash.html
+https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/HashDel.html
+https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/HashAnal.html
+https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/HashSumm.html
