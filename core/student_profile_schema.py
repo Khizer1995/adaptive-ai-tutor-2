@@ -33,6 +33,7 @@ class StudentProfile:
     student_id: str
     name: str
     level: str = "beginner"
+    subject: str = "python_general"
     current_topic: Optional[str] = None
     progress: List[str] = field(default_factory=list)
     engagement: str = "medium"
@@ -48,6 +49,7 @@ class StudentProfile:
     learning_gain_history: List[float] = field(default_factory=list)
     knowledge_state: Dict[str, Any] = field(default_factory=lambda: {"concepts": {}, "version": 1})
     knowledge_events: List[dict] = field(default_factory=list)
+    delivered_chunks: Dict[str, Dict[str, List[str]]] = field(default_factory=dict)
 
     def to_dict(self) -> dict:
         """Serialise to dict for JSON storage and agent consumption."""
@@ -55,6 +57,7 @@ class StudentProfile:
             "student_id": self.student_id,
             "name": self.name,
             "level": self.level,
+            "subject": self.subject,
             "current_topic": self.current_topic,
             "progress": self.progress,
             "engagement": self.engagement,
@@ -68,6 +71,7 @@ class StudentProfile:
             "learning_gain_history": self.learning_gain_history,
             "knowledge_state": self.knowledge_state,
             "knowledge_events": self.knowledge_events,
+            "delivered_chunks": self.delivered_chunks,
         }
 
     @classmethod
@@ -77,6 +81,7 @@ class StudentProfile:
             student_id=str(data.get("student_id", "UNKNOWN")),
             name=str(data.get("name", "Student")),
             level=str(data.get("knowledge_level", data.get("level", "beginner"))),
+            subject=str(data.get("subject", "python_general")),
             current_topic=data.get("current_topic"),
             progress=data.get('completed_topics', data.get('progress', [])),
             engagement=str(data.get("engagement", "medium")),
@@ -90,4 +95,5 @@ class StudentProfile:
             learning_gain_history=data.get("learning_gain_history", []),
             knowledge_state=data.get("knowledge_state", {"concepts": {}, "version": 1}),
             knowledge_events=data.get("knowledge_events", []),
+            delivered_chunks=data.get("delivered_chunks", {}),
         )

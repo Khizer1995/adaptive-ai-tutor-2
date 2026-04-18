@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Tuple
 from core.layered_kb.embeddings import EmbeddingProvider, build_embedder
 from core.layered_kb.schema import StudentState
 from core.layered_kb.vector_store import LayeredVectorStore
+from core.rag.filter_normalizer import normalize_where_filter
 
 
 class AdaptiveRetriever:
@@ -22,14 +23,27 @@ class AdaptiveRetriever:
         query: str,
         student_state: Dict[str, Any] | StudentState,
         k: int = 5,
+        where: Dict[str, Any] | None = None,
     ) -> List[Dict[str, Any]]:
         state = self._to_state(student_state)
         query_embedding = self.embedder.embed(query)
-        results = self.vector_store.query(
-            query_embedding=query_embedding,
-            k=max(20, k * 4),
-            where={"topic": state.topic},
-        )
+        where_clause: Dict[str, Any] = {"topic": state.topic}
+        if where:
+            where_clause.update(where)
+        normalized_where = normalize_where_filter(where_clause)
+        try:
+            results = self.vector_store.query(
+                query_embedding=query_embedding,
+                k=max(20, k * 4),
+                where=normalized_where,
+            )
+        except Exception:
+            # Safe fallback for invalid/unsupported filter shapes.
+            results = self.vector_store.query(
+                query_embedding=query_embedding,
+                k=max(20, k * 4),
+                where={"topic": state.topic},
+            )
         candidates = self._flatten_results(results)
         ranked = self._rerank(candidates, state)
         selected = self._diverse_select(ranked, k)

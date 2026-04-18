@@ -1,5 +1,6 @@
 from typing import List, Dict, Any, cast
 from core.rag.embedding_model import LocalEmbeddingModel
+from core.rag.filter_normalizer import normalize_where_filter
 from core.rag.vector_store import VectorStore
 from core.logging_utils import get_logger, trace_event, Timer
 
@@ -37,10 +38,21 @@ class Retriever:
             where["source_type"] = source_priority
         if subject:
             where["subject"] = subject
-        results: Dict[str, Any] = cast(
-            Dict[str, Any],
-            self.vector_store.query(query_embedding, k * 2, where=where if where else None),
-        )
+        normalized_where = normalize_where_filter(where if where else None)
+        try:
+            results: Dict[str, Any] = cast(
+                Dict[str, Any],
+                self.vector_store.query(query_embedding, k * 2, where=normalized_where),
+            )
+        except Exception as exc:
+            # Safe fallback: drop filter and continue retrieval so API does not fail hard.
+            self.logger.warning(
+                f"rag_filter_query_failed where={normalized_where} error={exc}; retrying_without_filter"
+            )
+            results = cast(
+                Dict[str, Any],
+                self.vector_store.query(query_embedding, k * 2, where=None),
+            )
         documents: Any = results.get("documents", [])
         chunks = []
         if isinstance(documents, list) and len(documents) > 0:

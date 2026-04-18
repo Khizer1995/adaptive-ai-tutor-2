@@ -87,6 +87,7 @@ class EducationCrew:
                 confidence=0.78,
                 challenge_level=tutor_challenge,
                 execution_cost=0.55,
+                rag_chunk_records=base_learning.get("rag_chunk_records", []),
             ).to_dict(),
             CrewProposal(
                 proposal_id="practice_plan",
@@ -99,6 +100,7 @@ class EducationCrew:
                 confidence=0.74,
                 challenge_level=practical_challenge,
                 execution_cost=0.7,
+                rag_chunk_records=base_learning.get("rag_chunk_records", []),
             ).to_dict(),
             CrewProposal(
                 proposal_id="persona_plan",
@@ -111,6 +113,7 @@ class EducationCrew:
                 confidence=0.7,
                 challenge_level="medium",
                 execution_cost=0.45,
+                rag_chunk_records=base_learning.get("rag_chunk_records", []),
             ).to_dict(),
         ]
 
@@ -127,6 +130,7 @@ class EducationCrew:
             return {
                 "learning_path": learning_path_result.get("llm_synthesis"),
                 "rag_chunks": learning_path_result.get("rag_chunks", []),
+                "rag_chunk_records": learning_path_result.get("rag_chunk_records", []),
                 "engineered_query": learning_path_result.get("engineered_query", ""),
             }
         return {"learning_path": learning_path_result}

@@ -1,0 +1,36 @@
+{
+  "array": {
+    "prerequisites": [],
+    "next_topics": [
+      "general_dsa"
+    ]
+  },
+  "general_dsa": {
+    "prerequisites": [],
+    "next_topics": [
+      "hash_table"
+    ]
+  },
+  "hash_table": {
+    "prerequisites": [
+      "array"
+    ],
+    "next_topics": [
+      "linked_list"
+    ]
+  },
+  "linked_list": {
+    "prerequisites": [
+      "array"
+    ],
+    "next_topics": [
+      "stack"
+    ]
+  },
+  "stack": {
+    "prerequisites": [
+      "array"
+    ],
+    "next_topics": []
+  }
+}

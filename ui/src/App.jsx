@@ -6,6 +6,26 @@ import './index.css'
 const API = 'http://localhost:8000'
 
 // ── HELPERS ──────────────────────────────────────────────────────
+function optionLabelToIndex(value) {
+  if (typeof value !== 'string') return -1
+  const trimmed = value.trim().toUpperCase()
+  if (trimmed.length === 1 && trimmed >= 'A' && trimmed <= 'Z') {
+    return trimmed.charCodeAt(0) - 65
+  }
+  return -1
+}
+
+function normalizeAnswerValue(value, options) {
+  if (value == null) return ''
+  const raw = String(value).trim()
+  const idx = optionLabelToIndex(raw)
+  if (idx >= 0 && idx < options.length) {
+    const resolved = options[idx]
+    return String(resolved?.text ?? resolved ?? '').trim()
+  }
+  return raw
+}
+
 function getMasteryColor(value) {
   if (value >= 0.7) return '#39d353'
   if (value >= 0.4) return '#f0883e'
@@ -140,13 +160,16 @@ function QuizPanel({ topic, onAnswerSubmit }) {
   const handleSubmit = async () => {
     if (!selected) return
     const q = questions[current]
+    const options = q.options || q.choices || []
+    const resolvedCorrectAnswer = normalizeAnswerValue(q.correct_answer || q.answer || '', options)
+    const resolvedSelectedAnswer = normalizeAnswerValue(selected, options)
     const res = await fetch(`${API}/quiz/submit`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         question: q.question || q,
-        selected_answer: selected,
-        correct_answer: q.correct_answer || q.answer || '',
+        selected_answer: resolvedSelectedAnswer,
+        correct_answer: resolvedCorrectAnswer,
         topic: topic.name,
       })
     })
@@ -171,16 +194,19 @@ function QuizPanel({ topic, onAnswerSubmit }) {
 
   const q = questions[current]
   const options = q.options || q.choices || []
+  const normalizedCorrectAnswer = normalizeAnswerValue(q.correct_answer || q.answer || '', options)
+  const normalizedSelectedAnswer = normalizeAnswerValue(selected, options)
   const isCorrect = result?.correct
 
   const getOptionStyle = (optId) => {
+    const normalizedOption = normalizeAnswerValue(optId, options)
     if (!submitted) {
       return selected === optId
         ? 'border-blue-500 bg-blue-500/10'
         : 'border-gray-700 hover:border-gray-500'
     }
-    if (optId === (q.correct_answer || q.answer)) return 'border-green-500 bg-green-500/10'
-    if (optId === selected && !isCorrect) return 'border-red-500 bg-red-500/10'
+    if (normalizedOption === normalizedCorrectAnswer) return 'border-green-500 bg-green-500/10'
+    if (normalizedOption === normalizedSelectedAnswer && !isCorrect) return 'border-red-500 bg-red-500/10'
     return 'border-gray-700 opacity-40'
   }
 
@@ -544,7 +570,7 @@ function ProgressCharts({ studentState, topics }) {
 }
 
 // ── CENTER PANEL ─────────────────────────────────────────────────
-function CenterPanel({ topic, studentState, onStateUpdate ,onShowCharts,showCharts}) {
+function CenterPanel({ topic, studentState, onStateUpdate, onShowCharts, showCharts, onSelectTopic }) {
   const [mode, setMode] = useState('concept')
   const [showExample, setShowExample] = useState(false)
   const [vizOpen, setVizOpen] = useState(false)
@@ -570,7 +596,7 @@ function CenterPanel({ topic, studentState, onStateUpdate ,onShowCharts,showChar
       .catch(() => setLoadingContent(false))
   }, [topic])
 
-  const handleAnswerSubmit = (result) => {
+  const handleAnswerSubmit = () => {
   if (onStateUpdate) {
     onStateUpdate().then(() => {
       // State refreshed — sidebar will re-render with new mastery values
@@ -736,6 +762,25 @@ function CenterPanel({ topic, studentState, onStateUpdate ,onShowCharts,showChar
                   Visualize
                 </button>
               </div>
+              {content?.next_recommendation && (
+                <div className="mt-4 bg-gray-900 border border-gray-700 rounded-lg p-4">
+                  <div className="text-xs uppercase tracking-widest text-blue-400 mb-1">
+                    Next Recommendation
+                  </div>
+                  <div className="text-sm text-gray-200 mb-1 capitalize">
+                    {content.next_recommendation.label}: {content.next_recommendation.topic} · {content.next_recommendation.concept}
+                  </div>
+                  <div className="text-xs text-gray-400 mb-3">
+                    {content.next_recommendation.reason}
+                  </div>
+                  <button
+                    onClick={() => onSelectTopic && onSelectTopic(content.next_recommendation.topic)}
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-xs rounded-lg transition-colors font-medium"
+                  >
+                    Continue Learning →
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
             <QuizPanel
@@ -791,6 +836,42 @@ function App() {
   })
 }
 
+  const handleSelectTopicByName = (topicName) => {
+    if (!topicName) return
+    const existing = topics.find(t => t.name === topicName)
+    if (existing) {
+      setSelectedTopic(existing)
+      return
+    }
+    fetch(`${API}/student/topics`)
+      .then(r => r.json())
+      .then(data => {
+        const refreshedTopics = data.topics || []
+        setTopics(refreshedTopics)
+        const found = refreshedTopics.find(t => t.name === topicName)
+        if (found) {
+          setSelectedTopic(found)
+        } else {
+          setSelectedTopic({
+            name: topicName,
+            mastery: 0,
+            confidence: 0,
+            attempts: 0,
+            weak_areas: []
+          })
+        }
+      })
+      .catch(() => {
+        setSelectedTopic({
+          name: topicName,
+          mastery: 0,
+          confidence: 0,
+          attempts: 0,
+          weak_areas: []
+        })
+      })
+  }
+
   useEffect(() => {
     fetchStudentData()
   }, [])
@@ -809,6 +890,7 @@ function App() {
       onStateUpdate={fetchStudentData}
       onShowCharts={() => setShowCharts(v => !v)}
       showCharts={showCharts}
+      onSelectTopic={handleSelectTopicByName}
     />
     {showCharts && (
       <ProgressCharts

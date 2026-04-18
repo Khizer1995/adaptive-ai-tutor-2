@@ -1,11 +1,12 @@
 from core.rag.retriever import Retriever
 from core.rag.query_engineering import RAGQueryEngineer
 from core.llm.router import ModelRouterAgent
+from core.learning_response_format import build_structured_explain_query
 from core.logging_utils import get_logger, trace_event, Timer
 from typing import Dict, Any, List, cast
 
 class TutorAgent:
-    curriculum = [
+    python_curriculum = [
         "Python variables",
         "Control flow (if/else)",
         "Loops",
@@ -16,19 +17,145 @@ class TutorAgent:
         "Error handling",
         "File I/O"
     ]
+    dsa_curriculum = [
+        "array",
+        "linked_list",
+        "stack",
+        "queue",
+        "hash_table",
+        "tree",
+        "graph",
+    ]
 
     def __init__(self):
         self.retriever = Retriever()
         self.query_engineer = RAGQueryEngineer()
         self.router = ModelRouterAgent()
         self.logger = get_logger("tutor_agent", "crew.log")
+        self._layered_retriever = None
+        self._layered_retriever_failed = False
 
     def get_next_topic(self, student_state: Dict[str, Any]) -> str:
+        subject = str(student_state.get("subject", "")).lower()
         progress = cast(List[str], student_state.get("progress", []))
-        for topic in self.curriculum:
+        curriculum = self.dsa_curriculum if "dsa" in subject else self.python_curriculum
+        for topic in curriculum:
             if topic not in progress:
                 return topic
-        return "Advanced Python topics"
+        return "advanced_dsa_topics" if "dsa" in subject else "Advanced Python topics"
+
+    def _analyze_learning_trend(self, student_state: Dict[str, Any]) -> str:
+        history = student_state.get("learning_history", [])
+        if len(history) < 3:
+            return "steady"
+        recent_scores = [float(h.get("score", 0.0)) for h in history[-3:]]
+        if recent_scores[2] > recent_scores[1] > recent_scores[0]:
+            return "improving"
+        if recent_scores[2] < recent_scores[1] < recent_scores[0]:
+            return "declining"
+        return "fluctuating"
+
+    def _build_layered_student_state(self, student_state: Dict[str, Any], topic: str) -> Dict[str, Any]:
+        concepts = student_state.get("knowledge_state", {}).get("concepts", {})
+        concept_state = concepts.get(topic, {}) if isinstance(concepts, dict) else {}
+        mastery = float(concept_state.get("mastery", student_state.get("last_score", 0.4)))
+        confidence = float(concept_state.get("confidence", 0.5))
+        return {
+            "topic": topic,
+            "student_mastery": max(0.0, min(1.0, mastery)),
+            "confidence": max(0.0, min(1.0, confidence)),
+            "learning_trend": self._analyze_learning_trend(student_state),
+        }
+
+    def _get_layered_retriever(self):
+        if self._layered_retriever_failed:
+            return None
+        if self._layered_retriever is not None:
+            return self._layered_retriever
+        try:
+            from core.layered_kb.retrieval import AdaptiveRetriever
+
+            self._layered_retriever = AdaptiveRetriever()
+            return self._layered_retriever
+        except Exception as exc:
+            self._layered_retriever_failed = True
+            self.logger.warning(f"layered_retriever_init_failed error={exc}")
+            return None
+
+    def retrieve_context_chunk_records(
+        self,
+        query: str,
+        student_state: Dict[str, Any],
+        k: int = 3,
+        allowed_chunk_ids: List[str] | None = None,
+        concept_family: List[str] | None = None,
+    ) -> List[Dict[str, Any]]:
+        topic = str(student_state.get("current_topic") or self.get_next_topic(student_state))
+        subject = str(student_state.get("subject", "")).lower()
+        if "dsa" in subject:
+            layered_retriever = self._get_layered_retriever()
+            if layered_retriever:
+                try:
+                    layered_state = self._build_layered_student_state(student_state, topic)
+                    where: Dict[str, Any] = {}
+                    if allowed_chunk_ids:
+                        where["chunk_id"] = {"$in": allowed_chunk_ids}
+                    elif concept_family:
+                        where["concept"] = {"$in": concept_family}
+                    layered_results = layered_retriever.retrieve(
+                        query=query,
+                        student_state=layered_state,
+                        k=k,
+                        where=where if where else None,
+                    )
+                    cleaned_results: List[Dict[str, Any]] = []
+                    for item in layered_results:
+                        content = str(item.get("content", "")).strip()
+                        if not content:
+                            continue
+                        cleaned_results.append(
+                            {
+                                "chunk_id": str(item.get("chunk_id", "")),
+                                "content": content,
+                                "metadata": item.get("metadata", {}) or {},
+                            }
+                        )
+                    return cleaned_results
+                except Exception as exc:
+                    self.logger.warning(f"layered_retrieval_failed topic='{topic}' error={exc}")
+
+        # Fallback to legacy retriever path.
+        macro_decision = student_state.get("macro_decision", {}) or {}
+        concept_scope = ""
+        target_concepts = macro_decision.get("target_concepts", [])
+        if target_concepts:
+            concept_scope = str(target_concepts[0])
+        source_priority = student_state.get("preferred_source_type", "")
+        subject_filter = student_state.get("subject", "")
+        fallback_chunks = self.retriever.retrieve(
+            query,
+            k=k,
+            concept_scope=concept_scope,
+            source_priority=source_priority,
+            subject=subject_filter,
+        )
+        return [
+            {
+                "chunk_id": f"legacy_{idx}",
+                "content": chunk,
+                "metadata": {
+                    "topic": topic,
+                    "concept": concept_scope or "general",
+                    "order_index": idx,
+                },
+            }
+            for idx, chunk in enumerate(fallback_chunks)
+            if str(chunk).strip()
+        ]
+
+    def retrieve_context_chunks(self, query: str, student_state: Dict[str, Any], k: int = 3) -> List[str]:
+        records = self.retrieve_context_chunk_records(query, student_state, k=k)
+        return [str(item.get("content", "")).strip() for item in records if str(item.get("content", "")).strip()]
 
 
 
@@ -37,7 +164,7 @@ class TutorAgent:
         level = student_state.get("level", "beginner")
         action = decision_output.get("action", "default")
         style = student_state.get("learning_style", "balanced")
-        macro_decision = student_state.get("macro_decision", {}) or {}
+        subject = str(student_state.get("subject", "")).lower()
 
         # Advance topic if action is 'advance_topic'
         if action == "advance_topic":
@@ -63,33 +190,27 @@ class TutorAgent:
             base_query = f"Explain {topic} for {level} level student with examples"
 
         engineered_query = self.query_engineer.engineer(base_query, student_state)
-        concept_scope = ""
-        target_concepts = macro_decision.get("target_concepts", [])
-        if target_concepts:
-            concept_scope = str(target_concepts[0])
-        source_priority = student_state.get("preferred_source_type", "")
-        subject = student_state.get("subject", "")
-        retrieved_chunks = self.retriever.retrieve(
-            engineered_query,
-            k=3,
-            concept_scope=concept_scope,
-            source_priority=source_priority,
-            subject=subject,
-        )
+        retrieved_chunk_records = self.retrieve_context_chunk_records(engineered_query, student_state, k=3)
+        retrieved_chunks = [
+            str(item.get("content", "")).strip()
+            for item in retrieved_chunk_records
+            if str(item.get("content", "")).strip()
+        ]
         context = "\n\n".join(retrieved_chunks) if retrieved_chunks else "No curriculum content found."
+        domain_label = "DSA" if "dsa" in subject else "Python"
 
         try:
             routed = self.router.route(
                 task_type="concept_explanation",
-                user_query=(
-                    f"Explain topic '{topic}' for a {level} learner with learning style '{style}'. "
-                    "Include misconception correction tips and examples."
-                ),
+                user_query=build_structured_explain_query(topic, level, style, domain_label),
                 context=context,
                 output_schema={
-                    "simple_explanation": "2-4 short paragraphs",
-                    "code_examples": "at least one Python code block",
-                    "key_takeaways": "3 concise bullet points",
+                    "concept_overview": "1-2 lines",
+                    "key_points": "3-5 concise bullets",
+                    "operations_or_steps": "numbered if sequential",
+                    "example": "minimal concrete example",
+                    "common_mistakes": "2-3 bullets",
+                    "quick_recap": "single line",
                 },
             )
             llm_response = routed.get("content", "")
@@ -118,6 +239,7 @@ class TutorAgent:
 
         return {
             "rag_chunks": cast(List[str], retrieved_chunks),
+            "rag_chunk_records": cast(List[Dict[str, Any]], retrieved_chunk_records),
             "llm_synthesis": str(llm_response),
             "engineered_query": str(engineered_query)
         }
