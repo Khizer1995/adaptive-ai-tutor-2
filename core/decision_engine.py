@@ -80,6 +80,7 @@ class DecisionEngine:
         trend = self.analyze_learning_trend(student_state)
         style = student_state.get("learning_style", "balanced")
         macro_plan = student_state.get("macro_decision", {}) or {}
+        macro_action = macro_plan.get("macro_action", "")
         scaffold_policy = macro_plan.get("scaffold_policy", "medium")
 
         actions = [
@@ -144,6 +145,8 @@ class DecisionEngine:
             weights["increase_challenge"] += 1
 
         best_action = max(weights, key=lambda k: weights[k])
+        if macro_action == "advance_concepts" and student_state.get("current_subtopic"):
+            best_action = "advance_topic"
         next_node = "education_crew"
         if best_action == "reduce_support":
             next_node = "monitor_agent"

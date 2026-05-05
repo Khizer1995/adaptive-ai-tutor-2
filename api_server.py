@@ -1,10 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from dotenv import load_dotenv
 import os
 import json
+import asyncio
 from typing import Any, Dict, List
+from difflib import get_close_matches
 
 load_dotenv()
 
@@ -18,6 +21,8 @@ from core.validation_agent import ValidationAgent
 from core.knowledge_state_updater import apply_execution_feedback
 from core.delivery_tracker import append_delivered_chunks, get_delivered_topic_summary
 from core.learning_navigation import build_next_recommendation
+from core.curriculum_config import UNLOCK_THRESHOLD, get_next_subtopic
+from core.practical_agent import QuizQuestion
 
 app = FastAPI()
 
@@ -188,6 +193,7 @@ def _run_adaptive_learning_flow(state: Dict[str, Any]) -> Dict[str, Any]:
 
 class TopicRequest(BaseModel):
     topic: str
+    subtopic: str | None = None
 
 
 class QuizAnswerRequest(BaseModel):
@@ -195,6 +201,33 @@ class QuizAnswerRequest(BaseModel):
     selected_answer: str
     correct_answer: str
     topic: str
+
+
+class QuizBatchAnswer(BaseModel):
+    question: str
+    selected_answer: str
+    correct_answer: str
+
+
+class QuizBatchSubmitRequest(BaseModel):
+    topic: str
+    subtopic: str
+    score: float | None = None
+    answers: List[QuizBatchAnswer]
+
+
+class CurriculumNextRequest(BaseModel):
+    current_topic: str
+    current_subtopic: str
+
+
+def _sse_delta(delta: str, done: bool = False, meta: Dict[str, Any] | None = None) -> str:
+    payload: Dict[str, Any] = {"delta": delta}
+    if done:
+        payload["done"] = True
+    if meta:
+        payload["meta"] = meta
+    return f"data: {json.dumps(payload)}\n\n"
 
 
 @app.get("/")
@@ -218,10 +251,13 @@ def get_state():
         "engagement": state.get("engagement", "medium"),
         "last_score": state.get("last_score", 0.0),
         "current_topic": state.get("current_topic"),
+        "current_subtopic": state.get("current_subtopic"),
         "macro_decision": macro_with_action,
         "learning_gain_history": state.get("learning_gain_history", []),
         "accuracy_history": state.get("accuracy_history", []),
         "knowledge_state": state.get("knowledge_state", {}),
+        "subtopic_mastery": state.get("subtopic_mastery", {}),
+        "subtopic_progress": state.get("subtopic_progress", {}),
     }
 
 
@@ -252,6 +288,8 @@ def get_topics():
 def get_explanation(body: TopicRequest):
     state = get_student_state()
     state["current_topic"] = body.topic
+    if body.subtopic:
+        state["current_subtopic"] = body.subtopic
     _ensure_rag_ready()
 
     flow = _run_adaptive_learning_flow(state)
@@ -279,19 +317,73 @@ def get_explanation(body: TopicRequest):
     }
 
 
+@app.get("/tutor/explain/stream")
+async def stream_explanation(topic: str, subtopic: str | None = None):
+    async def event_generator():
+        try:
+            state = get_student_state()
+            state["current_topic"] = topic
+            if subtopic:
+                state["current_subtopic"] = subtopic
+            _ensure_rag_ready()
+
+            flow = _run_adaptive_learning_flow(state)
+            macro = flow["macro"]
+            validated = flow["validated"]
+            updated_state = flow["updated_state"]
+
+            rag_chunk_records = validated.get("rag_chunk_records", []) or []
+            append_delivered_chunks(updated_state, topic, rag_chunk_records)
+            next_recommendation = build_next_recommendation(updated_state, topic)
+            pm.save(STUDENT_ID, updated_state)
+
+            learning_path = validated.get("learning_path", "")
+            payload = {
+                "topic": topic,
+                "subtopic": state.get("current_subtopic"),
+                "rag_chunks": validated.get("rag_chunks", []),
+                "teacher_style": validated.get("teacher_style", ""),
+                "macro_decision": {
+                    "action": macro.get("macro_action", ""),
+                    "reason": _format_macro_reason(macro),
+                },
+                "model_used": "gemini/Groq-fallback via ModelRouterAgent",
+                "proposal_id": validated.get("proposal_id"),
+                "validation_status": validated.get("validation_status"),
+                "next_recommendation": next_recommendation,
+            }
+            chunk_size = 18
+            for i in range(0, len(learning_path), chunk_size):
+                yield _sse_delta(learning_path[i : i + chunk_size], meta=payload if i == 0 else None)
+                await asyncio.sleep(0.03)
+            yield _sse_delta("", done=True)
+        except Exception as exc:
+            yield _sse_delta(f"\n\nError: {str(exc)}", done=True)
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )
+
+
 @app.post("/quiz/generate")
 def get_quiz(body: TopicRequest):
     state = get_student_state()
     state["current_topic"] = body.topic
+    if body.subtopic:
+        state["current_subtopic"] = body.subtopic
     subject = str(state.get("subject", "python_general"))
-    level = state.get("level", "beginner")
     _ensure_rag_ready()
 
     macro = decision_engine.decide_macro_plan(state)
     state["macro_decision"] = macro
     micro = decision_engine.decide_next_step(state)
 
-    practical_seed_questions = crew.practical.generate_quiz(micro, state)
     engineered_query = crew.tutor.query_engineer.engineer(
         f"Quiz questions for {body.topic}",
         state,
@@ -330,78 +422,73 @@ def get_quiz(body: TopicRequest):
     }
     domain_fallback = "DSA fundamentals" if "dsa" in subject.lower() else "Python programming fundamentals"
     rag_context = "\n\n".join(rag_chunks) if rag_chunks else domain_fallback
-    seed_text = "\n".join(f"- {q}" for q in practical_seed_questions[:3]) or f"- Basics of {body.topic}"
+    questions = crew.practical.generate_quiz_batch(micro, state, rag_context)
+    validated_questions: List[Dict[str, Any]] = []
+    for q in questions:
+        try:
+            validated_questions.append(QuizQuestion.model_validate(q).model_dump())
+        except Exception:
+            continue
 
-    prompt = f"""You are a {subject} quiz generator for a {level} level student.
+    return {
+        "topic": body.topic,
+        "subtopic": state.get("current_subtopic"),
+        "questions": validated_questions,
+        "rag_grounded": bool(rag_chunks),
+        "quiz_basis": quiz_basis,
+        "retrieval_warning": retrieval_warning,
+    }
 
-RAG Curriculum Context (use this as the source of truth, do NOT hallucinate):
-{rag_context}
 
-Topic: {body.topic}
-Decision action: {micro.get("action", "adjust_quiz")}
-Candidate question intents:
-{seed_text}
+def _normalize_answer(value: str) -> str:
+    return " ".join(str(value or "").strip().lower().split())
 
-Generate exactly 3 MCQ questions. Return ONLY a JSON array:
-[
-  {{
-    "question": "...",
-    "options": ["A", "B", "C", "D"],
-    "correct_answer": "A",
-    "explanation": "...",
-    "hint": "..."
-  }}
-]"""
 
-    try:
-        from groq import Groq
-
-        client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-        response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.3,
-        )
-        raw = response.choices[0].message.content.strip()
-        questions = _parse_json_array(raw)
-        if not questions:
-            questions = _fallback_mcq_questions(body.topic, practical_seed_questions)
-        return {
-            "topic": body.topic,
-            "questions": questions,
-            "rag_grounded": bool(rag_chunks),
-            "quiz_basis": quiz_basis,
-            "retrieval_warning": retrieval_warning,
-        }
-
-    except Exception as e:
-        print(f"GROQ QUIZ ERROR: {e}")
-        return {
-            "topic": body.topic,
-            "questions": _fallback_mcq_questions(body.topic, practical_seed_questions),
-            "rag_grounded": bool(rag_chunks),
-            "quiz_basis": quiz_basis,
-            "retrieval_warning": retrieval_warning,
-            "error": str(e),
-        }
+def _resolve_option_match(selected: str, correct: str, options: List[str] | None = None) -> bool:
+    if _normalize_answer(selected) == _normalize_answer(correct):
+        return True
+    if options:
+        norm_options = {_normalize_answer(opt): opt for opt in options}
+        selected_norm = _normalize_answer(selected)
+        correct_norm = _normalize_answer(correct)
+        if selected_norm in norm_options and correct_norm in norm_options:
+            return selected_norm == correct_norm
+        close = get_close_matches(correct_norm, list(norm_options.keys()), n=1, cutoff=0.45)
+        if close:
+            return selected_norm == close[0]
+    return False
 
 
 @app.post("/quiz/submit")
-def submit_answer(body: QuizAnswerRequest):
+def submit_answer(body: QuizBatchSubmitRequest):
     state = get_student_state()
     state["current_topic"] = body.topic
+    state["current_subtopic"] = body.subtopic
 
-    is_correct = body.selected_answer.strip().lower() == body.correct_answer.strip().lower()
-    score = 1.0 if is_correct else 0.0
+    total = max(1, len(body.answers))
+    correct_count = 0
+    for answer in body.answers:
+        if _resolve_option_match(answer.selected_answer, answer.correct_answer):
+            correct_count += 1
+    score = round(correct_count / total, 4)
 
     state["last_score"] = score
     state.setdefault("learning_history", []).append(
         {
             "topic": body.topic,
+            "subtopic": body.subtopic,
             "score": score,
-            "question": body.question,
+            "question_count": total,
         }
     )
+    subtopic_mastery = state.setdefault("subtopic_mastery", {})
+    subtopic_mastery[body.subtopic] = score
+    subtopic_progress = state.setdefault("subtopic_progress", {})
+    subtopic_progress[body.subtopic] = {
+        "score": score,
+        "passed": score >= UNLOCK_THRESHOLD,
+        "attempts": int(subtopic_progress.get(body.subtopic, {}).get("attempts", 0)) + 1 if isinstance(subtopic_progress.get(body.subtopic), dict) else 1,
+    }
 
     updated_state = simulation.run_cycle(state)
     updated_state = apply_execution_feedback(
@@ -417,10 +504,23 @@ def submit_answer(body: QuizAnswerRequest):
     pm.save(STUDENT_ID, updated_state)
 
     return {
-        "correct": is_correct,
+        "correct": score >= UNLOCK_THRESHOLD,
+        "correct_count": correct_count,
+        "total_questions": total,
         "score": score,
+        "passed_threshold": score >= UNLOCK_THRESHOLD,
+        "unlock_threshold": UNLOCK_THRESHOLD,
         "updated_level": updated_state.get("level"),
         "updated_engagement": updated_state.get("engagement"),
         "updated_macro_decision": updated_state.get("macro_decision", {}),
         "knowledge_state": updated_state.get("knowledge_state", {}),
+    }
+
+
+@app.post("/curriculum/next")
+def curriculum_next(body: CurriculumNextRequest):
+    next_subtopic, topic_complete = get_next_subtopic(body.current_topic, body.current_subtopic)
+    return {
+        "next_subtopic": next_subtopic,
+        "topic_complete": topic_complete,
     }

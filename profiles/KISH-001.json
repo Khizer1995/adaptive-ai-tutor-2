@@ -3,10 +3,10 @@
     "name": "Student",
     "level": "intermediate",
     "subject": "dsa",
-    "current_topic": "stack",
+    "current_topic": "array",
     "progress": [],
-    "engagement": "low",
-    "last_score": 0.29,
+    "engagement": "medium",
+    "last_score": 0.66,
     "learning_history": [
         {
             "topic": "stack",
@@ -97,19 +97,84 @@
         {
             "topic": "stack",
             "score": 0.29
+        },
+        {
+            "topic": "stack",
+            "score": 0.43
+        },
+        {
+            "topic": "stack",
+            "score": 0.51
+        },
+        {
+            "topic": "stack",
+            "score": 0.0,
+            "question": "What is the primary purpose of the 'peek' method in a stack implementation?"
+        },
+        {
+            "topic": "stack",
+            "score": 0.14
+        },
+        {
+            "topic": "stack",
+            "score": 0.31
+        },
+        {
+            "topic": "stack",
+            "score": 0.0,
+            "question": "What is the primary purpose of the 'peek' method in a stack implementation?"
+        },
+        {
+            "topic": "stack",
+            "score": 0.11
+        },
+        {
+            "topic": "stack",
+            "score": 0.0,
+            "question": "What is the primary purpose of the 'peek' method in a stack implementation?"
+        },
+        {
+            "topic": "stack",
+            "score": 0.17
+        },
+        {
+            "topic": "stack",
+            "score": 0.22
+        },
+        {
+            "topic": "stack",
+            "subtopic": "stack_introduction",
+            "score": 1.0,
+            "question_count": 6
+        },
+        {
+            "topic": "stack",
+            "score": 0.93
+        },
+        {
+            "topic": "array",
+            "score": 0.78
+        },
+        {
+            "topic": "array",
+            "score": 0.66
         }
     ],
     "frustration_level": 0,
     "engagement_score": 5,
     "learning_style": "balanced",
-    "last_active": "2026-04-18T16:26:08.561982+00:00",
+    "last_active": "2026-05-05T07:06:59.645436+00:00",
     "accuracy_history": [
         0.0,
         0.0,
         0.0,
         0.0,
         0.0,
-        0.0
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.06060606060606061
     ],
     "learning_gain_history": [
         0.15,
@@ -117,15 +182,19 @@
         0.19,
         0.08,
         0.19,
-        0.1
+        0.1,
+        0.14,
+        0.11,
+        0.17,
+        -0.06999999999999995
     ],
     "knowledge_state": {
         "concepts": {
             "stack": {
-                "mastery": 0.191,
-                "confidence": 0.38,
-                "scaffold_level": "high",
-                "attempts": 19
+                "mastery": 0.562,
+                "confidence": 0.523,
+                "scaffold_level": "medium",
+                "attempts": 31
             },
             "queue": {
                 "mastery": 0.102,
@@ -138,6 +207,12 @@
                 "confidence": 0.2,
                 "scaffold_level": "high",
                 "attempts": 1
+            },
+            "array": {
+                "mastery": 0.362,
+                "confidence": 0.568,
+                "scaffold_level": "high",
+                "attempts": 2
             }
         },
         "version": 2
@@ -289,6 +364,104 @@
             "confidence": 0.38,
             "scaffold_level": "high",
             "observed_score": 0.29
+        },
+        {
+            "topic": "stack",
+            "mastery": 0.263,
+            "confidence": 0.424,
+            "scaffold_level": "high",
+            "observed_score": 0.43
+        },
+        {
+            "topic": "stack",
+            "mastery": 0.337,
+            "confidence": 0.459,
+            "scaffold_level": "high",
+            "observed_score": 0.51
+        },
+        {
+            "topic": "stack",
+            "mastery": 0.278,
+            "confidence": 0.437,
+            "scaffold_level": "high",
+            "observed_score": 0.14
+        },
+        {
+            "topic": "stack",
+            "mastery": 0.195,
+            "confidence": 0.42,
+            "scaffold_level": "high",
+            "observed_score": 0.0
+        },
+        {
+            "topic": "stack",
+            "mastery": 0.229,
+            "confidence": 0.406,
+            "scaffold_level": "high",
+            "observed_score": 0.31
+        },
+        {
+            "topic": "stack",
+            "mastery": 0.193,
+            "confidence": 0.395,
+            "scaffold_level": "high",
+            "observed_score": 0.11
+        },
+        {
+            "topic": "stack",
+            "mastery": 0.135,
+            "confidence": 0.386,
+            "scaffold_level": "high",
+            "observed_score": 0.0
+        },
+        {
+            "topic": "stack",
+            "mastery": 0.146,
+            "confidence": 0.379,
+            "scaffold_level": "high",
+            "observed_score": 0.17
+        },
+        {
+            "topic": "stack",
+            "mastery": 0.102,
+            "confidence": 0.373,
+            "scaffold_level": "high",
+            "observed_score": 0.0
+        },
+        {
+            "topic": "stack",
+            "mastery": 0.137,
+            "confidence": 0.368,
+            "scaffold_level": "high",
+            "observed_score": 0.22
+        },
+        {
+            "topic": "stack",
+            "mastery": 0.375,
+            "confidence": 0.454,
+            "scaffold_level": "high",
+            "observed_score": 0.93
+        },
+        {
+            "topic": "stack",
+            "mastery": 0.562,
+            "confidence": 0.523,
+            "scaffold_level": "medium",
+            "observed_score": 1.0
+        },
+        {
+            "topic": "array",
+            "mastery": 0.234,
+            "confidence": 0.56,
+            "scaffold_level": "high",
+            "observed_score": 0.78
+        },
+        {
+            "topic": "array",
+            "mastery": 0.362,
+            "confidence": 0.568,
+            "scaffold_level": "high",
+            "observed_score": 0.66
         }
     ],
     "delivered_chunks": {
@@ -296,7 +469,13 @@
             "chunk_ids": [
                 "0d6520f1912e5fa31b8e5335acd30397bb2b4714",
                 "f41af779a9dd60516686883b86abd14050508003",
-                "3b780dddb3f59945fc07692ee7352fa2f2437dc4"
+                "3b780dddb3f59945fc07692ee7352fa2f2437dc4",
+                "hybrid_0",
+                "hybrid_1",
+                "hybrid_2",
+                "hybrid_3",
+                "hybrid_4",
+                "hybrid_5"
             ],
             "concepts": [
                 "operations",
@@ -304,7 +483,14 @@
             ]
         },
         "queue": {
-            "chunk_ids": [],
+            "chunk_ids": [
+                "hybrid_0",
+                "hybrid_1",
+                "hybrid_2",
+                "hybrid_3",
+                "hybrid_4",
+                "hybrid_5"
+            ],
             "concepts": []
         }
     },
@@ -314,20 +500,20 @@
             "hash_table"
         ],
         "scaffold_policy": "high",
-        "reason": "macro_action=stabilize_foundations based on score=0.1, trend=fluctuating, avg_mastery=0.12, avg_confidence=0.31"
+        "reason": "macro_action=stabilize_foundations based on score=0.78, trend=declining, avg_mastery=0.25, avg_confidence=0.41"
     },
     "decision": {
         "next_node": "education_crew",
-        "action": "increase_support",
+        "action": "advance_topic",
         "weights": {
-            "increase_support": 8,
-            "reinforce_basics": 5,
+            "increase_support": 4,
+            "reinforce_basics": 4,
             "adjust_quiz": 0,
-            "increase_challenge": 0,
+            "increase_challenge": 2,
             "challenge_with_variation": 0,
-            "advance_topic": 0,
-            "reduce_support": 0
+            "advance_topic": 6,
+            "reduce_support": 1
         },
-        "reason": "Selected 'increase_support' based on score=0.1, engagement=low, trend=fluctuating, style=balanced"
+        "reason": "Selected 'advance_topic' based on score=0.78, engagement=high, trend=declining, style=balanced"
     }
 }

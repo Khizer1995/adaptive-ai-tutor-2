@@ -4,6 +4,8 @@ from core.llm.router import ModelRouterAgent
 from core.learning_response_format import build_structured_explain_query
 from core.logging_utils import get_logger, trace_event, Timer
 from typing import Dict, Any, List, cast
+import json
+from core.hybrid_retriever import HybridRetriever
 
 class TutorAgent:
     python_curriculum = [
@@ -34,6 +36,7 @@ class TutorAgent:
         self.logger = get_logger("tutor_agent", "crew.log")
         self._layered_retriever = None
         self._layered_retriever_failed = False
+        self.hybrid_retriever = HybridRetriever()
 
     def get_next_topic(self, student_state: Dict[str, Any]) -> str:
         subject = str(student_state.get("subject", "")).lower()
@@ -93,6 +96,19 @@ class TutorAgent:
         topic = str(student_state.get("current_topic") or self.get_next_topic(student_state))
         subject = str(student_state.get("subject", "")).lower()
         if "dsa" in subject:
+            try:
+                hybrid_records = self.hybrid_retriever.retrieve_context(
+                    query=query,
+                    topic=topic,
+                    student_state=student_state,
+                    k=max(6, k),
+                    allowed_chunk_ids=allowed_chunk_ids,
+                )
+                if hybrid_records:
+                    return hybrid_records
+            except Exception as exc:
+                self.logger.warning(f"hybrid_retrieval_failed topic='{topic}' error={exc}")
+
             layered_retriever = self._get_layered_retriever()
             if layered_retriever:
                 try:
@@ -189,7 +205,27 @@ class TutorAgent:
         else:
             base_query = f"Explain {topic} for {level} level student with examples"
 
-        engineered_query = self.query_engineer.engineer(base_query, student_state)
+        mastery = float(
+            student_state.get("knowledge_state", {})
+            .get("concepts", {})
+            .get(topic, {})
+            .get("mastery", student_state.get("last_score", 0.4))
+        )
+        show_complexity = mastery > 0.4
+        structure_guard = (
+            "Return markdown in this exact structure:\n"
+            f"## {topic}\n\n"
+            "1-2 sentence hook.\n\n"
+            "### What is it?\n"
+            "### How it works\n"
+            "Use a numbered list.\n"
+            "### Example\n"
+            "Use one fenced code block.\n"
+            "### Key Points\n"
+            "Use 3 bullet points.\n"
+            + ("### Time & Space Complexity\nUse a markdown table.\n" if show_complexity else "")
+        )
+        engineered_query = self.query_engineer.engineer(f"{base_query}\n\n{structure_guard}", student_state)
         retrieved_chunk_records = self.retrieve_context_chunk_records(engineered_query, student_state, k=3)
         retrieved_chunks = [
             str(item.get("content", "")).strip()
@@ -214,6 +250,7 @@ class TutorAgent:
                 },
             )
             llm_response = routed.get("content", "")
+            llm_response = self._to_markdown_explanation(llm_response)
             if not llm_response:
                 llm_response = self._fallback_response(topic, level, style)
         except Exception as exc:
@@ -243,6 +280,69 @@ class TutorAgent:
             "llm_synthesis": str(llm_response),
             "engineered_query": str(engineered_query)
         }
+
+    def _extract_json_payload(self, text: str) -> Dict[str, Any]:
+        candidate = str(text or "").strip()
+        if not candidate:
+            return {}
+        if "```" in candidate:
+            parts = candidate.split("```")
+            if len(parts) >= 2:
+                candidate = parts[1]
+                if candidate.strip().lower().startswith("json"):
+                    candidate = candidate.strip()[4:]
+        candidate = candidate.strip()
+        try:
+            parsed = json.loads(candidate)
+            if isinstance(parsed, dict):
+                return parsed
+        except Exception:
+            return {}
+        return {}
+
+    def _looks_like_code(self, example: str) -> bool:
+        hints = ("def ", "class ", "return ", "for ", "while ", "if ", "print(", "=>", "{", "};")
+        return any(token in example for token in hints)
+
+    def _to_markdown_explanation(self, llm_response: str) -> str:
+        payload = self._extract_json_payload(llm_response)
+        if not payload:
+            return str(llm_response or "").strip()
+
+        lines: List[str] = []
+        overview = str(payload.get("concept_overview", "")).strip()
+        if overview:
+            lines.append(overview)
+
+        key_points = payload.get("key_points", [])
+        if isinstance(key_points, list) and key_points:
+            lines.append("")
+            for item in key_points:
+                value = str(item).strip()
+                if value:
+                    lines.append(f"• {value}")
+
+        operations = payload.get("operations_or_steps", [])
+        if isinstance(operations, list) and operations:
+            lines.append("")
+            step_num = 1
+            for item in operations:
+                value = str(item).strip()
+                if value:
+                    lines.append(f"{step_num}. {value}")
+                    step_num += 1
+
+        example = str(payload.get("example", "")).strip()
+        if example:
+            lines.append("")
+            if self._looks_like_code(example):
+                lines.append("```python")
+                lines.append(example)
+                lines.append("```")
+            else:
+                lines.append(example)
+
+        return "\n".join(lines).strip()
 
     def _fallback_response(self, topic, level, style="balanced"):
         if style == "visual":

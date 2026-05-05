@@ -61,7 +61,8 @@ class EducationCrew:
         base_learning = self._extract_learning(
             self.tutor.generate_learning_path(decision, student_state)
         )
-        base_quiz = self.practical.generate_quiz(decision, student_state)
+        rag_context = str(base_learning.get("learning_path", ""))
+        base_quiz = self.practical.generate_quiz_batch(decision, student_state, rag_context)
         teacher_style = self.persona.apply_persona(student_state)
         action = decision.get("action", "default")
 

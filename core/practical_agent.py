@@ -1,95 +1,185 @@
+from __future__ import annotations
+
+import json
+import difflib
+from typing import Any, Dict, List
+
+from pydantic import BaseModel, Field, ValidationError, model_validator
+
+
+def normalize_text(value: str) -> str:
+    return " ".join(str(value or "").strip().lower().split())
+
+
+class QuizQuestion(BaseModel):
+    question: str
+    options: List[str] = Field(min_length=4, max_length=4)
+    correct_answer: str
+    explanation: str
+
+    @model_validator(mode="after")
+    def validate_answer_in_options(self) -> "QuizQuestion":
+        option_map = {normalize_text(opt): opt for opt in self.options}
+        normalized_correct = normalize_text(self.correct_answer)
+        if normalized_correct in option_map:
+            self.correct_answer = option_map[normalized_correct]
+            return self
+        matches = difflib.get_close_matches(
+            normalized_correct,
+            list(option_map.keys()),
+            n=1,
+            cutoff=0.45,
+        )
+        if matches:
+            self.correct_answer = option_map[matches[0]]
+            return self
+        self.correct_answer = self.options[0]
+        return self
+
+
 class PracticalAgent:
     """
-    Generates adaptive quizzes based on
-    topic and student level.
+    Generates adaptive quiz batches grounded in the provided RAG context.
     """
 
-    def generate_quiz(self, decision_output: dict, student_state: dict):
+    def _question_count(self, mastery: float) -> int:
+        if mastery < 0.4:
+            return 6
+        if mastery <= 0.7:
+            return 4
+        return 3
+
+    def _fallback_question(self, topic: str, prompt: str, correct: str, wrong: List[str], explanation: str) -> Dict[str, Any]:
+        return {
+            "question": prompt,
+            "options": [correct] + wrong[:3],
+            "correct_answer": correct,
+            "explanation": explanation,
+        }
+
+    def _fallback_batch(self, topic: str, count: int) -> List[Dict[str, Any]]:
+        base = [
+            self._fallback_question(
+                topic,
+                f"What is the core purpose of {topic}?",
+                f"{topic.capitalize()} stores data to support predictable operations.",
+                [
+                    f"{topic.capitalize()} is only used in frontend styling.",
+                    f"{topic.capitalize()} removes the need for algorithms.",
+                    f"{topic.capitalize()} cannot be implemented in Python.",
+                ],
+                f"This is the best description of why {topic} exists.",
+            ),
+            self._fallback_question(
+                topic,
+                f"What usually happens when you perform a standard operation on {topic}?",
+                "The operation follows the data structure's rules and updates its state.",
+                [
+                    "The operation always sorts all values automatically.",
+                    "The operation has no effect on stored values.",
+                    "The operation always throws an error.",
+                ],
+                "Correct operations follow defined behavior and modify or inspect state.",
+            ),
+            self._fallback_question(
+                topic,
+                f"Given code using {topic}, what should you do first to predict output?",
+                "Track state changes step by step in operation order.",
+                [
+                    "Guess based on variable names only.",
+                    "Assume every operation is O(n).",
+                    "Ignore intermediate operations.",
+                ],
+                "Tracing requires following each operation in sequence.",
+            ),
+            self._fallback_question(
+                topic,
+                f"What edge case should be checked before removing an element from {topic}?",
+                "Check whether the structure is empty.",
+                [
+                    "Check whether values are sorted.",
+                    "Check whether there are duplicate values.",
+                    "Check whether the structure is circular.",
+                ],
+                "Empty-structure checks prevent invalid operations.",
+            ),
+        ]
+        return base[:count] if count <= len(base) else (base + [base[-1]] * (count - len(base)))
+
+    def generate_quiz_batch(
+        self,
+        decision_output: Dict[str, Any],
+        student_state: Dict[str, Any],
+        rag_context: str,
+    ) -> List[Dict[str, Any]]:
         from core.logging_utils import get_logger, trace_event
         from core.llm.router import ModelRouterAgent
-        import json
+
         logger = get_logger("practical_agent", "crew.log")
         router = ModelRouterAgent()
+        topic = str(student_state.get("current_topic", "topic"))
+        subtopic = str(student_state.get("current_subtopic", f"{topic}_introduction"))
+        mastery = float(
+            student_state.get("knowledge_state", {})
+            .get("concepts", {})
+            .get(topic, {})
+            .get("mastery", student_state.get("last_score", 0.4))
+        )
+        q_count = self._question_count(mastery)
+        fallback = self._fallback_batch(topic, q_count)
 
-        topic = student_state.get("current_topic", "Python variables")
-        level = student_state.get("level", "beginner")
-        style = student_state.get("learning_style", "balanced")
+        prompt = f"""
+You are creating an adaptive MCQ batch for topic '{topic}' and subtopic '{subtopic}'.
+Use ONLY the grounded RAG context below.
 
-        fallback_quiz = []
+RAG context:
+{rag_context}
 
-        if style == "visual":
-            quiz = [
-                f"Draw a diagram to explain {topic}.",
-                f"Label the parts of {topic} visually.",
-                f"Match the following visual representations to their code for {topic}."
-            ]
-        elif style == "problem-solver":
-            quiz = [
-                f"Solve this problem using {topic}.",
-                f"Debug the following code related to {topic}.",
-                f"Write a function that uses {topic} to achieve a goal."
-            ]
-        else:  # balanced or fallback
-            if level == "beginner":
-                quiz = [
-                    f"What is {topic}?",
-                    f"Write a simple example of {topic}.",
-                    f"When would you use {topic}?"
-                ]
-            elif level == "intermediate":
-                quiz = [
-                    f"Explain edge cases in {topic}.",
-                    f"Compare {topic} with a related concept.",
-                    f"Solve a moderate problem using {topic}."
-                ]
-            else:
-                quiz = [
-                    f"Optimize an implementation involving {topic}.",
-                    f"Discuss performance trade-offs in {topic}.",
-                    f"Design a system using {topic}."
-                ]
-        fallback_quiz = quiz
-
+Requirements:
+- Generate exactly {q_count} MCQs.
+- Include at least:
+  1 definitional question,
+  2 application questions (or 1 if total questions = 3),
+  1 tracing/output question,
+  1 edge-case question.
+- Return ONLY JSON array with objects:
+  {{
+    "question": "...",
+    "options": ["A","B","C","D"],
+    "correct_answer": "must be one of the 4 option texts",
+    "explanation": "short why"
+  }}
+"""
         try:
             routed = router.route(
                 task_type="quiz_generation",
-                user_query=(
-                    f"Create 3 adaptive quiz questions for topic '{topic}' at {level} level "
-                    f"for a {style} learner."
-                ),
-                context=f"Decision action: {decision_output.get('action', 'unknown')}",
+                user_query=prompt,
+                context=f"Decision action: {decision_output.get('action', 'adjust_quiz')}",
                 output_schema={
-                    "quiz": "array with 3 questions",
-                    "answer_outline": "brief expected answer hints",
+                    "questions": "array of quiz questions",
                 },
             )
-            content = routed.get("content", "").strip()
-            if content:
-                parsed_quiz = None
-                if content.startswith("{") or content.startswith("["):
-                    try:
-                        payload = json.loads(content)
-                        if isinstance(payload, dict):
-                            parsed_quiz = payload.get("quiz")
-                        elif isinstance(payload, list):
-                            parsed_quiz = payload
-                    except Exception:
-                        parsed_quiz = None
+            content = str(routed.get("content", "")).strip()
+            payload = json.loads(content) if content.startswith("{") or content.startswith("[") else {}
+            raw_questions = payload.get("questions", payload) if isinstance(payload, dict) else payload
+            if not isinstance(raw_questions, list):
+                raw_questions = []
 
-                if isinstance(parsed_quiz, list):
-                    quiz = [str(item).strip() for item in parsed_quiz if str(item).strip()][:3]
-                else:
-                    quiz = [line.strip("- ").strip() for line in content.splitlines() if line.strip()][:3]
-                quiz = quiz if len(quiz) == 3 else fallback_quiz
+            normalized: List[Dict[str, Any]] = []
+            for item in raw_questions:
+                try:
+                    q = QuizQuestion.model_validate(item if isinstance(item, dict) else {})
+                    normalized.append(q.model_dump())
+                except ValidationError:
+                    continue
+
+            if len(normalized) < q_count:
+                normalized = (normalized + fallback)[:q_count]
             else:
-                quiz = fallback_quiz
-        except Exception as exc:
-            logger.warning(f"groq_quiz_fallback error={exc}")
-            quiz = fallback_quiz
+                normalized = normalized[:q_count]
 
-        logger.info(f"topic='{topic}' level={level} style={style} quiz_len={len(quiz)}")
-        trace_event(
-            "quiz_generated",
-            {"topic": topic, "level": level, "style": style, "quiz_len": len(quiz)},
-        )
-        return quiz
+            trace_event("quiz_generated", {"topic": topic, "subtopic": subtopic, "quiz_len": len(normalized)})
+            return normalized
+        except Exception as exc:
+            logger.warning(f"quiz_batch_fallback topic='{topic}' subtopic='{subtopic}' error={exc}")
+            return fallback
