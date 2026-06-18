@@ -1,4 +1,4 @@
-from core.logging_utils import get_logger, trace_event
+from core.logging_utils import get_logger, log_jsonl, trace_event
 
 
 class DecisionEngine:
@@ -9,7 +9,7 @@ class DecisionEngine:
     - Performance-based adaptation
     - Engagement-aware routing
     - Learning trend analysis
-    - Weighted decision-making
+    - Deterministic weight-based decision rules
     """
 
     def __init__(self):
@@ -27,34 +27,98 @@ class DecisionEngine:
         weakest_concept = min(concept_items, key=lambda item: item[1].get("mastery", 0.0))[0]
         return avg_mastery, avg_confidence, weakest_concept
 
+    @staticmethod
+    def _cycle_index(student_state: dict) -> int:
+        history = student_state.get("learning_history", [])
+        return len(history) + 1
+
+    @staticmethod
+    def _join_rationale(lines: list[str]) -> str:
+        return " | ".join(line.strip() for line in lines if line and line.strip())
+
+    def _log_decision(self, decision_type: str, student_state: dict, payload: dict) -> None:
+        log_jsonl(
+            "decision_log.jsonl",
+            {
+                "decision_type": decision_type,
+                "cycle_index": self._cycle_index(student_state),
+                "student_id": student_state.get("student_id"),
+                "topic": student_state.get("current_topic"),
+                "subtopic": student_state.get("current_subtopic"),
+                "last_score": student_state.get("last_score"),
+                "engagement": student_state.get("engagement"),
+                "decision_payload": payload,
+                "decision_rationale": payload.get("decision_rationale", ""),
+            },
+        )
+
+    @staticmethod
+    def _select_weighted_action(weights: dict[str, int], action_order: list[str]) -> str:
+        best_action = action_order[0]
+        best_score = weights.get(best_action, 0)
+        for action in action_order[1:]:
+            score = weights.get(action, 0)
+            if score > best_score:
+                best_action = action
+                best_score = score
+        return best_action
+
     def decide_macro_plan(self, student_state: dict) -> dict:
         score = student_state.get("last_score", 0.0)
         engagement = student_state.get("engagement", "medium")
         trend = self.analyze_learning_trend(student_state)
         avg_mastery, avg_confidence, weakest_concept = self._knowledge_snapshot(student_state)
+        rationale_lines: list[str] = []
 
-        if score < 0.45 or trend == "declining":
+        if score < 0.45:
             macro_action = "stabilize_foundations"
             scaffold_policy = "high"
+            rationale_lines.append(
+                f"IF last_score ({score:.2f}) < 0.45 THEN stabilize foundations with high scaffolding."
+            )
+        elif trend == "declining":
+            macro_action = "stabilize_foundations"
+            scaffold_policy = "high"
+            rationale_lines.append(
+                "IF the last three scores are declining THEN stabilize foundations with high scaffolding."
+            )
         elif avg_mastery > 0.75 and avg_confidence > 0.7:
             macro_action = "advance_concepts"
             scaffold_policy = "low"
+            rationale_lines.append(
+                "IF average mastery > 0.75 AND average confidence > 0.70 THEN advance concepts with low scaffolding."
+            )
         else:
             macro_action = "guided_progression"
             scaffold_policy = "medium"
+            rationale_lines.append(
+                "IF the learner is neither at-risk nor clearly ready to accelerate THEN use guided progression with medium scaffolding."
+            )
 
         if engagement == "low" and scaffold_policy != "high":
             scaffold_policy = "medium"
+            rationale_lines.append(
+                "IF engagement is low THEN do not allow low scaffolding; clamp scaffold policy to medium."
+            )
+
+        rationale_lines.append(
+            f"Target weakest concept '{weakest_concept}' based on mastery snapshot (avg_mastery={avg_mastery:.2f}, avg_confidence={avg_confidence:.2f}, trend={trend})."
+        )
+        decision_rationale = self._join_rationale(rationale_lines)
 
         macro_plan = {
             "macro_action": macro_action,
             "target_concepts": [weakest_concept],
             "scaffold_policy": scaffold_policy,
-            "reason": (
-                f"macro_action={macro_action} based on score={score}, trend={trend}, "
-                f"avg_mastery={round(avg_mastery, 2)}, avg_confidence={round(avg_confidence, 2)}"
-            ),
+            "reason": decision_rationale,
+            "decision_rationale": decision_rationale,
         }
+        self.logger.info(
+            f"macro_action={macro_action} scaffold_policy={scaffold_policy} "
+            f"score={score} trend={trend} avg_mastery={avg_mastery:.2f} "
+            f"avg_confidence={avg_confidence:.2f} rationale={decision_rationale}"
+        )
+        self._log_decision("macro", student_state, macro_plan)
         trace_event("macro_decision_made", macro_plan)
         return macro_plan
 
@@ -82,7 +146,7 @@ class DecisionEngine:
         macro_plan = student_state.get("macro_decision", {}) or {}
         macro_action = macro_plan.get("macro_action", "")
         scaffold_policy = macro_plan.get("scaffold_policy", "medium")
-
+        current_subtopic = student_state.get("current_subtopic")
         actions = [
             "increase_support",
             "reinforce_basics",
@@ -92,79 +156,120 @@ class DecisionEngine:
             "advance_topic",
             "reduce_support",
         ]
-        weights = {a: 0 for a in actions}
+        weights = {action: 0 for action in actions}
+        weight_reasons: dict[str, list[str]] = {action: [] for action in actions}
 
-        # Engagement-based weighting
+        def add_weight(action: str, amount: int, reason: str) -> None:
+            weights[action] += amount
+            weight_reasons[action].append(f"+{amount}: {reason}")
+
         if engagement == "low":
-            weights["increase_support"] += 3
-            weights["reinforce_basics"] += 2
+            add_weight("increase_support", 3, "engagement is low")
+            add_weight("reinforce_basics", 2, "engagement is low")
         elif engagement == "high":
-            weights["increase_challenge"] += 2
-            weights["advance_topic"] += 2
+            add_weight("increase_challenge", 2, "engagement is high")
+            add_weight("advance_topic", 2, "engagement is high")
 
-        # Trend-based weighting
         if trend == "declining":
-            weights["reinforce_basics"] += 3
-            weights["increase_support"] += 2
+            add_weight("reinforce_basics", 3, "trend is declining")
+            add_weight("increase_support", 2, "trend is declining")
         elif trend == "improving":
-            weights["advance_topic"] += 2
-            weights["challenge_with_variation"] += 2
+            add_weight("advance_topic", 2, "trend is improving")
+            add_weight("challenge_with_variation", 2, "trend is improving")
 
-        # Score-based weighting (updated thresholds)
         if score < 0.4:
-            weights["increase_support"] += 3
-            weights["reinforce_basics"] += 2
+            add_weight("increase_support", 3, f"last_score {score:.2f} is below 0.40")
+            add_weight("reinforce_basics", 2, f"last_score {score:.2f} is below 0.40")
         elif 0.4 <= score < 0.65:
-            weights["adjust_quiz"] += 2
+            add_weight("adjust_quiz", 2, f"last_score {score:.2f} is in the guided band")
             if trend == "improving":
-                weights["increase_challenge"] += 1
+                add_weight("increase_challenge", 1, "guided-band score with improving trend")
         else:
-            # score >= 0.65
             if engagement in ("medium", "high"):
-                weights["advance_topic"] += 4
+                add_weight("advance_topic", 4, f"last_score {score:.2f} is at least 0.65 and engagement is {engagement}")
             else:
-                weights["adjust_quiz"] += 2
+                add_weight("adjust_quiz", 2, f"last_score {score:.2f} is strong but engagement is {engagement}")
             if trend == "improving":
-                weights["challenge_with_variation"] += 2
+                add_weight("challenge_with_variation", 2, "strong score with improving trend")
             else:
-                weights["reduce_support"] += 1
+                add_weight("reduce_support", 1, "strong score without improving trend")
 
-        # Learning style influence (problem-solver prefers challenge)
         if style == "problem-solver":
-            weights["increase_challenge"] += 1
-            weights["challenge_with_variation"] += 1
+            add_weight("increase_challenge", 1, "learning style is problem-solver")
+            add_weight("challenge_with_variation", 1, "learning style is problem-solver")
         elif style == "visual":
-            weights["adjust_quiz"] += 1
+            add_weight("adjust_quiz", 1, "learning style is visual")
 
-        # Macro policy nudges micro action without replacing baseline behavior.
         if scaffold_policy == "high":
-            weights["increase_support"] += 2
-            weights["reinforce_basics"] += 1
+            add_weight("increase_support", 2, "macro scaffold policy is high")
+            add_weight("reinforce_basics", 1, "macro scaffold policy is high")
         elif scaffold_policy == "low":
-            weights["advance_topic"] += 1
-            weights["increase_challenge"] += 1
+            add_weight("advance_topic", 1, "macro scaffold policy is low")
+            add_weight("increase_challenge", 1, "macro scaffold policy is low")
 
-        best_action = max(weights, key=lambda k: weights[k])
-        if macro_action == "advance_concepts" and student_state.get("current_subtopic"):
-            best_action = "advance_topic"
-        next_node = "education_crew"
-        if best_action == "reduce_support":
-            next_node = "monitor_agent"
+        if macro_action == "advance_concepts" and current_subtopic:
+            add_weight(
+                "advance_topic",
+                5,
+                "macro action is advance_concepts and a current_subtopic is active",
+            )
+
+        best_action = self._select_weighted_action(weights, actions)
+        next_node = "monitor_agent" if best_action == "reduce_support" else "education_crew"
+
+        fired_weights = []
+        for action in actions:
+            if weights[action] > 0:
+                fired_weights.append(
+                    {
+                        "action": action,
+                        "total_weight": weights[action],
+                        "reasons": weight_reasons[action],
+                    }
+                )
+
+        if fired_weights:
+            rationale_lines = [
+                "Deterministic weighted decision with no randomness.",
+                *[
+                    f"{entry['action']}={entry['total_weight']} from {', '.join(entry['reasons'])}"
+                    for entry in fired_weights
+                ],
+                (
+                    f"Selected '{best_action}' because it had the highest total weight ({weights[best_action]}). "
+                    f"Ties resolve by fixed action order: {', '.join(actions)}."
+                ),
+                (
+                    f"Context used: score={score:.2f}, engagement={engagement}, trend={trend}, "
+                    f"style={style}, macro_action={macro_action or 'none'}, scaffold_policy={scaffold_policy}."
+                ),
+            ]
+        else:
+            rationale_lines = [
+                "No positive weights fired; defaulted deterministically using fixed action order.",
+                f"Selected '{best_action}' with total weight {weights[best_action]}.",
+                (
+                    f"Context used: score={score:.2f}, engagement={engagement}, trend={trend}, "
+                    f"style={style}, macro_action={macro_action or 'none'}, scaffold_policy={scaffold_policy}."
+                ),
+            ]
+        decision_rationale = self._join_rationale(rationale_lines)
 
         decision = {
             "next_node": next_node,
             "action": best_action,
             "weights": weights,
-            "reason": (
-                f"Selected '{best_action}' based on score={score}, "
-                f"engagement={engagement}, trend={trend}, style={style}"
-            ),
+            "fired_weights": fired_weights,
+            "reason": decision_rationale,
+            "decision_rationale": decision_rationale,
         }
 
         self.logger.info(
             f"score={score} engagement={engagement} trend={trend} "
-            f"style={style} action={best_action} next_node={next_node}"
+            f"style={style} action={best_action} next_node={next_node} "
+            f"rationale={decision_rationale}"
         )
+        self._log_decision("micro", student_state, decision)
         trace_event(
             "decision_made",
             {
@@ -174,6 +279,7 @@ class DecisionEngine:
                 "style": style,
                 "action": best_action,
                 "next_node": next_node,
+                "decision_rationale": decision_rationale,
             },
         )
         return decision

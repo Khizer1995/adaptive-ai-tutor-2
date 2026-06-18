@@ -94,11 +94,14 @@ class TutorAgent:
         concept_family: List[str] | None = None,
     ) -> List[Dict[str, Any]]:
         topic = str(student_state.get("current_topic") or self.get_next_topic(student_state))
+        subtopic = str(student_state.get("current_subtopic") or f"{topic}_introduction")
         subject = str(student_state.get("subject", "")).lower()
+        retrieval_query = f"{query}\n\nExplain topic: {topic}\nFocus subtopic: {subtopic}".strip()
+        self.logger.info(f"rag_retrieve query='{retrieval_query}'")
         if "dsa" in subject:
             try:
                 hybrid_records = self.hybrid_retriever.retrieve_context(
-                    query=query,
+                    query=retrieval_query,
                     topic=topic,
                     student_state=student_state,
                     k=max(6, k),
@@ -118,11 +121,18 @@ class TutorAgent:
                         where["chunk_id"] = {"$in": allowed_chunk_ids}
                     elif concept_family:
                         where["concept"] = {"$in": concept_family}
+                    else:
+                        where["concept"] = {"$eq": topic}
+                    self.logger.info(f"rag_retrieve where={where}")
                     layered_results = layered_retriever.retrieve(
-                        query=query,
+                        query=retrieval_query,
                         student_state=layered_state,
                         k=k,
                         where=where if where else None,
+                    )
+                    self.logger.info(
+                        "rag_retrieve returned_concepts=%s",
+                        [str((item.get("metadata", {}) or {}).get("concept", "")) for item in layered_results],
                     )
                     cleaned_results: List[Dict[str, Any]] = []
                     for item in layered_results:

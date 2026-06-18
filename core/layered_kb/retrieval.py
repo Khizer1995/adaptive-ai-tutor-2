@@ -27,9 +27,11 @@ class AdaptiveRetriever:
     ) -> List[Dict[str, Any]]:
         state = self._to_state(student_state)
         query_embedding = self.embedder.embed(query)
-        where_clause: Dict[str, Any] = {"topic": state.topic}
+        base_topic_filter: Dict[str, Any] = {"topic": {"$eq": state.topic}}
         if where:
-            where_clause.update(where)
+            where_clause = {"$and": [base_topic_filter, where]}
+        else:
+            where_clause = base_topic_filter
         normalized_where = normalize_where_filter(where_clause)
         try:
             results = self.vector_store.query(
@@ -42,7 +44,7 @@ class AdaptiveRetriever:
             results = self.vector_store.query(
                 query_embedding=query_embedding,
                 k=max(20, k * 4),
-                where={"topic": state.topic},
+                where=base_topic_filter,
             )
         candidates = self._flatten_results(results)
         ranked = self._rerank(candidates, state)

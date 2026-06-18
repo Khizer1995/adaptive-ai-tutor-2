@@ -12,6 +12,67 @@ def ensure_knowledge_state(student_state: Dict[str, Any]) -> Dict[str, Any]:
     return student_state
 
 
+def _assessment_entry(student_state: Dict[str, Any], topic: str, subtopic: str) -> Dict[str, Any]:
+    assessments = student_state.setdefault("assessment_scores", {})
+    topic_entry = assessments.setdefault(topic, {})
+    return topic_entry.setdefault(subtopic, {})
+
+
+def record_assessment_score(
+    student_state: Dict[str, Any],
+    topic: str,
+    subtopic: str,
+    assessment_type: str,
+    score: float,
+) -> Dict[str, Any]:
+    score = round(max(0.0, min(1.0, float(score))), 4)
+    entry = _assessment_entry(student_state, topic, subtopic)
+
+    if assessment_type == "pretest":
+        entry["pretest_score"] = score
+        student_state["pretest_score"] = score
+    elif assessment_type == "posttest":
+        entry["posttest_score"] = score
+        student_state["posttest_score"] = score
+    else:
+        raise ValueError(f"Unsupported assessment_type: {assessment_type}")
+
+    pretest_score = entry.get("pretest_score")
+    posttest_score = entry.get("posttest_score")
+    student_state.setdefault("assessment_history", []).append(
+        {
+            "type": assessment_type,
+            "topic": topic,
+            "subtopic": subtopic,
+            "score": score,
+        }
+    )
+    student_state["last_assessment_type"] = assessment_type
+
+    if pretest_score is not None and posttest_score is not None:
+        learning_gain = round(float(posttest_score) - float(pretest_score), 4)
+        denominator = 1.0 - float(pretest_score)
+        normalized_learning_gain = 0.0
+        if denominator > 0:
+            normalized_learning_gain = round((float(posttest_score) - float(pretest_score)) / denominator, 4)
+        entry["learning_gain"] = learning_gain
+        entry["normalized_learning_gain"] = normalized_learning_gain
+        student_state["learning_gain"] = learning_gain
+        student_state["normalized_learning_gain"] = normalized_learning_gain
+        student_state.setdefault("learning_gain_events", []).append(
+            {
+                "topic": topic,
+                "subtopic": subtopic,
+                "pretest_score": round(float(pretest_score), 4),
+                "posttest_score": round(float(posttest_score), 4),
+                "learning_gain": learning_gain,
+                "normalized_learning_gain": normalized_learning_gain,
+            }
+        )
+
+    return student_state
+
+
 def apply_execution_feedback(
     student_state: Dict[str, Any],
     execution_feedback: Dict[str, Any],

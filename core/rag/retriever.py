@@ -39,6 +39,7 @@ class Retriever:
         if subject:
             where["subject"] = subject
         normalized_where = normalize_where_filter(where if where else None)
+        self.logger.info(f"legacy_retrieve query='{query}' where={normalized_where}")
         try:
             results: Dict[str, Any] = cast(
                 Dict[str, Any],

@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import json
 import difflib
+import hashlib
 from typing import Any, Dict, List
+from difflib import SequenceMatcher
 
 from pydantic import BaseModel, Field, ValidationError, model_validator
 
@@ -111,6 +113,8 @@ class PracticalAgent:
         decision_output: Dict[str, Any],
         student_state: Dict[str, Any],
         rag_context: str,
+        target_count: int | None = None,
+        seen_hashes: set[str] | None = None,
     ) -> List[Dict[str, Any]]:
         from core.logging_utils import get_logger, trace_event
         from core.llm.router import ModelRouterAgent
@@ -125,8 +129,9 @@ class PracticalAgent:
             .get(topic, {})
             .get("mastery", student_state.get("last_score", 0.4))
         )
-        q_count = self._question_count(mastery)
+        q_count = target_count if isinstance(target_count, int) and target_count > 0 else self._question_count(mastery)
         fallback = self._fallback_batch(topic, q_count)
+        active_seen = seen_hashes if seen_hashes is not None else set()
 
         prompt = f"""
 You are creating an adaptive MCQ batch for topic '{topic}' and subtopic '{subtopic}'.
@@ -137,6 +142,10 @@ RAG context:
 
 Requirements:
 - Generate exactly {q_count} MCQs.
+- Every question must be COMPLETELY DIFFERENT from all others.
+- Do not rephrase the same question.
+- Cover different aspects: definition, purpose, operation, output tracing, edge case, comparison.
+- If unique generation is impossible, return fewer questions instead of duplicates.
 - Include at least:
   1 definitional question,
   2 application questions (or 1 if total questions = 3),
@@ -173,13 +182,66 @@ Requirements:
                 except ValidationError:
                     continue
 
-            if len(normalized) < q_count:
-                normalized = (normalized + fallback)[:q_count]
-            else:
-                normalized = normalized[:q_count]
+            normalized = self._deduplicate_questions(normalized)
+            if active_seen:
+                normalized = self._filter_seen(normalized, active_seen)
+
+            candidate_pool = normalized + fallback
+            candidate_pool = self._deduplicate_questions(candidate_pool)
+            if active_seen:
+                candidate_pool = self._filter_seen(candidate_pool, active_seen)
+            normalized = candidate_pool[:q_count]
 
             trace_event("quiz_generated", {"topic": topic, "subtopic": subtopic, "quiz_len": len(normalized)})
             return normalized
         except Exception as exc:
             logger.warning(f"quiz_batch_fallback topic='{topic}' subtopic='{subtopic}' error={exc}")
-            return fallback
+            filtered_fallback = self._deduplicate_questions(fallback)
+            if active_seen:
+                filtered_fallback = self._filter_seen(filtered_fallback, active_seen)
+            return filtered_fallback[:q_count]
+    @staticmethod
+    def _similarity(a: str, b: str) -> float:
+        return SequenceMatcher(None, str(a).lower(), str(b).lower()).ratio()
+
+    def _deduplicate_questions(self, questions: List[Dict[str, Any]], threshold: float = 0.75) -> List[Dict[str, Any]]:
+        unique: List[Dict[str, Any]] = []
+        for candidate in questions:
+            q_text = str(candidate.get("question", "")).strip()
+            if not q_text:
+                continue
+            is_duplicate = any(
+                self._similarity(q_text, str(seen.get("question", ""))) > threshold
+                for seen in unique
+            )
+            if not is_duplicate:
+                unique.append(candidate)
+        return unique
+
+    @staticmethod
+    def _question_hash(q: str) -> str:
+        return hashlib.md5(str(q).strip().lower().encode("utf-8")).hexdigest()
+
+    def _filter_seen(
+        self,
+        questions: List[Dict[str, Any]],
+        seen_hashes: set[str],
+        threshold: float = 0.75,
+    ) -> List[Dict[str, Any]]:
+        fresh: List[Dict[str, Any]] = []
+        for candidate in questions:
+            q_text = str(candidate.get("question", "")).strip()
+            if not q_text:
+                continue
+            q_hash = self._question_hash(q_text)
+            if q_hash in seen_hashes:
+                continue
+            too_similar = any(
+                self._similarity(q_text, str(existing.get("question", ""))) > threshold
+                for existing in fresh
+            )
+            if too_similar:
+                continue
+            fresh.append(candidate)
+            seen_hashes.add(q_hash)
+        return fresh

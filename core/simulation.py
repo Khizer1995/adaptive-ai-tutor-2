@@ -14,6 +14,7 @@ from .evaluation import evaluate_cycle
 from .logging_utils import Timer
 from .learning_record import log_state_learning_record
 from .knowledge_state_updater import apply_execution_feedback, ensure_knowledge_state
+from .metrics_collector import log_learning_cycle_metrics
 
 
 class AdaptiveLearningSimulation:
@@ -30,6 +31,7 @@ class AdaptiveLearningSimulation:
         self.teacher_review = TeacherReviewAgent()
 
     def run_cycle(self, student_state: dict) -> dict:
+        t_e2e = Timer()
         print("\n--- New Cycle ---")
         print(f"Level      : {student_state.get('level')}")
         print(f"Topic      : {student_state.get('current_topic')}")
@@ -47,9 +49,10 @@ class AdaptiveLearningSimulation:
         print(f"Decision   : {decision}")
 
         # 2. Education Crew
-        t_crew = Timer()
+        crew_ms = 0.0
         crew_output = {"message": "No crew action required."}
         if decision.get("next_node") == "education_crew":
+            t_crew = Timer()
             crew_state = self.education_crew.run(
                 {"decision": decision, "student_state": student_state}
             )
@@ -57,10 +60,10 @@ class AdaptiveLearningSimulation:
             crew_output = self.decision_engine.arbitrate_crew_proposals(
                 decision, proposals, student_state
             )
-        crew_ms = round(t_crew.elapsed_ms(), 2)
+            crew_ms = round(t_crew.elapsed_ms(), 2)
 
         # 3. Validation
-        crew_output = self.validation.validate_content(crew_output)
+        crew_output = self.validation.validate_content(crew_output, student_state)
 
         # 4. Teacher review (CLI)
         review = self.teacher_review.review(crew_output, student_state)
@@ -128,6 +131,19 @@ class AdaptiveLearningSimulation:
                 "crew_ms": crew_ms,
                 "monitor_ms": monitor_ms,
             },
+        )
+        log_learning_cycle_metrics(
+            student_state=updated_state,
+            macro_decision=macro,
+            micro_decision=decision,
+            crew_output=crew_output,
+            timings={
+                "rag_latency_ms": 0.0,
+                "crewai_latency_ms": crew_ms,
+                "e2e_latency_ms": round(t_e2e.elapsed_ms(), 2),
+            },
+            rag_chunk_records=crew_output.get("rag_chunk_records", []) or [],
+            decision_iterations=1,
         )
 
         return updated_state

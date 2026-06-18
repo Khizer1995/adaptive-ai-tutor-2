@@ -4,6 +4,7 @@ import remarkGfm from 'remark-gfm'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
 import { Bot, Check, X } from 'lucide-react'
+import StudyQuestionnaire from './StudyQuestionnaire'
 
 const API = 'http://localhost:8000'
 const UNLOCK_THRESHOLD = 0.7
@@ -99,10 +100,12 @@ function QuizSection({ topic, subtopic, open, onBatchComplete, onToast, onMoveFu
   const loadQuiz = async () => {
     if (!topic || !subtopic) return
     setLoading(true)
+    const payload = { topic, subtopic }
+    console.log('Requesting topic for /quiz/generate:', payload)
     const res = await fetch(`${API}/quiz/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ topic, subtopic }),
+      body: JSON.stringify(payload),
     })
     const data = await res.json()
     setQuestions(data.questions || [])
@@ -247,6 +250,141 @@ function QuizSection({ topic, subtopic, open, onBatchComplete, onToast, onMoveFu
   )
 }
 
+function AssessmentSection({ topic, subtopic, mode, open, onComplete, onToast }) {
+  const [questions, setQuestions] = useState([])
+  const [idx, setIdx] = useState(0)
+  const [selectedAnswer, setSelectedAnswer] = useState('')
+  const [answered, setAnswered] = useState([])
+  const [feedbackVisible, setFeedbackVisible] = useState(false)
+  const [summary, setSummary] = useState(null)
+  const [loading, setLoading] = useState(false)
+
+  const endpoint = mode === 'posttest' ? '/quiz/posttest' : '/quiz/pretest'
+  const title = mode === 'posttest' ? 'Complete Assessment' : 'Start Learning Assessment'
+
+  const loadAssessment = async () => {
+    if (!topic) return
+    setLoading(true)
+    const payload = { topic, subtopic }
+    const res = await fetch(`${API}${endpoint}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+    const data = await res.json()
+    setQuestions(data.questions || [])
+    setIdx(0)
+    setSelectedAnswer('')
+    setAnswered([])
+    setFeedbackVisible(false)
+    setSummary(null)
+    setLoading(false)
+  }
+
+  useEffect(() => {
+    if (!open) return
+    loadAssessment()
+  }, [topic, subtopic, mode, open])
+
+  if (!open) return null
+  if (loading) return <div className="rounded-2xl border border-gray-800 bg-gray-900 p-4 text-sm text-gray-400">Preparing assessment...</div>
+
+  const question = questions[idx]
+  if (!question && !summary) return <div className="rounded-2xl border border-gray-800 bg-gray-900 p-4 text-sm text-gray-400">No assessment available.</div>
+
+  const isCorrect = question && normalize(selectedAnswer) === normalize(question.correct_answer)
+
+  const submitCurrent = () => {
+    if (!selectedAnswer || !question) return
+    setAnswered([...answered, {
+      question: question.question,
+      selected_answer: selectedAnswer,
+      correct_answer: question.correct_answer,
+      correct: isCorrect,
+    }])
+    setFeedbackVisible(true)
+  }
+
+  const submitAssessment = async (finalAnswers) => {
+    const res = await fetch(`${API}${endpoint}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ topic, subtopic, answers: finalAnswers }),
+    })
+    const data = await res.json()
+    setSummary(data)
+    onComplete?.(data)
+    onToast?.(`${title} submitted · ${Math.round((data.score || 0) * 100)}%`)
+  }
+
+  const nextQuestion = async () => {
+    const finalAnswers = [...answered]
+    if (idx >= questions.length - 1) {
+      await submitAssessment(finalAnswers)
+      return
+    }
+    setIdx(idx + 1)
+    setSelectedAnswer('')
+    setFeedbackVisible(false)
+  }
+
+  if (summary) {
+    return (
+      <div className="rounded-2xl border border-teal-500/40 bg-teal-950/30 p-4">
+        <div className="flex items-center gap-4">
+          <ScoreRing score={Number(summary.score || 0)} />
+          <div>
+            <p className="text-base font-semibold">{title} Score: {Math.round((summary.score || 0) * 100)}%</p>
+            {mode === 'posttest' && (
+              <p className="mt-1 text-sm text-gray-300">
+                Pre {Math.round((summary.pretest_score || 0) * 100)}% · Post {Math.round((summary.posttest_score || 0) * 100)}% · Gain {Math.round((summary.learning_gain || 0) * 100)}%
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="rounded-2xl border border-teal-500/40 bg-gray-900 p-4">
+      <div className="mb-3 flex items-center justify-between">
+        <h3 className="text-sm font-semibold text-teal-300">{title}</h3>
+        <span className="text-xs text-gray-400">Question {idx + 1} of {questions.length}</span>
+      </div>
+      <p className="mb-3 text-sm text-gray-100">{question.question}</p>
+      <div className="space-y-2">
+        {(question.options || []).map((op, i) => {
+          const showCorrect = feedbackVisible && normalize(op) === normalize(question.correct_answer)
+          const showWrong = feedbackVisible && normalize(op) === normalize(selectedAnswer) && !isCorrect
+          return (
+            <button
+              key={`${op}-${i}`}
+              disabled={feedbackVisible}
+              onClick={() => setSelectedAnswer(op)}
+              className={`w-full rounded-xl border p-3 text-left text-sm transition ${showCorrect ? 'border-green-400 bg-green-900' : showWrong ? 'border-red-400 bg-red-900' : normalize(selectedAnswer) === normalize(op) ? 'border-teal-400 bg-teal-950' : 'border-gray-700 hover:border-teal-400'}`}
+            >
+              <span className="inline-flex items-center gap-2">
+                <span>{op}</span>
+                {showCorrect && <Check size={14} className="text-green-300" />}
+                {showWrong && <X size={14} className="text-red-300" />}
+              </span>
+            </button>
+          )
+        })}
+      </div>
+      {feedbackVisible && <p className="mt-3 text-sm text-gray-300">{question.explanation}</p>}
+      <div className="mt-3">
+        {!feedbackVisible ? (
+          <button onClick={submitCurrent} disabled={!selectedAnswer} className="rounded-lg bg-teal-500 px-3 py-2 text-xs font-semibold text-gray-950 disabled:opacity-50">Submit Answer</button>
+        ) : (
+          <button onClick={nextQuestion} className="rounded-lg bg-teal-500 px-3 py-2 text-xs font-semibold text-gray-950">Next Question &gt;</button>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export default function App() {
   const [topics, setTopics] = useState([])
   const [studentState, setStudentState] = useState(null)
@@ -258,6 +396,8 @@ export default function App() {
   const [waitingFirstChunk, setWaitingFirstChunk] = useState(false)
   const [toast, setToast] = useState('')
   const [topicComplete, setTopicComplete] = useState(false)
+  const [assessmentOpen, setAssessmentOpen] = useState(false)
+  const [assessmentMode, setAssessmentMode] = useState('pretest')
 
   const activeMessageId = useRef(null)
   const bottomRef = useRef(null)
@@ -296,6 +436,7 @@ export default function App() {
     setStreaming(true)
     setWaitingFirstChunk(true)
 
+    console.log('Requesting topic for /tutor/explain/stream:', { topic, subtopic })
     const es = new EventSource(`${API}/tutor/explain/stream?topic=${encodeURIComponent(topic)}&subtopic=${encodeURIComponent(subtopic || '')}`)
     es.onmessage = (event) => {
       const data = JSON.parse(event.data || '{}')
@@ -321,18 +462,30 @@ export default function App() {
 
   const startStream = () => {
     if (!selectedTopic || streaming) return
-    const subtopic = currentSubtopic || TOPIC_SUBTOPICS[selectedTopic]?.[0]?.id || ''
+    const topicToExplain = selectedTopic
+    const subtopic = currentSubtopic || TOPIC_SUBTOPICS[topicToExplain]?.[0]?.id || ''
     setCurrentSubtopic(subtopic)
     setTopicComplete(false)
-    setMessages((m) => [...m, { id: `s-${Date.now()}`, role: 'student', text: `Teach me ${selectedTopic} (${subtopic}).` }])
-    streamTopic(selectedTopic, subtopic)
+    setMessages((m) => [...m, { id: `s-${Date.now()}`, role: 'student', text: `Teach me ${topicToExplain} (${subtopic}).` }])
+    streamTopic(topicToExplain, subtopic)
+  }
+
+  const openAssessment = (mode) => {
+    if (!selectedTopic) return
+    const subtopic = currentSubtopic || TOPIC_SUBTOPICS[selectedTopic]?.[0]?.id || `${selectedTopic}_assessment`
+    setCurrentSubtopic(subtopic)
+    setAssessmentMode(mode)
+    setAssessmentOpen(true)
+    setQuizOpen(false)
   }
 
   const handleMoveFurther = async () => {
+    const payload = { current_topic: selectedTopic, current_subtopic: currentSubtopic }
+    console.log('Requesting topic for /curriculum/next:', payload)
     const res = await fetch(`${API}/curriculum/next`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ current_topic: selectedTopic, current_subtopic: currentSubtopic }),
+      body: JSON.stringify(payload),
     })
     const data = await res.json()
     if (data.topic_complete) {
@@ -359,6 +512,7 @@ export default function App() {
   const cycles = (studentState?.accuracy_history || []).length
   const status = (studentState?.macro_decision?.action || 'active').replaceAll('_', ' ')
   const progressPct = Math.max(0, Math.min(100, (score / 0.85) * 100))
+  const hasPretest = studentState?.pretest_score !== null && studentState?.pretest_score !== undefined
 
   return (
     <div className="h-screen overflow-hidden bg-gray-950 font-[Inter,system-ui] text-gray-100">
@@ -405,9 +559,16 @@ export default function App() {
         <main className="flex-1 bg-[#0d1117] p-4">
           <div className="mb-3 flex items-center justify-between">
             <h1 className="text-sm text-gray-300">Tutor Chat · {currentSubtopic || 'subtopic not set'}</h1>
-            <button onClick={startStream} disabled={!selectedTopic || streaming} className="rounded-lg bg-teal-500 px-4 py-2 text-xs font-semibold text-gray-950 disabled:opacity-50">
-              {streaming ? 'Streaming...' : `Explain ${selectedTopic || ''}`}
-            </button>
+            <div className="flex gap-2">
+              {!hasPretest && (
+                <button onClick={() => openAssessment('pretest')} disabled={!selectedTopic || streaming} className="rounded-lg border border-teal-500 px-4 py-2 text-xs font-semibold text-teal-300 disabled:opacity-50">
+                  Start Learning Assessment
+                </button>
+              )}
+              <button onClick={startStream} disabled={!selectedTopic || streaming} className="rounded-lg bg-teal-500 px-4 py-2 text-xs font-semibold text-gray-950 disabled:opacity-50">
+                {streaming ? 'Streaming...' : `Explain ${selectedTopic || ''}`}
+              </button>
+            </div>
           </div>
 
           <div className="h-full overflow-y-auto max-h-[60vh] scroll-smooth pr-1">
@@ -430,6 +591,18 @@ export default function App() {
                 </div>
               ))}
 
+              <AssessmentSection
+                topic={selectedTopic}
+                subtopic={currentSubtopic}
+                mode={assessmentMode}
+                open={assessmentOpen}
+                onComplete={() => {
+                  refreshData()
+                  if (assessmentMode === 'pretest') setAssessmentOpen(false)
+                }}
+                onToast={showToast}
+              />
+
               <QuizSection
                 topic={selectedTopic}
                 subtopic={currentSubtopic}
@@ -443,7 +616,23 @@ export default function App() {
                 <div className="rounded-2xl border border-green-500/40 bg-green-950/40 p-4">
                   <p className="text-base font-semibold text-green-300">Topic Complete</p>
                   <p className="mt-1 text-sm text-gray-300">You finished all configured subtopics for {selectedTopic}. Next topic is now unlocked in your learning path.</p>
+                  <button onClick={() => openAssessment('posttest')} className="mt-4 rounded-lg bg-teal-500 px-4 py-2 text-sm font-semibold text-gray-950">Complete Assessment</button>
                 </div>
+              )}
+
+              {studentState?.posttest_score !== null && studentState?.posttest_score !== undefined && (
+                <>
+                  <div className="rounded-2xl border border-teal-500/40 bg-gray-900 p-4 text-sm text-gray-300">
+                    Pre-test {Math.round((studentState.pretest_score || 0) * 100)}% · Post-test {Math.round((studentState.posttest_score || 0) * 100)}% · Learning gain {Math.round((studentState.learning_gain || 0) * 100)}%
+                  </div>
+                  <StudyQuestionnaire
+                    apiBase={API}
+                    topic={selectedTopic}
+                    subtopic={currentSubtopic}
+                    studentId={studentState.student_id}
+                    onToast={showToast}
+                  />
+                </>
               )}
 
               <div ref={bottomRef} />

@@ -24,7 +24,7 @@ def test_explain_response_always_contains_next_recommendation(monkeypatch) -> No
             "delivered_chunks": {},
         }
 
-    def fake_run_flow(state):
+    def fake_run_flow(state, **kwargs):
         return {
             "macro": {"macro_action": "stabilize_foundations"},
             "validated": {
@@ -96,7 +96,18 @@ def test_quiz_chunk_ids_are_subset_of_delivered_chunks(monkeypatch) -> None:
 
     monkeypatch.setattr(api_server, "get_student_state", fake_get_student_state)
     monkeypatch.setattr(api_server, "_ensure_rag_ready", lambda: {"rag_ready": True})
-    monkeypatch.setattr(api_server.crew.practical, "generate_quiz", lambda micro, state: ["What is stack?"])
+    monkeypatch.setattr(
+        api_server.crew.practical,
+        "generate_quiz_batch",
+        lambda micro, state, rag_context, target_count=None, seen_hashes=None: [
+            {
+                "question": "What is stack?",
+                "options": ["Stack follows LIFO.", "Stack follows FIFO.", "Stack is a tree.", "Stack is a graph."],
+                "correct_answer": "Stack follows LIFO.",
+                "explanation": "A stack removes the newest item first.",
+            }
+        ],
+    )
     monkeypatch.setattr(
         api_server.crew.tutor.query_engineer,
         "engineer",

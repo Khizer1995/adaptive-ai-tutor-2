@@ -1,4 +1,5 @@
 from langgraph.graph import StateGraph, END
+from time import perf_counter
 
 from core.decision_engine import DecisionEngine
 from core.education_crew import EducationCrew
@@ -10,6 +11,7 @@ from core.teacher_review_agent import TeacherReviewAgent
 from core.knowledge_state_updater import apply_execution_feedback, ensure_knowledge_state
 from core.logging_utils import trace_event
 from core.learning_record import log_state_learning_record
+from core.metrics_collector import log_learning_cycle_metrics
 
 
 decision_engine = DecisionEngine()
@@ -37,6 +39,7 @@ def micro_decision_node(state: dict):
     student_state["macro_decision"] = state.get("macro_decision", {})
     decision = decision_engine.decide_next_step(student_state)
     state["decision"] = decision
+    state["crewai_latency_ms"] = 0.0
     state.setdefault("decision_trace", []).append(
         {"macro_decision": state.get("macro_decision", {}), "micro_decision": decision}
     )
@@ -46,7 +49,9 @@ def micro_decision_node(state: dict):
 
 def education_crew_node(state: dict):
     trace_event("node_enter", {"node": "education_crew"})
+    started_at = perf_counter()
     state = education_crew.run(state)
+    state["crewai_latency_ms"] = round((perf_counter() - started_at) * 1000.0, 2)
     trace_event("node_exit", {"node": "education_crew"})
     return state
 
@@ -69,7 +74,10 @@ def arbitration_node(state: dict):
 
 def validation_node(state: dict):
     trace_event("node_enter", {"node": "validation"})
-    state["crew_output"] = validation_agent.validate_content(state.get("crew_output", {}))
+    state["crew_output"] = validation_agent.validate_content(
+        state.get("crew_output", {}),
+        state.get("student_state", {}),
+    )
     trace_event("node_exit", {"node": "validation"})
     return state
 
@@ -79,23 +87,6 @@ def teacher_review_node(state: dict):
     review = teacher_review_agent.review(
         state.get("crew_output", {}),
         state.get("student_state", {}),
-    )
-    state["teacher_review"] = review
-    if review.get("review_status") == "approved":
-        log_state_learning_record(state)
-    trace_event("node_exit", {"node": "teacher_review"})
-    return state
-
-
-def teacher_review_node(state: dict):
-    """
-    Teacher Review Node
-    Uses JSON review queue to approve/reject content.
-    """
-    trace_event("node_enter", {"node": "teacher_review"})
-    review = teacher_review_agent.review(
-        state.get("crew_output", {}),
-        state.get("student_state", {})
     )
     state["teacher_review"] = review
     if review.get("review_status") == "approved":
@@ -129,6 +120,7 @@ def knowledge_state_node(state: dict):
 
 def file_manager_node(state: dict):
     trace_event("node_enter", {"node": "file_manager"})
+    state.setdefault("_cycle_started_at", perf_counter())
     status = file_manager_agent.prepare_knowledge_base()
     state["rag_status"] = status
     trace_event("node_exit", {"node": "file_manager"})
@@ -138,6 +130,22 @@ def file_manager_node(state: dict):
 def profile_node(state: dict):
     trace_event("node_enter", {"node": "student_profile"})
     state["student_state"] = student_profile_agent.persist(state["student_state"])
+    started_at = state.get("_cycle_started_at")
+    e2e_latency_ms = round((perf_counter() - started_at) * 1000.0, 2) if started_at else 0.0
+    log_learning_cycle_metrics(
+        student_state=state.get("student_state", {}),
+        macro_decision=state.get("macro_decision", {}),
+        micro_decision=state.get("decision", {}),
+        crew_output=state.get("crew_output", {}),
+        timings={
+            "rag_latency_ms": (state.get("rag_status", {}) or {}).get("duration_ms", 0.0),
+            "crewai_latency_ms": state.get("crewai_latency_ms", 0.0),
+            "e2e_latency_ms": e2e_latency_ms,
+        },
+        rag_chunk_records=(state.get("crew_output", {}) or {}).get("rag_chunk_records", []) or [],
+        decision_iterations=len(state.get("decision_trace", []) or []) or 1,
+    )
+    state["_cycle_started_at"] = perf_counter()
     trace_event("node_exit", {"node": "student_profile"})
     return state
 
@@ -200,15 +208,6 @@ builder.add_conditional_edges(
 
 builder.add_edge("monitor", "knowledge_state")
 builder.add_edge("knowledge_state", "student_profile")
-
-builder.add_conditional_edges(
-    "teacher_review",
-    route_after_teacher_review,
-    {
-        "approved": "monitor",
-        "halt": END
-    }
-)
 
 builder.add_conditional_edges(
     "student_profile",

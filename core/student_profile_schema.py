@@ -47,6 +47,12 @@ class StudentProfile:
     # --- Metrics tracking fields ---
     accuracy_history: List[float] = field(default_factory=list)
     learning_gain_history: List[float] = field(default_factory=list)
+    learning_gain: float = 0.0
+    normalized_learning_gain: float = 0.0
+    pretest_score: Optional[float] = None
+    posttest_score: Optional[float] = None
+    assessment_scores: Dict[str, Dict[str, Dict[str, Any]]] = field(default_factory=dict)
+    assessment_history: List[dict] = field(default_factory=list)
     knowledge_state: Dict[str, Any] = field(default_factory=lambda: {"concepts": {}, "version": 1})
     knowledge_events: List[dict] = field(default_factory=list)
     delivered_chunks: Dict[str, Dict[str, List[str]]] = field(default_factory=dict)
@@ -69,6 +75,12 @@ class StudentProfile:
             "last_active": self.last_active,
             "accuracy_history": self.accuracy_history,
             "learning_gain_history": self.learning_gain_history,
+            "learning_gain": self.learning_gain,
+            "normalized_learning_gain": self.normalized_learning_gain,
+            "pretest_score": self.pretest_score,
+            "posttest_score": self.posttest_score,
+            "assessment_scores": self.assessment_scores,
+            "assessment_history": self.assessment_history,
             "knowledge_state": self.knowledge_state,
             "knowledge_events": self.knowledge_events,
             "delivered_chunks": self.delivered_chunks,
@@ -93,6 +105,12 @@ class StudentProfile:
             last_active=data.get("last_active"),
             accuracy_history=data.get("accuracy_history", []),
             learning_gain_history=data.get("learning_gain_history", []),
+            learning_gain=float(data.get("learning_gain", 0.0)),
+            normalized_learning_gain=float(data.get("normalized_learning_gain", 0.0)),
+            pretest_score=data.get("pretest_score"),
+            posttest_score=data.get("posttest_score"),
+            assessment_scores=data.get("assessment_scores", {}),
+            assessment_history=data.get("assessment_history", []),
             knowledge_state=data.get("knowledge_state", {"concepts": {}, "version": 1}),
             knowledge_events=data.get("knowledge_events", []),
             delivered_chunks=data.get("delivered_chunks", {}),

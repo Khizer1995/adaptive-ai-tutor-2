@@ -26,15 +26,26 @@ class HybridRetriever:
     def _subtopic_key(student_state: Dict[str, Any], topic: str) -> str:
         return str(student_state.get("current_subtopic") or f"{topic}_introduction")
 
-    def _fetch_opendsa(self, subtopic: str) -> Dict[str, Any]:
+    @staticmethod
+    def _cache_key(topic: str, subtopic: str) -> str:
+        safe_topic = str(topic or "general").strip().lower().replace(" ", "_")
+        safe_subtopic = str(subtopic or f"{safe_topic}_introduction").strip().lower().replace(" ", "_")
+        return f"{safe_topic}__{safe_subtopic}"
+
+    def _fetch_opendsa(self, topic: str, subtopic: str) -> Dict[str, Any]:
         page = OPENDSA_PAGE_MAP.get(subtopic)
         if not page:
             return {"prose": "", "code_blocks": [], "tables": []}
 
-        cache_path = self.cache_dir / f"{subtopic}.json"
+        cache_key = self._cache_key(topic, subtopic)
+        cache_path = self.cache_dir / f"opendsa_{cache_key}.json"
         if cache_path.exists():
             payload = json.loads(cache_path.read_text(encoding="utf-8"))
             if time.time() - float(payload.get("fetched_at", 0)) < self.cache_ttl_seconds:
+                cached_data = payload.get("data", {})
+                self.logger.info(
+                    f"OpenDSA cache hit for {cache_key}: {cached_data.get('url', 'unknown_url')}"
+                )
                 return payload.get("data", {})
 
         url = f"https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/{page}.html"
@@ -58,7 +69,7 @@ class HybridRetriever:
             for node in root.select("table")
             if node.get_text(" ", strip=True)
         ][:2]
-        data = {"prose": prose, "code_blocks": code_blocks, "tables": tables}
+        data = {"url": url, "prose": prose, "code_blocks": code_blocks, "tables": tables}
         cache_path.write_text(
             json.dumps({"fetched_at": time.time(), "data": data}, ensure_ascii=False, indent=2),
             encoding="utf-8",
@@ -129,13 +140,23 @@ class HybridRetriever:
             "learning_trend": "steady",
         }
         where = {"chunk_id": {"$in": allowed_chunk_ids}} if allowed_chunk_ids else None
-        pdf_records = self.layered.retrieve(query=query, student_state=layered_state, k=max(6, k), where=where)
+        query_for_retrieval = f"{query}\n\nTopic: {topic}\nSubtopic: {student_state.get('current_subtopic', '')}".strip()
+        self.logger.info(f"hybrid_retrieve query={query_for_retrieval}")
+        self.logger.info(f"hybrid_retrieve where={where if where else {'topic': {'$eq': topic}}}")
+        pdf_records = self.layered.retrieve(
+            query=query_for_retrieval,
+            student_state=layered_state,
+            k=max(6, k),
+            where=where,
+        )
+        concepts = [str((item.get("metadata", {}) or {}).get("concept", "")) for item in pdf_records]
+        self.logger.info(f"hybrid_retrieve returned_concepts={concepts}")
         pdf_chunks = [str(item.get("content", "")).strip() for item in pdf_records if str(item.get("content", "")).strip()]
 
         subtopic = self._subtopic_key(student_state, topic)
         opendsa_data: Dict[str, Any] = {"prose": "", "code_blocks": [], "tables": []}
         try:
-            opendsa_data = self._fetch_opendsa(subtopic)
+            opendsa_data = self._fetch_opendsa(topic, subtopic)
         except Exception as exc:
             self._log_fetch_error(subtopic, exc)
             self.logger.warning(f"opendsa_fetch_failed subtopic={subtopic} error={exc}")

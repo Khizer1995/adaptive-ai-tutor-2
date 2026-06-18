@@ -5,6 +5,16 @@ from core.rag.vector_store import VectorStore
 
 
 class PDFIngestionService:
+    TOPIC_KEYWORD_MAP = {
+        "stack": ["stack", "push", "pop", "peek", "lifo"],
+        "queue": ["queue", "enqueue", "dequeue", "fifo", "front", "rear"],
+        "linked_list": ["linked list", "node", "next pointer", "head", "tail"],
+        "array": ["array", "index", "element", "contiguous"],
+        "hash_table": ["hash", "bucket", "collision", "key-value", "key value"],
+        "tree": ["binary tree", "root", "leaf", "traversal", "bst"],
+        "sorting": ["bubble sort", "merge sort", "quick sort", "insertion sort"],
+        "binary_search": ["binary search", "mid", "low", "high"],
+    }
     def __init__(
         self,
         pdf_path,
@@ -78,20 +88,11 @@ class PDFIngestionService:
         print("[PDFIngestionService] Ingestion complete.")
 
     def _infer_concept(self, chunk: str, index: int) -> str:
-        text = chunk.lower()
-        concept_keywords = [
-            "array",
-            "linked list",
-            "stack",
-            "queue",
-            "tree",
-            "graph",
-            "sorting",
-            "searching",
-            "recursion",
-            "dynamic programming",
-        ]
-        for keyword in concept_keywords:
-            if keyword in text:
-                return keyword
-        return f"concept_{index}"
+        text = str(chunk or "").lower()
+        scores = {}
+        for topic, keywords in self.TOPIC_KEYWORD_MAP.items():
+            scores[topic] = sum(1 for kw in keywords if kw in text)
+        best = max(scores, key=scores.get)
+        if scores[best] > 0:
+            return best
+        return "general"

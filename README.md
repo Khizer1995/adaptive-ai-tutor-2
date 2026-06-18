@@ -86,7 +86,7 @@ The system is structured as a **LangGraph state machine** where each node is a d
 | `TeacherPersonaAgent` | Selects persona (Supportive Tutor / Balanced Coach / Challenging Mentor) |
 | `ValidationAgent` | Confirms `learning_path` is non-empty; marks `validation_status` |
 | `TeacherReviewAgent` | Approves or halts content based on review queue rules |
-| `MonitorAgent` | Adjusts `last_score` and `engagement` based on challenge level; appends to `learning_history` |
+| `MonitorAgent` | Observes validated learning output and preserves quiz-driven score state without random score mutation |
 | `KnowledgeStateUpdater` | Applies execution feedback to per-concept mastery/confidence/scaffold fields |
 | `StudentProfileAgent` | Persists updated student state to `profiles/<student_id>.json` |
 | `ModelRouterAgent` | Routes LLM calls to Gemini or Groq; handles Gemini → Groq fallback |
@@ -123,7 +123,7 @@ Each agent submits a **proposal** (scored by confidence, execution cost, challen
 `TeacherReviewAgent` reviews the validated output. If approved, the cycle continues; if rejected, the graph terminates at `END` for that cycle.
 
 **Step 7 — Monitor & Knowledge Update**  
-`MonitorAgent` simulates interaction outcome: adjusts `last_score` relative to `challenge_level`, updates engagement tier (low / medium / high), and appends to `learning_history`. `KnowledgeStateUpdater` then updates per-concept `mastery`, `confidence`, `attempts`, and `scaffold_level`.
+`MonitorAgent` observes the validated learning output without applying random score variation. `KnowledgeStateUpdater` then applies quiz/assessment execution feedback to per-concept `mastery`, `confidence`, `attempts`, and `scaffold_level`.
 
 **Step 8 — Profile Persistence & Loop Control**  
 `StudentProfileAgent` saves the updated state to disk. If `last_score < 0.85`, the graph loops back to `macro_decision` for another cycle; otherwise it exits.
@@ -260,9 +260,77 @@ Learning Gain (this cycle): 0.12
 
 ---
 
+## Current Implementation Progress
+
+### Tech Stack in Use
+
+| Area | Implemented Technology |
+|---|---|
+| Backend API | FastAPI, Pydantic v2 |
+| Adaptive workflow | LangGraph `StateGraph` |
+| Agent collaboration | Tutor, practical, teacher persona, teacher review, monitor, validation, and profile agents |
+| LLM routing | Gemini for explanations/reasoning, Groq for fast quiz generation fallback |
+| Retrieval | ChromaDB vector stores, `sentence-transformers`, PDF curriculum, and OpenDSA cached sources |
+| Frontend | React, Vite, Tailwind CSS |
+| Persistence | JSON student profiles in `profiles/`, JSONL logs in `logs/`, study data in `data/` |
+| Evaluation | Pytest, Vite production build, `scripts/generate_eval_report.py` |
+
+### Completed Backend Capabilities
+
+- Deterministic macro and micro scaffolding decisions are implemented in `core/decision_engine.py`; every decision includes `decision_rationale`, fired weights, and JSONL evidence in `logs/decision_log.jsonl`.
+- Random score mutation has been removed from `MonitorAgent`; learner score changes are driven by quiz, pre-test, and post-test submissions.
+- Duplicate LangGraph teacher review node and conditional edge definitions were removed, leaving one clean review path.
+- Learning-cycle metrics are collected through `core/metrics_collector.py`, including RAG latency, CrewAI latency, validation score, decision iterations, scaffolding direction, source types, and quiz pass rate.
+- `ValidationAgent` returns a structured `ValidationResult` with pass/fail, per-check results, score, and flags, and logs each validation to `logs/validation_log.jsonl`.
+- Pre-test and post-test endpoints are implemented at `/quiz/pretest` and `/quiz/posttest`; both reuse the quiz generation/scoring pipeline and tag submissions by assessment type.
+- `core/knowledge_state_updater.py` computes `learning_gain` and Hake `normalized_learning_gain` from pre/post scores and stores them in the student profile.
+- `GET /student/state` exposes assessment scores, learning gain, normalized learning gain, knowledge state, and progress fields.
+- Study survey endpoints are implemented: `POST /study/survey` stores responses in `data/survey_responses.jsonl`, and `GET /study/results` returns aggregate Table 2-style means per question.
+- Evaluation reporting is implemented through `scripts/generate_eval_report.py`, which reads metrics logs, validation logs, survey responses, and all student profiles, then exports `data/eval_report.json`.
+
+### Completed Frontend Capabilities
+
+- React UI supports topic selection, streamed tutor explanations, mastery heatmap, quick quizzes, and progress feedback.
+- A "Start Learning Assessment" button triggers the pre-test before learning starts.
+- A "Complete Assessment" button appears after topic completion and triggers the post-test.
+- The UI displays pre-test score, post-test score, and learning gain after post-test completion.
+- `ui/src/StudyQuestionnaire.jsx` provides a post-session survey with Usability, Trust, Engagement, and optional open-text sections.
+- Survey responses are submitted from the UI to `/study/survey` after post-test completion.
+
+### Evaluation Outputs Now Available
+
+Run:
+
+```bash
+python scripts/generate_eval_report.py
+```
+
+The script prints:
+
+- **SYSTEM METRICS** vs base paper benchmarks: RAG latency, CrewAI latency, validation score, decision iterations, and scaffolding accuracy.
+- **LEARNING OUTCOMES**: mean pre-test, post-test, raw learning gain, and Hake normalized gain.
+- **USER STUDY**: mean Likert dimensions for usability, adaptation, and engagement.
+
+It also exports the same structured report to:
+
+```bash
+data/eval_report.json
+```
+
+### Not Started / Still Pending
+
+- Multi-student API sessions are not implemented; the API still uses one active local `STUDENT_ID`.
+- Authentication and user account management are not implemented.
+- A teacher dashboard for manual review is not implemented; the API still auto-approves teacher review output for local/demo use.
+- A frontend analytics dashboard for `data/eval_report.json` is not implemented yet.
+- Deployment packaging with Docker or hosted infrastructure is not implemented.
+- Real browser-based end-to-end tests are not implemented; current coverage is focused backend pytest plus frontend production build.
+
+---
+
 ## Limitations
 
-- **Simulated engagement signals** — `MonitorAgent` currently infers performance from `challenge_level` using random perturbations, not from actual student quiz answers in the LangGraph loop. Real-time answer grading is only wired in through the API's `/quiz/submit` endpoint.
+- **Limited non-quiz engagement signals** — `MonitorAgent` no longer applies random score variation; however, richer real-time behavioral signals such as time-on-task, hesitation, and hint usage are not yet captured.
 - **Single active student** — The API server hardcodes `STUDENT_ID = "KISH-001"`. Supporting concurrent multi-student sessions would require session-scoped state management.
 - **Fixed curriculum scope** — The system currently supports a predefined set of Python (9 topics) and DSA (7 topics) concepts. Adding new subjects requires extending curriculum files and re-ingesting the vector database.
 - **No authentication** — There is no user authentication layer. The API is open and intended for local or lab use only.
