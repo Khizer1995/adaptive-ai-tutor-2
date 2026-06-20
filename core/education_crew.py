@@ -1,3 +1,16 @@
+"""
+education_crew.py
+=================
+Root-cause fix for Issue #4:
+  Previously, _build_competing_proposals() called
+  self.practical.generate_quiz_batch() during content generation, which caused
+  quiz content to appear alongside learning content.
+
+  Now, proposals carry ONLY the learning path.  Quiz generation is invoked
+  exclusively from the /quiz/generate endpoint (on-demand), keeping the two
+  phases completely separate.
+"""
+
 from core.tutor_agent import TutorAgent
 from core.practical_agent import PracticalAgent
 from core.teacher_persona_agent import TeacherPersonaAgent
@@ -11,6 +24,9 @@ class EducationCrew:
 
     Produces competing proposals from crew members.
     Selection is handled by the LangGraph decision layer.
+
+    KEY CHANGE: Proposals no longer include quiz questions.
+    Quiz generation is a separate on-demand operation.
     """
 
     def __init__(self):
@@ -35,7 +51,6 @@ class EducationCrew:
 
         proposals = self._build_competing_proposals(decision, student_state)
         state["crew_proposals"] = proposals
-        # Compatibility fallback: legacy flow expects crew_output.
         state["crew_output"] = proposals[0] if proposals else {"decision": decision}
 
         duration_ms = round(timer.elapsed_ms(), 2)
@@ -61,8 +76,6 @@ class EducationCrew:
         base_learning = self._extract_learning(
             self.tutor.generate_learning_path(decision, student_state)
         )
-        rag_context = str(base_learning.get("learning_path", ""))
-        base_quiz = self.practical.generate_quiz_batch(decision, student_state, rag_context)
         teacher_style = self.persona.apply_persona(student_state)
         action = decision.get("action", "default")
 
@@ -76,12 +89,13 @@ class EducationCrew:
             tutor_challenge = "medium"
             practical_challenge = "medium"
 
+        # ── FIX #4: NO quiz generation here — empty quiz lists in proposals ──
         proposals = [
             CrewProposal(
                 proposal_id="tutor_plan",
                 owner_agent="tutor_agent",
                 learning_path=base_learning.get("learning_path", ""),
-                quiz=base_quiz[:2],
+                quiz=[],          # EMPTY — quiz is on-demand only
                 teacher_style=teacher_style,
                 rag_chunks=base_learning.get("rag_chunks", []),
                 engineered_query=base_learning.get("engineered_query", ""),
@@ -94,7 +108,7 @@ class EducationCrew:
                 proposal_id="practice_plan",
                 owner_agent="practical_agent",
                 learning_path=base_learning.get("learning_path", ""),
-                quiz=base_quiz,
+                quiz=[],          # EMPTY — quiz is on-demand only
                 teacher_style=teacher_style,
                 rag_chunks=base_learning.get("rag_chunks", []),
                 engineered_query=base_learning.get("engineered_query", ""),
@@ -107,7 +121,7 @@ class EducationCrew:
                 proposal_id="persona_plan",
                 owner_agent="teacher_persona",
                 learning_path=base_learning.get("learning_path", ""),
-                quiz=base_quiz[:1] if base_quiz else [],
+                quiz=[],          # EMPTY — quiz is on-demand only
                 teacher_style=teacher_style,
                 rag_chunks=base_learning.get("rag_chunks", []),
                 engineered_query=base_learning.get("engineered_query", ""),
@@ -133,5 +147,6 @@ class EducationCrew:
                 "rag_chunks": learning_path_result.get("rag_chunks", []),
                 "rag_chunk_records": learning_path_result.get("rag_chunk_records", []),
                 "engineered_query": learning_path_result.get("engineered_query", ""),
+                "adaptive_ctx": learning_path_result.get("adaptive_ctx", {}),
             }
         return {"learning_path": learning_path_result}

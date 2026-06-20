@@ -1,14 +1,127 @@
 {
     "student_id": "KISH-001",
     "name": "Student",
-    "subject": "dsa",
     "level": "beginner",
-    "current_topic": "stack",
+    "subject": "dsa",
+    "current_topic": "linked_list",
+    "progress": [
+        "array",
+        "linked_list"
+    ],
+    "engagement": "high",
+    "last_score": 0.8333,
+    "learning_history": [
+        {
+            "timestamp": "2026-06-20T08:46:30.434155+00:00",
+            "topic": "array",
+            "subtopic": "array_introduction",
+            "score": 0.6667,
+            "question_count": 6
+        },
+        {
+            "timestamp": "2026-06-20T08:48:08.702413+00:00",
+            "topic": "array",
+            "subtopic": "array_operations",
+            "score": 0.8333,
+            "question_count": 6
+        }
+    ],
+    "frustration_level": 0,
+    "engagement_score": 5,
+    "learning_style": "balanced",
+    "last_active": "2026-06-20T09:09:56.091500+00:00",
+    "accuracy_history": [],
+    "learning_gain_history": [],
+    "learning_gain": 0.0,
+    "normalized_learning_gain": 0.0,
+    "pretest_score": null,
+    "posttest_score": null,
+    "assessment_scores": {},
+    "assessment_history": [],
     "knowledge_state": {
         "concepts": {
             "stack": {
                 "confidence": 0.8
+            },
+            "array": {
+                "mastery": 0.712,
+                "confidence": 0.598,
+                "attempts": 7,
+                "scaffold_level": "medium",
+                "weak_areas": [],
+                "strong_areas": [
+                    "array_operations"
+                ],
+                "completed": false
+            },
+            "linked_list": {
+                "mastery": 0.831,
+                "confidence": 0.57,
+                "attempts": 3,
+                "scaffold_level": "medium",
+                "weak_areas": [],
+                "strong_areas": [],
+                "completed": false
             }
+        },
+        "version": 2
+    },
+    "knowledge_events": [
+        {
+            "topic": "array",
+            "mastery": 0.0,
+            "confidence": 0.35,
+            "scaffold_level": "high",
+            "observed_score": 0.0
+        },
+        {
+            "topic": "array",
+            "mastery": 0.363,
+            "confidence": 0.35,
+            "scaffold_level": "high",
+            "observed_score": 0.6667
+        },
+        {
+            "topic": "array",
+            "mastery": 0.455,
+            "confidence": 0.4,
+            "scaffold_level": "high",
+            "observed_score": 0.67
+        },
+        {
+            "topic": "array",
+            "mastery": 0.661,
+            "confidence": 0.548,
+            "scaffold_level": "medium",
+            "observed_score": 0.8333
+        },
+        {
+            "topic": "array",
+            "mastery": 0.712,
+            "confidence": 0.598,
+            "scaffold_level": "medium",
+            "observed_score": 0.83
+        },
+        {
+            "topic": "linked_list",
+            "mastery": 0.832,
+            "confidence": 0.44,
+            "scaffold_level": "high",
+            "observed_score": 0.83
+        },
+        {
+            "topic": "linked_list",
+            "mastery": 0.831,
+            "confidence": 0.512,
+            "scaffold_level": "medium",
+            "observed_score": 0.83
+        },
+        {
+            "topic": "linked_list",
+            "mastery": 0.831,
+            "confidence": 0.57,
+            "scaffold_level": "medium",
+            "observed_score": 0.83
         }
     },
     "delivered_chunks": {
@@ -21,24 +134,111 @@
                 "definition",
                 "operations"
             ]
+        },
+        "array": {
+            "chunk_ids": [
+                "hybrid_0",
+                "hybrid_1",
+                "hybrid_2",
+                "hybrid_3",
+                "hybrid_4",
+                "hybrid_5"
+            ],
+            "concepts": []
+        },
+        "linked_list": {
+            "chunk_ids": [
+                "hybrid_0",
+                "hybrid_1",
+                "hybrid_2"
+            ],
+            "concepts": []
         }
     },
-    "current_subtopic": "stack_introduction",
-    "quiz_seen_questions": {
-        "stack": {
-            "stack_introduction": [
-                "445dca886471252ea956ca04375f39ff"
-            ]
-        }
-    },
+    "current_subtopic": "linked_list_applications",
     "macro_decision": {
-        "macro_action": "stabilize_foundations",
+        "macro_action": "guided_progression",
         "target_concepts": [
             "stack"
         ],
-        "scaffold_policy": "high",
-        "reason": "IF last_score (0.00) < 0.45 THEN stabilize foundations with high scaffolding. | Target weakest concept 'stack' based on mastery snapshot (avg_mastery=0.00, avg_confidence=0.80, trend=stable).",
-        "decision_rationale": "IF last_score (0.00) < 0.45 THEN stabilize foundations with high scaffolding. | Target weakest concept 'stack' based on mastery snapshot (avg_mastery=0.00, avg_confidence=0.80, trend=stable)."
+        "scaffold_policy": "medium",
+        "reason": "IF the learner is neither at-risk nor clearly ready to accelerate THEN use guided progression with medium scaffolding. | Target weakest concept 'stack' based on mastery snapshot (avg_mastery=0.51, avg_confidence=0.64, trend=stable).",
+        "decision_rationale": "IF the learner is neither at-risk nor clearly ready to accelerate THEN use guided progression with medium scaffolding. | Target weakest concept 'stack' based on mastery snapshot (avg_mastery=0.51, avg_confidence=0.64, trend=stable)."
     },
-    "last_active": "2026-06-18T10:30:46.674445+00:00"
+    "decision": {
+        "next_node": "education_crew",
+        "action": "advance_topic",
+        "weights": {
+            "increase_support": 0,
+            "reinforce_basics": 0,
+            "adjust_quiz": 0,
+            "increase_challenge": 2,
+            "challenge_with_variation": 0,
+            "advance_topic": 6,
+            "reduce_support": 1
+        },
+        "fired_weights": [
+            {
+                "action": "increase_challenge",
+                "total_weight": 2,
+                "reasons": [
+                    "+2: engagement is high"
+                ]
+            },
+            {
+                "action": "advance_topic",
+                "total_weight": 6,
+                "reasons": [
+                    "+2: engagement is high",
+                    "+4: last_score 0.83 is at least 0.65 and engagement is high"
+                ]
+            },
+            {
+                "action": "reduce_support",
+                "total_weight": 1,
+                "reasons": [
+                    "+1: strong score without improving trend"
+                ]
+            }
+        ],
+        "reason": "Deterministic weighted decision with no randomness. | increase_challenge=2 from +2: engagement is high | advance_topic=6 from +2: engagement is high, +4: last_score 0.83 is at least 0.65 and engagement is high | reduce_support=1 from +1: strong score without improving trend | Selected 'advance_topic' because it had the highest total weight (6). Ties resolve by fixed action order: increase_support, reinforce_basics, adjust_quiz, increase_challenge, challenge_with_variation, advance_topic, reduce_support. | Context used: score=0.83, engagement=high, trend=stable, style=balanced, macro_action=guided_progression, scaffold_policy=medium.",
+        "decision_rationale": "Deterministic weighted decision with no randomness. | increase_challenge=2 from +2: engagement is high | advance_topic=6 from +2: engagement is high, +4: last_score 0.83 is at least 0.65 and engagement is high | reduce_support=1 from +1: strong score without improving trend | Selected 'advance_topic' because it had the highest total weight (6). Ties resolve by fixed action order: increase_support, reinforce_basics, adjust_quiz, increase_challenge, challenge_with_variation, advance_topic, reduce_support. | Context used: score=0.83, engagement=high, trend=stable, style=balanced, macro_action=guided_progression, scaffold_policy=medium."
+    },
+    "generated_content_history": {
+        "linked_list": {
+            "linked_list_applications": [
+                {
+                    "timestamp": "2026-06-20T09:09:55.993648+00:00",
+                    "fingerprint": "557578998c54f4a8ce62df9f08f42a69f05fa9f417b00b2b9c5193b3da143d1b",
+                    "preview": "## linked_list \u2014 linked_list_applications\n\n**Overview**\nLinked lists excel in scenarios requiring frequent $O(1)$ insertions and deletions where memory is non-contiguous or the total data volume is unpredictable. At an advanced level, they ",
+                    "metadata": {
+                        "mode": "advanced",
+                        "depth": "advanced",
+                        "score": 0.8333
+                    }
+                },
+                {
+                    "timestamp": "2026-06-20T09:09:56.048329+00:00",
+                    "fingerprint": "557578998c54f4a8ce62df9f08f42a69f05fa9f417b00b2b9c5193b3da143d1b",
+                    "preview": "## linked_list \u2014 linked_list_applications\n\n**Overview**\nLinked lists excel in scenarios requiring frequent $O(1)$ insertions and deletions where memory is non-contiguous or the total data volume is unpredictable. At an advanced level, they ",
+                    "metadata": {}
+                }
+            ]
+        }
+    },
+    "content_fingerprints": {
+        "linked_list": {
+            "linked_list_applications": [
+                "557578998c54f4a8ce62df9f08f42a69f05fa9f417b00b2b9c5193b3da143d1b"
+            ]
+        }
+    },
+    "quiz_seen_questions": {},
+    "quiz_attempts": {},
+    "weak_areas": {},
+    "strong_areas": {},
+    "completed_topics": [
+        "array",
+        "linked_list"
+    ]
 }

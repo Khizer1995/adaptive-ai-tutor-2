@@ -1,3 +1,43 @@
+"""
+api_server.py  —  Cognitive Adaptive AI Tutor
+==============================================
+
+Root-cause fixes in this version
+──────────────────────────────────
+Issue #1  Adaptive learning not working:
+  /tutor/explain/stream now passes the up-to-date student state (including
+  last_score, knowledge_state, weak_areas) through _run_adaptive_learning_flow
+  which feeds into TutorAgent.generate_learning_path → adaptive_engine.
+  Quiz submission via /quiz/submit calls adaptive_engine.after_quiz_submit
+  to update mastery/scaffold_level before the next explanation is generated.
+
+Issue #2  Content repetition:
+  record_content() from adaptive_engine is called after every explanation so
+  the "prior content" anti-repetition guard activates on the next call.
+
+Issue #3  Quiz repetition:
+  /quiz/generate tracks seen question hashes per subtopic in student state,
+  passes them to generate_quiz_batch, and persists after each call.
+
+Issue #4  Quiz rendered below content:
+  /tutor/explain/stream no longer includes quiz in its response payload.
+  /quiz/generate is a separate, explicit endpoint.
+
+Issue #5  Only one topic shown:
+  /student/topics now uses get_all_curriculum_topics() from curriculum_config
+  so all 7 DSA topics (array, linked_list, stack, queue, hash_table, tree,
+  graph) are returned with their subtopic lists.
+
+Issue #6  Source material not utilised:
+  No change to RAG plumbing needed — the adaptive prompts in tutor_agent and
+  practical_agent now inject the RAG context more forcefully.
+
+Issue #7  Learning state not maintained:
+  /quiz/submit calls after_quiz_submit() which calls record_quiz_attempt() in
+  adaptive_learning.py — this updates mastery, confidence, scaffold_level,
+  weak_areas, strong_areas, and level persistently in the student profile.
+"""
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
@@ -24,10 +64,11 @@ from core.validation_agent import ValidationAgent
 from core.knowledge_state_updater import apply_execution_feedback, record_assessment_score
 from core.delivery_tracker import append_delivered_chunks, get_delivered_topic_summary
 from core.learning_navigation import build_next_recommendation
-from core.curriculum_config import UNLOCK_THRESHOLD, get_next_subtopic
+from core.curriculum_config import UNLOCK_THRESHOLD, get_next_subtopic, get_all_curriculum_topics
 from core.practical_agent import QuizQuestion
 from core.logging_utils import Timer
 from core.metrics_collector import log_learning_cycle_metrics
+from core.adaptive_engine import after_quiz_submit, record_content, get_all_topics
 
 app = FastAPI()
 
@@ -49,61 +90,17 @@ validation_agent = ValidationAgent()
 STUDENT_ID = "KISH-001"
 SURVEY_RESPONSES_PATH = Path("data/survey_responses.jsonl")
 SURVEY_QUESTIONS: List[Dict[str, str]] = [
-    {
-        "id": "usability_easy_to_use",
-        "section": "Usability",
-        "question": "The system was easy to use",
-    },
-    {
-        "id": "usability_clear_explanations",
-        "section": "Usability",
-        "question": "The explanations were clear and understandable",
-    },
-    {
-        "id": "usability_quiz_alignment",
-        "section": "Usability",
-        "question": "The quizzes matched what I just learned",
-    },
-    {
-        "id": "usability_adapted_level",
-        "section": "Usability",
-        "question": "The system felt like it adapted to my level",
-    },
-    {
-        "id": "usability_use_again",
-        "section": "Usability",
-        "question": "I would use this system again to learn a new topic",
-    },
-    {
-        "id": "trust_explanations",
-        "section": "Trust",
-        "question": "I trusted the system's explanations",
-    },
-    {
-        "id": "trust_hints",
-        "section": "Trust",
-        "question": "The system gave me appropriate hints",
-    },
-    {
-        "id": "trust_learning_needs",
-        "section": "Trust",
-        "question": "I felt the system understood my learning needs",
-    },
-    {
-        "id": "engagement_throughout",
-        "section": "Engagement",
-        "question": "I was engaged throughout the session",
-    },
-    {
-        "id": "engagement_difficulty",
-        "section": "Engagement",
-        "question": "The difficulty felt appropriate for me",
-    },
-    {
-        "id": "engagement_progress",
-        "section": "Engagement",
-        "question": "I felt I made progress",
-    },
+    {"id": "usability_easy_to_use",      "section": "Usability",   "question": "The system was easy to use"},
+    {"id": "usability_clear_explanations","section": "Usability",   "question": "The explanations were clear and understandable"},
+    {"id": "usability_quiz_alignment",    "section": "Usability",   "question": "The quizzes matched what I just learned"},
+    {"id": "usability_adapted_level",     "section": "Usability",   "question": "The system felt like it adapted to my level"},
+    {"id": "usability_use_again",         "section": "Usability",   "question": "I would use this system again to learn a new topic"},
+    {"id": "trust_explanations",          "section": "Trust",       "question": "I trusted the system's explanations"},
+    {"id": "trust_hints",                 "section": "Trust",       "question": "The system gave me appropriate hints"},
+    {"id": "trust_learning_needs",        "section": "Trust",       "question": "I felt the system understood my learning needs"},
+    {"id": "engagement_throughout",       "section": "Engagement",  "question": "I was engaged throughout the session"},
+    {"id": "engagement_difficulty",       "section": "Engagement",  "question": "The difficulty felt appropriate for me"},
+    {"id": "engagement_progress",         "section": "Engagement",  "question": "I felt I made progress"},
 ]
 
 from core.teacher_review_agent import TeacherReviewAgent
@@ -116,6 +113,10 @@ def auto_approve_review(self, crew_output, student_state):
 
 TeacherReviewAgent.review = auto_approve_review
 
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Student state helpers
+# ──────────────────────────────────────────────────────────────────────────────
 
 def get_student_state():
     try:
@@ -138,12 +139,20 @@ def get_student_state():
                         "confidence": 0.25,
                         "attempts": 0,
                         "scaffold_level": "high",
+                        "weak_areas": [],
+                        "strong_areas": [],
+                        "completed": False,
                     }
                 },
-                "version": 1,
+                "version": 2,
             },
             "delivered_chunks": {},
             "quiz_seen_questions": {},
+            "weak_areas": {},
+            "strong_areas": {},
+            "quiz_attempts": {},
+            "generated_content_history": {},
+            "content_fingerprints": {},
         }
 
 
@@ -169,7 +178,9 @@ def _store_seen_hashes_for_subtopic(
     topic_map[subtopic] = sorted(seen_hashes)
 
 
-def _reset_seen_hashes_for_other_subtopics(state: Dict[str, Any], topic: str, active_subtopic: str) -> None:
+def _reset_seen_hashes_for_other_subtopics(
+    state: Dict[str, Any], topic: str, active_subtopic: str
+) -> None:
     quiz_seen = state.setdefault("quiz_seen_questions", {})
     topic_map = quiz_seen.setdefault(topic, {})
     for key in list(topic_map.keys()):
@@ -181,11 +192,7 @@ def _ensure_rag_ready() -> Dict[str, Any]:
     try:
         return file_manager.prepare_knowledge_base(force_reingest=False)
     except Exception as exc:
-        return {
-            "rag_ready": False,
-            "status": "failed",
-            "detail": str(exc),
-        }
+        return {"rag_ready": False, "status": "failed", "detail": str(exc)}
 
 
 def _format_macro_reason(macro: Dict[str, Any]) -> str:
@@ -226,15 +233,13 @@ def _fallback_mcq_questions(topic: str, seeds: List[str]) -> List[Dict[str, Any]
             f"{topic} cannot be tested using quiz questions.",
             f"{topic} replaces all Python fundamentals automatically.",
         ]
-        fallback.append(
-            {
-                "question": q_text,
-                "options": options,
-                "correct_answer": correct,
-                "explanation": f"This option correctly captures the purpose of {topic}.",
-                "hint": f"Focus on how {topic} is used in real learning tasks.",
-            }
-        )
+        fallback.append({
+            "question": q_text,
+            "options": options,
+            "correct_answer": correct,
+            "explanation": f"This option correctly captures the purpose of {topic}.",
+            "hint": f"Focus on how {topic} is used in real learning tasks.",
+        })
     return fallback
 
 
@@ -308,6 +313,10 @@ def _run_adaptive_learning_flow(
     }
 
 
+# ──────────────────────────────────────────────────────────────────────────────
+# Request/Response models
+# ──────────────────────────────────────────────────────────────────────────────
+
 class TopicRequest(BaseModel):
     topic: str
     subtopic: str | None = None
@@ -353,6 +362,10 @@ class StudySurveyRequest(BaseModel):
     student_id: str | None = None
 
 
+# ──────────────────────────────────────────────────────────────────────────────
+# SSE helpers
+# ──────────────────────────────────────────────────────────────────────────────
+
 def _sse_delta(delta: str, done: bool = False, meta: Dict[str, Any] | None = None) -> str:
     payload: Dict[str, Any] = {"delta": delta}
     if done:
@@ -361,6 +374,10 @@ def _sse_delta(delta: str, done: bool = False, meta: Dict[str, Any] | None = Non
         payload["meta"] = meta
     return f"data: {json.dumps(payload)}\n\n"
 
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Survey helpers
+# ──────────────────────────────────────────────────────────────────────────────
 
 def _survey_question_ids() -> set[str]:
     return {question["id"] for question in SURVEY_QUESTIONS}
@@ -374,7 +391,6 @@ def _validated_survey_scores(responses: Dict[str, int]) -> Dict[str, int]:
             status_code=400,
             detail=f"Missing survey responses for: {', '.join(missing)}",
         )
-
     validated: Dict[str, int] = {}
     for question_id in expected_ids:
         value = responses.get(question_id)
@@ -396,7 +412,6 @@ def _append_survey_response(payload: Dict[str, Any]) -> None:
 def _read_survey_responses() -> List[Dict[str, Any]]:
     if not SURVEY_RESPONSES_PATH.exists():
         return []
-
     records: List[Dict[str, Any]] = []
     with SURVEY_RESPONSES_PATH.open("r", encoding="utf-8") as handle:
         for line in handle:
@@ -408,6 +423,42 @@ def _read_survey_responses() -> List[Dict[str, Any]]:
                 records.append(record)
     return records
 
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Answer scoring helpers
+# ──────────────────────────────────────────────────────────────────────────────
+
+def _normalize_answer(value: str) -> str:
+    return " ".join(str(value or "").strip().lower().split())
+
+
+def _resolve_option_match(selected: str, correct: str, options: List[str] | None = None) -> bool:
+    if _normalize_answer(selected) == _normalize_answer(correct):
+        return True
+    if options:
+        norm_options = {_normalize_answer(opt): opt for opt in options}
+        selected_norm = _normalize_answer(selected)
+        correct_norm = _normalize_answer(correct)
+        if selected_norm in norm_options and correct_norm in norm_options:
+            return selected_norm == correct_norm
+        close = get_close_matches(correct_norm, list(norm_options.keys()), n=1, cutoff=0.45)
+        if close:
+            return selected_norm == close[0]
+    return False
+
+
+def _score_answer_batch(answers: List[QuizBatchAnswer]) -> tuple[int, int, float]:
+    total = max(1, len(answers))
+    correct_count = 0
+    for answer in answers:
+        if _resolve_option_match(answer.selected_answer, answer.correct_answer):
+            correct_count += 1
+    return correct_count, total, round(correct_count / total, 4)
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Routes
+# ──────────────────────────────────────────────────────────────────────────────
 
 @app.get("/")
 def root():
@@ -425,7 +476,7 @@ def get_state():
     return {
         "student_id": state.get("student_id"),
         "name": state.get("name"),
-        "subject": state.get("subject", "python_general"),
+        "subject": state.get("subject", "dsa"),
         "level": state.get("level", "beginner"),
         "engagement": state.get("engagement", "medium"),
         "last_score": state.get("last_score", 0.0),
@@ -444,30 +495,67 @@ def get_state():
         "knowledge_state": state.get("knowledge_state", {}),
         "subtopic_mastery": state.get("subtopic_mastery", {}),
         "subtopic_progress": state.get("subtopic_progress", {}),
+        "weak_areas": state.get("weak_areas", {}),
+        "strong_areas": state.get("strong_areas", {}),
+        "quiz_attempts": state.get("quiz_attempts", {}),
+        "completed_topics": state.get("completed_topics", []),
     }
 
 
 @app.get("/student/topics")
 def get_topics():
+    """
+    Issue #5 fix: returns ALL curriculum topics (not just the ones that happen
+    to be in the student's knowledge_state) together with subtopic lists so the
+    sidebar can render a complete, navigable topic tree.
+    """
     state = get_student_state()
     knowledge_state = state.get("knowledge_state", {})
+    concepts = knowledge_state.get("concepts", {})
+    subtopic_progress = state.get("subtopic_progress", {})
+    subtopic_mastery = state.get("subtopic_mastery", {})
+
+    # Full curriculum from curriculum_config (all 7 DSA topics).
+    curriculum = get_all_curriculum_topics()
 
     topics = []
-    concepts = knowledge_state.get("concepts", {})
+    for topic_def in curriculum:
+        name = topic_def["name"]
+        concept_data = concepts.get(name, {})
+        subtopic_details = topic_def.get("subtopic_details", [])
 
-    for topic_name, data in concepts.items():
-        if isinstance(data, dict):
-            topics.append(
-                {
-                    "name": topic_name,
-                    "mastery": data.get("mastery", 0.0),
-                    "confidence": data.get("confidence", 0.0),
-                    "attempts": data.get("attempts", 0),
-                    "weak_areas": data.get("weak_areas", []),
-                }
-            )
+        # Enrich each subtopic with progress data.
+        enriched_subtopics = []
+        for sub in subtopic_details:
+            sid = sub["id"]
+            prog = subtopic_progress.get(sid, {})
+            enriched_subtopics.append({
+                "id": sid,
+                "title": sub["title"],
+                "score": subtopic_mastery.get(sid, 0.0),
+                "passed": bool(prog.get("passed", False)),
+                "attempts": int(prog.get("attempts", 0)),
+            })
+
+        topics.append({
+            "name": name,
+            "mastery": float(concept_data.get("mastery", 0.0)),
+            "confidence": float(concept_data.get("confidence", 0.0)),
+            "attempts": int(concept_data.get("attempts", 0)),
+            "scaffold_level": str(concept_data.get("scaffold_level", "high")),
+            "weak_areas": concept_data.get("weak_areas", []),
+            "strong_areas": concept_data.get("strong_areas", []),
+            "completed": bool(concept_data.get("completed", False)),
+            "subtopics": enriched_subtopics,
+        })
 
     return {"topics": topics}
+
+
+@app.get("/curriculum/topics")
+def get_curriculum_topics():
+    """Full curriculum definition without per-student enrichment."""
+    return {"topics": get_all_curriculum_topics()}
 
 
 @app.post("/study/survey")
@@ -504,16 +592,13 @@ def get_study_results():
             value = responses.get(question["id"]) if isinstance(responses, dict) else None
             if isinstance(value, (int, float)):
                 values.append(float(value))
-        rows.append(
-            {
-                "question_id": question["id"],
-                "section": question["section"],
-                "question": question["question"],
-                "mean": round(sum(values) / len(values), 4) if values else None,
-                "count": len(values),
-            }
-        )
-
+        rows.append({
+            "question_id": question["id"],
+            "section": question["section"],
+            "question": question["question"],
+            "mean": round(sum(values) / len(values), 4) if values else None,
+            "count": len(values),
+        })
     return {
         "table": "Table 2",
         "response_count": len(records),
@@ -527,15 +612,14 @@ def get_explanation(body: TopicRequest):
     state["current_topic"] = body.topic
     if body.subtopic:
         state["current_subtopic"] = body.subtopic
-    trace_payload = {
+    from core.logging_utils import trace_event
+    trace_event("state_topic_updated", {
         "phase": "pre_macro_decision",
         "node": "topic_selection",
         "current_topic": state.get("current_topic"),
         "current_subtopic": state.get("current_subtopic"),
-        "student_state": state,
-    }
-    from core.logging_utils import trace_event
-    trace_event("state_topic_updated", trace_payload)
+        "last_score": state.get("last_score"),
+    })
     rag_status = _ensure_rag_ready()
 
     flow = _run_adaptive_learning_flow(state, rag_status=rag_status)
@@ -544,18 +628,25 @@ def get_explanation(body: TopicRequest):
     updated_state = flow["updated_state"]
     rag_chunk_records = validated.get("rag_chunk_records", []) or []
     append_delivered_chunks(updated_state, body.topic, rag_chunk_records)
+
+    # ── Issue #2 fix: record the content so anti-repetition guard fires ──────
+    learning_path = validated.get("learning_path", "")
+    if learning_path and body.subtopic:
+        record_content(updated_state, body.topic, body.subtopic, learning_path)
+
     next_recommendation = build_next_recommendation(updated_state, body.topic)
     pm.save(STUDENT_ID, updated_state)
 
     return {
         "topic": body.topic,
-        "learning_path": validated.get("learning_path", ""),
+        "learning_path": learning_path,
         "rag_chunks": validated.get("rag_chunks", []),
         "teacher_style": validated.get("teacher_style", ""),
         "macro_decision": {
             "action": macro.get("macro_action", ""),
             "reason": _format_macro_reason(macro),
         },
+        "adaptive_mode": validated.get("adaptive_ctx", {}).get("mode", "guided"),
         "model_used": "gemini/Groq-fallback via ModelRouterAgent",
         "proposal_id": validated.get("proposal_id"),
         "validation_status": validated.get("validation_status"),
@@ -565,6 +656,11 @@ def get_explanation(body: TopicRequest):
 
 @app.get("/tutor/explain/stream")
 async def stream_explanation(topic: str, subtopic: str | None = None):
+    """
+    Issue #1 fix: state is loaded fresh on every call so the latest
+    last_score/mastery feed into the adaptive prompt.
+    Issue #4 fix: this endpoint returns ONLY learning content — no quiz.
+    """
     async def event_generator():
         try:
             state = get_student_state()
@@ -572,16 +668,14 @@ async def stream_explanation(topic: str, subtopic: str | None = None):
             if subtopic:
                 state["current_subtopic"] = subtopic
             from core.logging_utils import trace_event
-            trace_event(
-                "state_topic_updated",
-                {
-                    "phase": "pre_macro_decision",
-                    "node": "topic_selection_stream",
-                    "current_topic": state.get("current_topic"),
-                    "current_subtopic": state.get("current_subtopic"),
-                    "student_state": state,
-                },
-            )
+            trace_event("state_topic_updated", {
+                "phase": "pre_macro_decision",
+                "node": "topic_selection_stream",
+                "current_topic": state.get("current_topic"),
+                "current_subtopic": state.get("current_subtopic"),
+                "last_score": state.get("last_score"),
+                "level": state.get("level"),
+            })
             rag_status = _ensure_rag_ready()
 
             flow = _run_adaptive_learning_flow(state, rag_status=rag_status)
@@ -591,27 +685,39 @@ async def stream_explanation(topic: str, subtopic: str | None = None):
 
             rag_chunk_records = validated.get("rag_chunk_records", []) or []
             append_delivered_chunks(updated_state, topic, rag_chunk_records)
+
+            # Issue #2: record content so next call can vary it.
+            learning_path = validated.get("learning_path", "")
+            current_subtopic = subtopic or updated_state.get("current_subtopic", f"{topic}_introduction")
+            if learning_path:
+                record_content(updated_state, topic, current_subtopic, learning_path)
+
             next_recommendation = build_next_recommendation(updated_state, topic)
             pm.save(STUDENT_ID, updated_state)
 
-            learning_path = validated.get("learning_path", "")
-            payload = {
+            meta = {
                 "topic": topic,
-                "subtopic": state.get("current_subtopic"),
+                "subtopic": updated_state.get("current_subtopic"),
                 "rag_chunks": validated.get("rag_chunks", []),
                 "teacher_style": validated.get("teacher_style", ""),
                 "macro_decision": {
                     "action": macro.get("macro_action", ""),
                     "reason": _format_macro_reason(macro),
                 },
+                # Issue #1: expose adaptive mode so the UI can show it.
+                "adaptive_mode": validated.get("adaptive_ctx", {}).get("mode", "guided"),
+                "adaptive_score": state.get("last_score", 0.0),
                 "model_used": "gemini/Groq-fallback via ModelRouterAgent",
                 "proposal_id": validated.get("proposal_id"),
                 "validation_status": validated.get("validation_status"),
                 "next_recommendation": next_recommendation,
+                # Issue #4: explicitly tell the UI no quiz is embedded.
+                "quiz_embedded": False,
             }
+
             chunk_size = 18
             for i in range(0, len(learning_path), chunk_size):
-                yield _sse_delta(learning_path[i : i + chunk_size], meta=payload if i == 0 else None)
+                yield _sse_delta(learning_path[i: i + chunk_size], meta=meta if i == 0 else None)
                 await asyncio.sleep(0.03)
             yield _sse_delta("", done=True)
         except Exception as exc:
@@ -630,6 +736,14 @@ async def stream_explanation(topic: str, subtopic: str | None = None):
 
 @app.post("/quiz/generate")
 def get_quiz(body: TopicRequest):
+    """
+    Issue #3 fix: seen question hashes are loaded, passed to the quiz
+    generator, and stored back after generation so repeated calls produce
+    different questions.
+
+    Issue #4 fix: this is the ONLY place quiz questions are generated;
+    the /tutor/explain/stream endpoint no longer generates them.
+    """
     state = get_student_state()
     state["current_topic"] = body.topic
     if body.subtopic:
@@ -638,7 +752,7 @@ def get_quiz(body: TopicRequest):
     state["current_subtopic"] = current_subtopic
     _reset_seen_hashes_for_other_subtopics(state, body.topic, current_subtopic)
     seen_hashes = _get_seen_hashes_for_subtopic(state, body.topic, current_subtopic)
-    subject = str(state.get("subject", "python_general"))
+    subject = str(state.get("subject", "dsa"))
     _ensure_rag_ready()
 
     macro = decision_engine.decide_macro_plan(state)
@@ -646,8 +760,7 @@ def get_quiz(body: TopicRequest):
     micro = decision_engine.decide_next_step(state)
 
     engineered_query = crew.tutor.query_engineer.engineer(
-        f"Quiz questions for {body.topic}",
-        state,
+        f"Quiz questions for {body.topic} — {current_subtopic}", state
     )
     delivered_summary = get_delivered_topic_summary(state, body.topic)
     delivered_chunk_ids = delivered_summary.get("chunk_ids", [])
@@ -658,12 +771,12 @@ def get_quiz(body: TopicRequest):
     try:
         if "dsa" in subject.lower():
             if delivered_chunk_ids:
-                # Restrict quiz retrieval to already-delivered chunk ids.
                 rag_chunk_records = crew.tutor.retrieve_context_chunk_records(
-                    engineered_query,
-                    state,
-                    k=2,
-                    allowed_chunk_ids=delivered_chunk_ids,
+                    engineered_query, state, k=2, allowed_chunk_ids=delivered_chunk_ids
+                )
+            else:
+                rag_chunk_records = crew.tutor.retrieve_context_chunk_records(
+                    engineered_query, state, k=3
                 )
         else:
             rag_chunk_records = crew.tutor.retrieve_context_chunk_records(engineered_query, state, k=2)
@@ -676,19 +789,17 @@ def get_quiz(body: TopicRequest):
         for item in rag_chunk_records
         if str(item.get("content", "")).strip()
     ]
+    domain_fallback = "DSA fundamentals" if "dsa" in subject.lower() else "Python programming fundamentals"
+    rag_context = "\n\n".join(rag_chunks) if rag_chunks else domain_fallback
+
     quiz_basis = {
         "topics_covered": [body.topic] if delivered_chunk_ids else [],
         "concepts_covered": delivered_concepts,
         "chunk_ids_used": [str(item.get("chunk_id", "")) for item in rag_chunk_records if str(item.get("chunk_id", ""))],
     }
-    domain_fallback = "DSA fundamentals" if "dsa" in subject.lower() else "Python programming fundamentals"
-    rag_context = "\n\n".join(rag_chunks) if rag_chunks else domain_fallback
+
     questions = crew.practical.generate_quiz_batch(
-        micro,
-        state,
-        rag_context,
-        target_count=6,
-        seen_hashes=seen_hashes,
+        micro, state, rag_context, target_count=6, seen_hashes=seen_hashes
     )
     if len(questions) < 6:
         extra_questions = crew.practical.generate_quiz_batch(
@@ -699,6 +810,8 @@ def get_quiz(body: TopicRequest):
             seen_hashes=seen_hashes,
         )
         questions = questions + extra_questions
+
+    # Issue #3: persist updated seen hashes.
     _store_seen_hashes_for_subtopic(
         state,
         body.topic,
@@ -706,6 +819,7 @@ def get_quiz(body: TopicRequest):
         seen_hashes.union({_question_hash(q.get("question", "")) for q in questions if isinstance(q, dict)}),
     )
     pm.save(STUDENT_ID, state)
+
     validated_questions: List[Dict[str, Any]] = []
     for q in questions:
         try:
@@ -720,42 +834,18 @@ def get_quiz(body: TopicRequest):
         "rag_grounded": bool(rag_chunks),
         "quiz_basis": quiz_basis,
         "retrieval_warning": retrieval_warning,
+        # Tell the UI which adaptive mode was used so it can show context.
+        "adaptive_mode": macro.get("scaffold_policy", "medium"),
     }
 
 
-def _normalize_answer(value: str) -> str:
-    return " ".join(str(value or "").strip().lower().split())
-
-
-def _resolve_option_match(selected: str, correct: str, options: List[str] | None = None) -> bool:
-    if _normalize_answer(selected) == _normalize_answer(correct):
-        return True
-    if options:
-        norm_options = {_normalize_answer(opt): opt for opt in options}
-        selected_norm = _normalize_answer(selected)
-        correct_norm = _normalize_answer(correct)
-        if selected_norm in norm_options and correct_norm in norm_options:
-            return selected_norm == correct_norm
-        close = get_close_matches(correct_norm, list(norm_options.keys()), n=1, cutoff=0.45)
-        if close:
-            return selected_norm == close[0]
-    return False
-
-
-def _score_answer_batch(answers: List[QuizBatchAnswer]) -> tuple[int, int, float]:
-    total = max(1, len(answers))
-    correct_count = 0
-    for answer in answers:
-        if _resolve_option_match(answer.selected_answer, answer.correct_answer):
-            correct_count += 1
-    return correct_count, total, round(correct_count / total, 4)
-
-
-def _generate_assessment_questions(state: Dict[str, Any], topic: str, subtopic: str, assessment_type: str) -> Dict[str, Any]:
+def _generate_assessment_questions(
+    state: Dict[str, Any], topic: str, subtopic: str, assessment_type: str
+) -> Dict[str, Any]:
     state["current_topic"] = topic
     state["current_subtopic"] = subtopic
     state["last_assessment_type"] = assessment_type
-    subject = str(state.get("subject", "python_general"))
+    subject = str(state.get("subject", "dsa"))
     _ensure_rag_ready()
 
     macro = decision_engine.decide_macro_plan(state)
@@ -763,8 +853,7 @@ def _generate_assessment_questions(state: Dict[str, Any], topic: str, subtopic: 
     micro = decision_engine.decide_next_step(state)
 
     engineered_query = crew.tutor.query_engineer.engineer(
-        f"{assessment_type} diagnostic quiz questions for {topic} {subtopic}",
-        state,
+        f"{assessment_type} diagnostic quiz questions for {topic} {subtopic}", state
     )
     delivered_summary = get_delivered_topic_summary(state, topic)
     delivered_chunk_ids = delivered_summary.get("chunk_ids", [])
@@ -774,13 +863,12 @@ def _generate_assessment_questions(state: Dict[str, Any], topic: str, subtopic: 
     try:
         if "dsa" in subject.lower() and delivered_chunk_ids:
             rag_chunk_records = crew.tutor.retrieve_context_chunk_records(
-                engineered_query,
-                state,
-                k=2,
-                allowed_chunk_ids=delivered_chunk_ids,
+                engineered_query, state, k=2, allowed_chunk_ids=delivered_chunk_ids
             )
         elif "dsa" not in subject.lower():
             rag_chunk_records = crew.tutor.retrieve_context_chunk_records(engineered_query, state, k=2)
+        else:
+            rag_chunk_records = crew.tutor.retrieve_context_chunk_records(engineered_query, state, k=3)
     except Exception as exc:
         retrieval_warning = f"RAG retrieval fallback used: {exc}"
         rag_chunk_records = []
@@ -792,12 +880,9 @@ def _generate_assessment_questions(state: Dict[str, Any], topic: str, subtopic: 
     ]
     domain_fallback = "DSA fundamentals" if "dsa" in subject.lower() else "Python programming fundamentals"
     rag_context = "\n\n".join(rag_chunks) if rag_chunks else domain_fallback
+
     questions = crew.practical.generate_quiz_batch(
-        micro,
-        state,
-        rag_context,
-        target_count=6,
-        seen_hashes=set(),
+        micro, state, rag_context, target_count=6, seen_hashes=set()
     )
     if len(questions) < 6:
         questions.extend(
@@ -842,22 +927,18 @@ def _handle_assessment(body: AssessmentRequest, assessment_type: str) -> Dict[st
     state["current_topic"] = body.topic
     state["current_subtopic"] = subtopic
     state["last_score"] = score
-    state.setdefault("learning_history", []).append(
-        {
-            "type": assessment_type,
-            "topic": body.topic,
-            "subtopic": subtopic,
-            "score": score,
-            "question_count": total,
-        }
-    )
+    state.setdefault("learning_history", []).append({
+        "type": assessment_type,
+        "topic": body.topic,
+        "subtopic": subtopic,
+        "score": score,
+        "question_count": total,
+    })
     state = record_assessment_score(state, body.topic, subtopic, assessment_type, score)
     pm.save(STUDENT_ID, state)
 
     assessment_entry = (
-        state.get("assessment_scores", {})
-        .get(body.topic, {})
-        .get(subtopic, {})
+        state.get("assessment_scores", {}).get(body.topic, {}).get(subtopic, {})
     )
     return {
         "type": assessment_type,
@@ -870,8 +951,7 @@ def _handle_assessment(body: AssessmentRequest, assessment_type: str) -> Dict[st
         "posttest_score": assessment_entry.get("posttest_score", state.get("posttest_score")),
         "learning_gain": assessment_entry.get("learning_gain", state.get("learning_gain", 0.0)),
         "normalized_learning_gain": assessment_entry.get(
-            "normalized_learning_gain",
-            state.get("normalized_learning_gain", 0.0),
+            "normalized_learning_gain", state.get("normalized_learning_gain", 0.0)
         ),
     }
 
@@ -888,6 +968,14 @@ def posttest_quiz(body: AssessmentRequest):
 
 @app.post("/quiz/submit")
 def submit_answer(body: QuizBatchSubmitRequest):
+    """
+    Issue #1 & #7 fix:
+    • Calls after_quiz_submit() from adaptive_engine which invokes
+      record_quiz_attempt() in adaptive_learning — this updates mastery,
+      confidence, scaffold_level, weak_areas, strong_areas and level.
+    • The NEXT call to /tutor/explain/stream will load this updated state and
+      produce a properly adapted explanation.
+    """
     state = get_student_state()
     state["current_topic"] = body.topic
     state["current_subtopic"] = body.subtopic
@@ -899,36 +987,61 @@ def submit_answer(body: QuizBatchSubmitRequest):
             correct_count += 1
     score = round(correct_count / total, 4)
 
-    state["last_score"] = score
-    state.setdefault("learning_history", []).append(
-        {
-            "topic": body.topic,
-            "subtopic": body.subtopic,
-            "score": score,
-            "question_count": total,
-        }
+    # ── Issue #1 & #7: full adaptive state update after quiz ─────────────────
+    state = after_quiz_submit(
+        student_state=state,
+        topic=body.topic,
+        subtopic=body.subtopic,
+        score=score,
+        answers=body.answers,
     )
+
+    # Also update subtopic-level progress tracking.
     subtopic_mastery = state.setdefault("subtopic_mastery", {})
     subtopic_mastery[body.subtopic] = score
     subtopic_progress = state.setdefault("subtopic_progress", {})
+    prev_attempts = int(subtopic_progress.get(body.subtopic, {}).get("attempts", 0)) \
+        if isinstance(subtopic_progress.get(body.subtopic), dict) else 0
     subtopic_progress[body.subtopic] = {
         "score": score,
         "passed": score >= UNLOCK_THRESHOLD,
-        "attempts": int(subtopic_progress.get(body.subtopic, {}).get("attempts", 0)) + 1 if isinstance(subtopic_progress.get(body.subtopic), dict) else 1,
+        "attempts": prev_attempts + 1,
     }
 
-    updated_state = simulation.run_cycle(state)
+    # Apply execution feedback for macro-level state updates.
     updated_state = apply_execution_feedback(
-        updated_state,
+        state,
         {
             "topic": body.topic,
             "observed_score": score,
-            "observed_engagement": updated_state.get("engagement"),
+            "observed_engagement": state.get("engagement"),
         },
-        updated_state.get("macro_decision", {}),
+        state.get("macro_decision", {}),
     )
 
     pm.save(STUDENT_ID, updated_state)
+
+    # Determine adaptive recommendation for the UI.
+    concepts = updated_state.get("knowledge_state", {}).get("concepts", {})
+    topic_concept = concepts.get(body.topic, {})
+    new_mastery = float(topic_concept.get("mastery", score))
+    scaffold_level = str(topic_concept.get("scaffold_level", "medium"))
+
+    if score < 0.45:
+        adaptive_action = "remediate"
+        adaptive_message = (
+            "Score was low. The next explanation will be simplified with "
+            "analogies and smaller concept chunks."
+        )
+    elif score >= 0.75:
+        adaptive_action = "advance"
+        adaptive_message = (
+            "Excellent score! The next explanation will increase in depth "
+            "and introduce more challenging concepts."
+        )
+    else:
+        adaptive_action = "continue"
+        adaptive_message = "Good progress. Continue with the next subtopic."
 
     return {
         "correct": score >= UNLOCK_THRESHOLD,
@@ -941,6 +1054,12 @@ def submit_answer(body: QuizBatchSubmitRequest):
         "updated_engagement": updated_state.get("engagement"),
         "updated_macro_decision": updated_state.get("macro_decision", {}),
         "knowledge_state": updated_state.get("knowledge_state", {}),
+        # Issue #1: expose the adaptive recommendation so the UI can react.
+        "adaptive_action": adaptive_action,
+        "adaptive_message": adaptive_message,
+        "new_mastery": round(new_mastery, 4),
+        "scaffold_level": scaffold_level,
+        "weak_areas": updated_state.get("weak_areas", {}),
     }
 
 

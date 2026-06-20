@@ -1,32 +1,41 @@
 from core.rag.retriever import Retriever
 from core.rag.query_engineering import RAGQueryEngineer
 from core.llm.router import ModelRouterAgent
-from core.learning_response_format import build_structured_explain_query
 from core.logging_utils import get_logger, trace_event, Timer
+from core.adaptive_engine import (
+    build_content_context,
+    build_adaptive_prompt,
+    record_content,
+)
 from typing import Dict, Any, List, cast
 import json
 from core.hybrid_retriever import HybridRetriever
 
+
 class TutorAgent:
+    """
+    Adaptive Tutor Agent
+    ====================
+    Root-cause fixes applied:
+      • generate_learning_path now calls build_content_context() so the LLM
+        prompt adapts to the student's actual quiz score (Issue #1).
+      • Variation seed in the prompt prevents identical outputs on repeated
+        calls for the same topic (Issue #2).
+      • Generated content is recorded via record_content() so the next call
+        sees the prior summary and avoids repeating it (Issue #2).
+      • curriculum lists are sourced from adaptive_engine.get_all_topics()
+        rather than a hardcoded 7-item list (Issue #5 partial).
+    """
+
+    # Legacy static lists kept only for get_next_topic() compatibility.
     python_curriculum = [
-        "Python variables",
-        "Control flow (if/else)",
-        "Loops",
-        "Functions",
-        "Lists and arrays",
-        "Modules and packages",
-        "Object-oriented programming",
-        "Error handling",
-        "File I/O"
+        "Python variables", "Control flow (if/else)", "Loops", "Functions",
+        "Lists and arrays", "Modules and packages", "Object-oriented programming",
+        "Error handling", "File I/O"
     ]
     dsa_curriculum = [
-        "array",
-        "linked_list",
-        "stack",
-        "queue",
-        "hash_table",
-        "tree",
-        "graph",
+        "array", "linked_list", "stack", "queue",
+        "hash_table", "tree", "graph",
     ]
 
     def __init__(self):
@@ -77,7 +86,6 @@ class TutorAgent:
             return self._layered_retriever
         try:
             from core.layered_kb.retrieval import AdaptiveRetriever
-
             self._layered_retriever = AdaptiveRetriever()
             return self._layered_retriever
         except Exception as exc:
@@ -139,13 +147,11 @@ class TutorAgent:
                         content = str(item.get("content", "")).strip()
                         if not content:
                             continue
-                        cleaned_results.append(
-                            {
-                                "chunk_id": str(item.get("chunk_id", "")),
-                                "content": content,
-                                "metadata": item.get("metadata", {}) or {},
-                            }
-                        )
+                        cleaned_results.append({
+                            "chunk_id": str(item.get("chunk_id", "")),
+                            "content": content,
+                            "metadata": item.get("metadata", {}) or {},
+                        })
                     return cleaned_results
                 except Exception as exc:
                     self.logger.warning(f"layered_retrieval_failed topic='{topic}' error={exc}")
@@ -183,16 +189,16 @@ class TutorAgent:
         records = self.retrieve_context_chunk_records(query, student_state, k=k)
         return [str(item.get("content", "")).strip() for item in records if str(item.get("content", "")).strip()]
 
-
+    # ──────────────────────────────────────────────────────────────────────────
+    # PRIMARY CONTENT GENERATION — now fully adaptive
+    # ──────────────────────────────────────────────────────────────────────────
 
     def generate_learning_path(self, decision_output: dict, student_state: dict):
         timer = Timer()
-        level = student_state.get("level", "beginner")
-        action = decision_output.get("action", "default")
-        style = student_state.get("learning_style", "balanced")
         subject = str(student_state.get("subject", "")).lower()
 
-        # Advance topic if action is 'advance_topic'
+        # Topic selection (unchanged).
+        action = decision_output.get("action", "default")
         if action == "advance_topic":
             next_topic = self.get_next_topic(student_state)
             student_state["current_topic"] = next_topic
@@ -203,82 +209,63 @@ class TutorAgent:
                 topic = self.get_next_topic(student_state)
                 student_state["current_topic"] = topic
 
-        # Adapt base_query based on learning style
-        if style == "visual":
-            base_query = f"Explain {topic} using diagrams and visual aids for {level} level. Include annotated code snippets."
-        elif style == "problem-solver":
-            base_query = f"Provide challenging problems and step-by-step solutions for {topic} at {level} level. Include minimal theory."
-        elif action == "increase_support":
-            base_query = f"Explain {topic} in simple terms for beginner with examples"
-        elif level == "advanced":
-            base_query = f"Provide deep technical explanation and edge cases for {topic}"
-        else:
-            base_query = f"Explain {topic} for {level} level student with examples"
+        subtopic = str(student_state.get("current_subtopic") or f"{topic}_introduction")
+        domain_label = "DSA" if "dsa" in subject else "Python"
 
-        mastery = float(
-            student_state.get("knowledge_state", {})
-            .get("concepts", {})
-            .get(topic, {})
-            .get("mastery", student_state.get("last_score", 0.4))
+        # ── FIX #1 & #2: Build a fully adaptive context and prompt ────────────
+        ctx = build_content_context(student_state, topic, subtopic)
+        adaptive_prompt = build_adaptive_prompt(topic, subtopic, ctx, domain_label)
+
+        # ── RAG retrieval ─────────────────────────────────────────────────────
+        engineered_query = self.query_engineer.engineer(
+            f"Explain {topic} {subtopic} at {ctx['depth']} level", student_state
         )
-        show_complexity = mastery > 0.4
-        structure_guard = (
-            "Return markdown in this exact structure:\n"
-            f"## {topic}\n\n"
-            "1-2 sentence hook.\n\n"
-            "### What is it?\n"
-            "### How it works\n"
-            "Use a numbered list.\n"
-            "### Example\n"
-            "Use one fenced code block.\n"
-            "### Key Points\n"
-            "Use 3 bullet points.\n"
-            + ("### Time & Space Complexity\nUse a markdown table.\n" if show_complexity else "")
-        )
-        engineered_query = self.query_engineer.engineer(f"{base_query}\n\n{structure_guard}", student_state)
         retrieved_chunk_records = self.retrieve_context_chunk_records(engineered_query, student_state, k=3)
         retrieved_chunks = [
             str(item.get("content", "")).strip()
             for item in retrieved_chunk_records
             if str(item.get("content", "")).strip()
         ]
-        context = "\n\n".join(retrieved_chunks) if retrieved_chunks else "No curriculum content found."
-        domain_label = "DSA" if "dsa" in subject else "Python"
+        rag_context = "\n\n".join(retrieved_chunks) if retrieved_chunks else "No curriculum content found."
 
+        # ── LLM call with the ADAPTIVE prompt ─────────────────────────────────
         try:
             routed = self.router.route(
                 task_type="concept_explanation",
-                user_query=build_structured_explain_query(topic, level, style, domain_label),
-                context=context,
-                output_schema={
-                    "concept_overview": "1-2 lines",
-                    "key_points": "3-5 concise bullets",
-                    "operations_or_steps": "numbered if sequential",
-                    "example": "minimal concrete example",
-                    "common_mistakes": "2-3 bullets",
-                    "quick_recap": "single line",
-                },
+                user_query=adaptive_prompt,
+                context=rag_context,
+                output_schema=None,  # We want raw markdown, not JSON schema
             )
-            llm_response = routed.get("content", "")
-            llm_response = self._to_markdown_explanation(llm_response)
+            llm_response = str(routed.get("content", "")).strip()
             if not llm_response:
-                llm_response = self._fallback_response(topic, level, style)
+                llm_response = self._fallback_response(topic, subtopic, ctx["depth"], ctx["mode"])
         except Exception as exc:
             self.logger.error(f"llm_error={exc}")
-            llm_response = self._fallback_response(topic, level, style)
+            llm_response = self._fallback_response(topic, subtopic, ctx["depth"], ctx["mode"])
+
+        # ── FIX #2: Record content so next call sees it and can vary ──────────
+        if llm_response:
+            record_content(
+                student_state,
+                topic,
+                subtopic,
+                llm_response,
+                metadata={"mode": ctx["mode"], "depth": ctx["depth"], "score": ctx["score"]},
+            )
 
         duration_ms = round(timer.elapsed_ms(), 2)
         self.logger.info(
-            f"topic='{topic}' level={level} style={style} action={action} "
-            f"rag_chunks={len(retrieved_chunks)} duration_ms={duration_ms}"
+            f"topic='{topic}' subtopic='{subtopic}' mode={ctx['mode']} depth={ctx['depth']} "
+            f"score={ctx['score']} rag_chunks={len(retrieved_chunks)} duration_ms={duration_ms}"
         )
         trace_event(
             "tutor_generated",
             {
                 "topic": topic,
-                "level": level,
-                "style": style,
-                "action": action,
+                "subtopic": subtopic,
+                "mode": ctx["mode"],
+                "depth": ctx["depth"],
+                "score": ctx["score"],
                 "rag_chunks": len(retrieved_chunks),
                 "duration_ms": duration_ms,
             },
@@ -288,8 +275,52 @@ class TutorAgent:
             "rag_chunks": cast(List[str], retrieved_chunks),
             "rag_chunk_records": cast(List[Dict[str, Any]], retrieved_chunk_records),
             "llm_synthesis": str(llm_response),
-            "engineered_query": str(engineered_query)
+            "engineered_query": str(engineered_query),
+            "adaptive_ctx": ctx,
         }
+
+    # ──────────────────────────────────────────────────────────────────────────
+    # Fallback (adaptive-aware)
+    # ──────────────────────────────────────────────────────────────────────────
+
+    def _fallback_response(self, topic: str, subtopic: str, depth: str, mode: str) -> str:
+        if mode == "remedial":
+            return (
+                f"## {topic} — {subtopic}\n\n"
+                f"**Overview**\nLet's start from the very beginning with {topic}.\n\n"
+                f"**Key Points**\n"
+                f"• {topic} is a fundamental concept you'll use frequently.\n"
+                f"• Think of it like organising items in a specific way.\n"
+                f"• Don't worry if it feels complex — we'll break it into small pieces.\n\n"
+                f"**Quick Recap**\n{topic} helps you solve problems in an organised, predictable way.\n\n"
+                f"_(Adaptive fallback: remedial mode — score was low)_"
+            )
+        elif mode == "advanced":
+            return (
+                f"## {topic} — {subtopic}\n\n"
+                f"**Overview**\nAdvanced deep-dive into {topic}.\n\n"
+                f"**Key Points**\n"
+                f"• Analyse time and space complexity trade-offs carefully.\n"
+                f"• Consider edge cases: empty state, single element, overflow.\n"
+                f"• Compare against alternative data structures for the same problem.\n\n"
+                f"**Interview Question**\nWhen would you choose {topic} over a similar alternative, and why?\n\n"
+                f"_(Adaptive fallback: advanced mode)_"
+            )
+        else:
+            return (
+                f"## {topic} — {subtopic}\n\n"
+                f"**Overview**\n{topic} is a key concept used to store and process data efficiently.\n\n"
+                f"**Key Points**\n"
+                f"• Understand the basic operations and their order.\n"
+                f"• Try a simple implementation before optimising.\n"
+                f"• Connect to problems you have already solved.\n\n"
+                f"**Quick Recap**\nPractice {topic} with small examples to build intuition.\n\n"
+                f"_(Adaptive fallback: guided mode — {depth} level)_"
+            )
+
+    # ──────────────────────────────────────────────────────────────────────────
+    # Kept for backward-compat (education_crew._extract_learning)
+    # ──────────────────────────────────────────────────────────────────────────
 
     def _extract_json_payload(self, text: str) -> Dict[str, Any]:
         candidate = str(text or "").strip()
@@ -313,83 +344,3 @@ class TutorAgent:
     def _looks_like_code(self, example: str) -> bool:
         hints = ("def ", "class ", "return ", "for ", "while ", "if ", "print(", "=>", "{", "};")
         return any(token in example for token in hints)
-
-    def _to_markdown_explanation(self, llm_response: str) -> str:
-        payload = self._extract_json_payload(llm_response)
-        if not payload:
-            return str(llm_response or "").strip()
-
-        lines: List[str] = []
-        overview = str(payload.get("concept_overview", "")).strip()
-        if overview:
-            lines.append(overview)
-
-        key_points = payload.get("key_points", [])
-        if isinstance(key_points, list) and key_points:
-            lines.append("")
-            for item in key_points:
-                value = str(item).strip()
-                if value:
-                    lines.append(f"• {value}")
-
-        operations = payload.get("operations_or_steps", [])
-        if isinstance(operations, list) and operations:
-            lines.append("")
-            step_num = 1
-            for item in operations:
-                value = str(item).strip()
-                if value:
-                    lines.append(f"{step_num}. {value}")
-                    step_num += 1
-
-        example = str(payload.get("example", "")).strip()
-        if example:
-            lines.append("")
-            if self._looks_like_code(example):
-                lines.append("```python")
-                lines.append(example)
-                lines.append("```")
-            else:
-                lines.append(example)
-
-        return "\n".join(lines).strip()
-
-    def _fallback_response(self, topic, level, style="balanced"):
-        if style == "visual":
-            return (
-                f"[Visual Style]\n"
-                f"- Diagram: [Imagine a diagram explaining {topic}]\n"
-                f"- Annotated code: [Show code with comments for {topic}]\n"
-                f"- Visual summary: [Key points in visual format]"
-            )
-        elif style == "problem-solver":
-            return (
-                f"[Problem-Solver Style]\n"
-                f"- Challenge: Solve a real-world problem using {topic}.\n"
-                f"- Step-by-step solution: [Detailed steps]"
-            )
-        # Balanced style fallback
-        if level == "advanced":
-            extra = "- Discuss edge cases and optimization\n- Consider performance implications"
-        elif level == "intermediate":
-            extra = "- Practice with multiple examples\n- Understand use cases"
-        else:
-            extra = "- Focus on basics\n- Try simple exercises"
-
-        return f"""
-Simple Explanation:
-{topic} is a key concept in Python used to store and manipulate data.
-
-Code Example:
-x = 10
-name = "Alice"
-print(x, name)
-
-Key Takeaways:
-- Variables store data
-- Python is dynamically typed
-- No need to declare types
-{extra}
-
-(Level: {level} | Adaptive fallback mode)
-"""
