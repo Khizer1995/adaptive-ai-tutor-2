@@ -1,0 +1,177 @@
+{
+    "student_id": "USER-230d4930",
+    "name": "Student",
+    "level": "beginner",
+    "subject": "dsa",
+    "current_topic": "queue",
+    "progress": [],
+    "engagement": "low",
+    "last_score": 0.3,
+    "learning_history": [],
+    "frustration_level": 0,
+    "engagement_score": 5,
+    "learning_style": "balanced",
+    "last_active": "2026-06-20T17:57:35.022546+00:00",
+    "accuracy_history": [],
+    "learning_gain_history": [],
+    "learning_gain": 0.0,
+    "normalized_learning_gain": 0.0,
+    "pretest_score": null,
+    "posttest_score": null,
+    "assessment_scores": {},
+    "assessment_history": [],
+    "knowledge_state": {
+        "concepts": {
+            "array": {
+                "mastery": 0.23,
+                "confidence": 0.27,
+                "attempts": 1,
+                "scaffold_level": "high",
+                "weak_areas": [],
+                "strong_areas": [],
+                "completed": false
+            },
+            "queue": {
+                "mastery": 0.3,
+                "confidence": 0.35,
+                "attempts": 3,
+                "scaffold_level": "high",
+                "weak_areas": [],
+                "strong_areas": [],
+                "completed": false
+            }
+        },
+        "version": 2
+    },
+    "knowledge_events": [
+        {
+            "topic": "array",
+            "mastery": 0.23,
+            "confidence": 0.27,
+            "scaffold_level": "high",
+            "observed_score": 0.3
+        },
+        {
+            "topic": "queue",
+            "mastery": 0.3,
+            "confidence": 0.35,
+            "scaffold_level": "high",
+            "observed_score": 0.3
+        },
+        {
+            "topic": "queue",
+            "mastery": 0.3,
+            "confidence": 0.35,
+            "scaffold_level": "high",
+            "observed_score": 0.3
+        },
+        {
+            "topic": "queue",
+            "mastery": 0.3,
+            "confidence": 0.35,
+            "scaffold_level": "high",
+            "observed_score": 0.3
+        }
+    ],
+    "delivered_chunks": {
+        "array": {
+            "chunk_ids": [
+                "hybrid_0",
+                "hybrid_1",
+                "hybrid_2",
+                "hybrid_3",
+                "hybrid_4",
+                "hybrid_5"
+            ],
+            "concepts": []
+        },
+        "queue": {
+            "chunk_ids": [
+                "hybrid_0",
+                "hybrid_1",
+                "hybrid_2"
+            ],
+            "concepts": []
+        }
+    },
+    "current_subtopic": "queue_applications",
+    "macro_decision": {
+        "macro_action": "stabilize_foundations",
+        "target_concepts": [
+            "array"
+        ],
+        "scaffold_policy": "high",
+        "reason": "IF last_score (0.30) < 0.45 THEN stabilize foundations with high scaffolding. | Target weakest concept 'array' based on mastery snapshot (avg_mastery=0.27, avg_confidence=0.31, trend=stable).",
+        "decision_rationale": "IF last_score (0.30) < 0.45 THEN stabilize foundations with high scaffolding. | Target weakest concept 'array' based on mastery snapshot (avg_mastery=0.27, avg_confidence=0.31, trend=stable)."
+    },
+    "decision": {
+        "next_node": "education_crew",
+        "action": "increase_support",
+        "weights": {
+            "increase_support": 8,
+            "reinforce_basics": 5,
+            "adjust_quiz": 0,
+            "increase_challenge": 0,
+            "challenge_with_variation": 0,
+            "advance_topic": 0,
+            "reduce_support": 0
+        },
+        "fired_weights": [
+            {
+                "action": "increase_support",
+                "total_weight": 8,
+                "reasons": [
+                    "+3: engagement is low",
+                    "+3: last_score 0.30 is below 0.40",
+                    "+2: macro scaffold policy is high"
+                ]
+            },
+            {
+                "action": "reinforce_basics",
+                "total_weight": 5,
+                "reasons": [
+                    "+2: engagement is low",
+                    "+2: last_score 0.30 is below 0.40",
+                    "+1: macro scaffold policy is high"
+                ]
+            }
+        ],
+        "reason": "Deterministic weighted decision with no randomness. | increase_support=8 from +3: engagement is low, +3: last_score 0.30 is below 0.40, +2: macro scaffold policy is high | reinforce_basics=5 from +2: engagement is low, +2: last_score 0.30 is below 0.40, +1: macro scaffold policy is high | Selected 'increase_support' because it had the highest total weight (8). Ties resolve by fixed action order: increase_support, reinforce_basics, adjust_quiz, increase_challenge, challenge_with_variation, advance_topic, reduce_support. | Context used: score=0.30, engagement=low, trend=stable, style=balanced, macro_action=stabilize_foundations, scaffold_policy=high.",
+        "decision_rationale": "Deterministic weighted decision with no randomness. | increase_support=8 from +3: engagement is low, +3: last_score 0.30 is below 0.40, +2: macro scaffold policy is high | reinforce_basics=5 from +2: engagement is low, +2: last_score 0.30 is below 0.40, +1: macro scaffold policy is high | Selected 'increase_support' because it had the highest total weight (8). Ties resolve by fixed action order: increase_support, reinforce_basics, adjust_quiz, increase_challenge, challenge_with_variation, advance_topic, reduce_support. | Context used: score=0.30, engagement=low, trend=stable, style=balanced, macro_action=stabilize_foundations, scaffold_policy=high."
+    },
+    "generated_content_history": {
+        "queue": {
+            "queue_applications": [
+                {
+                    "timestamp": "2026-06-20T17:57:33.452285+00:00",
+                    "fingerprint": "a02bac687f50845ef045bd8a92cc0fcdd512069f7126312d9d1df359ddf3af55",
+                    "preview": "## queue \u2014 queue_applications\n\n**Overview**\nQueues are like waiting lines in real life. They are super useful in computer science when tasks or data need to be handled in the exact order they arrived, ensuring things are processed fairly.\n\n",
+                    "metadata": {
+                        "mode": "remedial",
+                        "depth": "beginner",
+                        "score": 0.3
+                    }
+                },
+                {
+                    "timestamp": "2026-06-20T17:57:35.016151+00:00",
+                    "fingerprint": "a02bac687f50845ef045bd8a92cc0fcdd512069f7126312d9d1df359ddf3af55",
+                    "preview": "## queue \u2014 queue_applications\n\n**Overview**\nQueues are like waiting lines in real life. They are super useful in computer science when tasks or data need to be handled in the exact order they arrived, ensuring things are processed fairly.\n\n",
+                    "metadata": {}
+                }
+            ]
+        }
+    },
+    "content_fingerprints": {
+        "queue": {
+            "queue_applications": [
+                "a02bac687f50845ef045bd8a92cc0fcdd512069f7126312d9d1df359ddf3af55"
+            ]
+        }
+    },
+    "quiz_seen_questions": {},
+    "quiz_attempts": {},
+    "weak_areas": {},
+    "strong_areas": {},
+    "completed_topics": [],
+    "_rag_latency_ms": 396.81
+}

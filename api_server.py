@@ -329,13 +329,19 @@ def _run_adaptive_learning_flow(
         macro,
     )
     rag_chunk_records = validated.get("rag_chunk_records", []) or []
+    
+    # Extract RAG latency - try multiple sources
+    rag_latency_ms = validated.get("rag_latency_ms", 0.0)
+    if rag_latency_ms == 0.0:
+        rag_latency_ms = (rag_status or {}).get("duration_ms", 0.0)
+    
     log_learning_cycle_metrics(
         student_state=updated_state,
         macro_decision=macro,
         micro_decision=decision,
         crew_output=validated,
         timings={
-            "rag_latency_ms": (rag_status or {}).get("duration_ms", 0.0),
+            "rag_latency_ms": rag_latency_ms,
             "crewai_latency_ms": crew_ms,
             "e2e_latency_ms": round(e2e_timer.elapsed_ms(), 2),
         },

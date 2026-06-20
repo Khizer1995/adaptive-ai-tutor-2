@@ -89,6 +89,9 @@ class EducationCrew:
             tutor_challenge = "medium"
             practical_challenge = "medium"
 
+        # Get RAG timing from base_learning
+        rag_latency_ms = base_learning.get("rag_latency_ms", 0.0)
+        
         # ── FIX #4: NO quiz generation here — empty quiz lists in proposals ──
         proposals = [
             CrewProposal(
@@ -132,8 +135,10 @@ class EducationCrew:
             ).to_dict(),
         ]
 
+        # Add RAG latency and decision to all proposals
         for proposal in proposals:
             proposal["decision"] = decision
+            proposal["rag_latency_ms"] = rag_latency_ms  # Add RAG timing to each proposal
         trace_event(
             "crew_proposals_generated",
             {"proposal_ids": [p["proposal_id"] for p in proposals], "action": action},
@@ -148,5 +153,6 @@ class EducationCrew:
                 "rag_chunk_records": learning_path_result.get("rag_chunk_records", []),
                 "engineered_query": learning_path_result.get("engineered_query", ""),
                 "adaptive_ctx": learning_path_result.get("adaptive_ctx", {}),
+                "rag_latency_ms": learning_path_result.get("rag_latency_ms", 0.0),  # Pass RAG timing
             }
         return {"learning_path": learning_path_result}

@@ -101,6 +101,9 @@ class TutorAgent:
         allowed_chunk_ids: List[str] | None = None,
         concept_family: List[str] | None = None,
     ) -> List[Dict[str, Any]]:
+        from time import perf_counter
+        rag_start_time = perf_counter()
+        
         topic = str(student_state.get("current_topic") or self.get_next_topic(student_state))
         subtopic = str(student_state.get("current_subtopic") or f"{topic}_introduction")
         subject = str(student_state.get("subject", "")).lower()
@@ -116,6 +119,10 @@ class TutorAgent:
                     allowed_chunk_ids=allowed_chunk_ids,
                 )
                 if hybrid_records:
+                    rag_latency_ms = round((perf_counter() - rag_start_time) * 1000.0, 2)
+                    self.logger.info(f"rag_retrieve_completed path=hybrid latency_ms={rag_latency_ms}")
+                    # Store timing in student_state for metrics collection
+                    student_state["_rag_latency_ms"] = rag_latency_ms
                     return hybrid_records
             except Exception as exc:
                 self.logger.warning(f"hybrid_retrieval_failed topic='{topic}' error={exc}")
@@ -152,6 +159,9 @@ class TutorAgent:
                             "content": content,
                             "metadata": item.get("metadata", {}) or {},
                         })
+                    rag_latency_ms = round((perf_counter() - rag_start_time) * 1000.0, 2)
+                    self.logger.info(f"rag_retrieve_completed path=layered latency_ms={rag_latency_ms}")
+                    student_state["_rag_latency_ms"] = rag_latency_ms
                     return cleaned_results
                 except Exception as exc:
                     self.logger.warning(f"layered_retrieval_failed topic='{topic}' error={exc}")
@@ -171,7 +181,7 @@ class TutorAgent:
             source_priority=source_priority,
             subject=subject_filter,
         )
-        return [
+        results = [
             {
                 "chunk_id": f"legacy_{idx}",
                 "content": chunk,
@@ -184,6 +194,10 @@ class TutorAgent:
             for idx, chunk in enumerate(fallback_chunks)
             if str(chunk).strip()
         ]
+        rag_latency_ms = round((perf_counter() - rag_start_time) * 1000.0, 2)
+        self.logger.info(f"rag_retrieve_completed path=legacy latency_ms={rag_latency_ms}")
+        student_state["_rag_latency_ms"] = rag_latency_ms
+        return results
 
     def retrieve_context_chunks(self, query: str, student_state: Dict[str, Any], k: int = 3) -> List[str]:
         records = self.retrieve_context_chunk_records(query, student_state, k=k)
@@ -271,12 +285,16 @@ class TutorAgent:
             },
         )
 
+        # Extract RAG latency from student_state (set by retrieve_context_chunk_records)
+        rag_latency_ms = student_state.get("_rag_latency_ms", 0.0)
+        
         return {
             "rag_chunks": cast(List[str], retrieved_chunks),
             "rag_chunk_records": cast(List[Dict[str, Any]], retrieved_chunk_records),
             "llm_synthesis": str(llm_response),
             "engineered_query": str(engineered_query),
             "adaptive_ctx": ctx,
+            "rag_latency_ms": rag_latency_ms,  # Pass RAG timing through
         }
 
     # ──────────────────────────────────────────────────────────────────────────

@@ -132,13 +132,28 @@ def profile_node(state: dict):
     state["student_state"] = student_profile_agent.persist(state["student_state"])
     started_at = state.get("_cycle_started_at")
     e2e_latency_ms = round((perf_counter() - started_at) * 1000.0, 2) if started_at else 0.0
+    
+    # Extract RAG latency - try multiple sources
+    rag_latency_ms = 0.0
+    
+    # First try: from student_state (set by tutor_agent during retrieval)
+    rag_latency_ms = state.get("student_state", {}).get("_rag_latency_ms", 0.0)
+    
+    # Second try: from crew_output (passed through proposals)
+    if rag_latency_ms == 0.0:
+        rag_latency_ms = state.get("crew_output", {}).get("rag_latency_ms", 0.0)
+    
+    # Third try: from rag_status (file manager timing - not ideal but better than 0)
+    if rag_latency_ms == 0.0:
+        rag_latency_ms = (state.get("rag_status", {}) or {}).get("duration_ms", 0.0)
+    
     log_learning_cycle_metrics(
         student_state=state.get("student_state", {}),
         macro_decision=state.get("macro_decision", {}),
         micro_decision=state.get("decision", {}),
         crew_output=state.get("crew_output", {}),
         timings={
-            "rag_latency_ms": (state.get("rag_status", {}) or {}).get("duration_ms", 0.0),
+            "rag_latency_ms": rag_latency_ms,
             "crewai_latency_ms": state.get("crewai_latency_ms", 0.0),
             "e2e_latency_ms": e2e_latency_ms,
         },
