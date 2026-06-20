@@ -3,7 +3,7 @@
     "name": "Student",
     "level": "beginner",
     "subject": "dsa",
-    "current_topic": "linked_list",
+    "current_topic": "stack",
     "progress": [
         "array",
         "linked_list"
@@ -29,7 +29,7 @@
     "frustration_level": 0,
     "engagement_score": 5,
     "learning_style": "balanced",
-    "last_active": "2026-06-20T09:09:56.091500+00:00",
+    "last_active": "2026-06-20T12:35:49.953869+00:00",
     "accuracy_history": [],
     "learning_gain_history": [],
     "learning_gain": 0.0,
@@ -41,7 +41,10 @@
     "knowledge_state": {
         "concepts": {
             "stack": {
-                "confidence": 0.8
+                "confidence": 0.8,
+                "mastery": 0.249,
+                "scaffold_level": "high",
+                "attempts": 1
             },
             "array": {
                 "mastery": 0.712,
@@ -122,13 +125,23 @@
             "confidence": 0.57,
             "scaffold_level": "medium",
             "observed_score": 0.83
+        },
+        {
+            "topic": "stack",
+            "mastery": 0.249,
+            "confidence": 0.8,
+            "scaffold_level": "high",
+            "observed_score": 0.83
         }
-    },
+    ],
     "delivered_chunks": {
         "stack": {
             "chunk_ids": [
                 "id1",
-                "id2"
+                "id2",
+                "hybrid_0",
+                "hybrid_1",
+                "hybrid_2"
             ],
             "concepts": [
                 "definition",
@@ -155,15 +168,15 @@
             "concepts": []
         }
     },
-    "current_subtopic": "linked_list_applications",
+    "current_subtopic": "stack_peek",
     "macro_decision": {
         "macro_action": "guided_progression",
         "target_concepts": [
             "stack"
         ],
         "scaffold_policy": "medium",
-        "reason": "IF the learner is neither at-risk nor clearly ready to accelerate THEN use guided progression with medium scaffolding. | Target weakest concept 'stack' based on mastery snapshot (avg_mastery=0.51, avg_confidence=0.64, trend=stable).",
-        "decision_rationale": "IF the learner is neither at-risk nor clearly ready to accelerate THEN use guided progression with medium scaffolding. | Target weakest concept 'stack' based on mastery snapshot (avg_mastery=0.51, avg_confidence=0.64, trend=stable)."
+        "reason": "IF the learner is neither at-risk nor clearly ready to accelerate THEN use guided progression with medium scaffolding. | Target weakest concept 'stack' based on mastery snapshot (avg_mastery=0.51, avg_confidence=0.66, trend=stable).",
+        "decision_rationale": "IF the learner is neither at-risk nor clearly ready to accelerate THEN use guided progression with medium scaffolding. | Target weakest concept 'stack' based on mastery snapshot (avg_mastery=0.51, avg_confidence=0.66, trend=stable)."
     },
     "decision": {
         "next_node": "education_crew",
@@ -205,12 +218,12 @@
         "decision_rationale": "Deterministic weighted decision with no randomness. | increase_challenge=2 from +2: engagement is high | advance_topic=6 from +2: engagement is high, +4: last_score 0.83 is at least 0.65 and engagement is high | reduce_support=1 from +1: strong score without improving trend | Selected 'advance_topic' because it had the highest total weight (6). Ties resolve by fixed action order: increase_support, reinforce_basics, adjust_quiz, increase_challenge, challenge_with_variation, advance_topic, reduce_support. | Context used: score=0.83, engagement=high, trend=stable, style=balanced, macro_action=guided_progression, scaffold_policy=medium."
     },
     "generated_content_history": {
-        "linked_list": {
-            "linked_list_applications": [
+        "stack": {
+            "stack_peek": [
                 {
-                    "timestamp": "2026-06-20T09:09:55.993648+00:00",
-                    "fingerprint": "557578998c54f4a8ce62df9f08f42a69f05fa9f417b00b2b9c5193b3da143d1b",
-                    "preview": "## linked_list \u2014 linked_list_applications\n\n**Overview**\nLinked lists excel in scenarios requiring frequent $O(1)$ insertions and deletions where memory is non-contiguous or the total data volume is unpredictable. At an advanced level, they ",
+                    "timestamp": "2026-06-20T12:35:49.901274+00:00",
+                    "fingerprint": "d0692b2fba9d1665450c7b0b6d336005ad4add7787e46d59cf70108292f3bfdd",
+                    "preview": "## stack \u2014 stack_peek\n\n**Overview**\nThe `peek` (or `top`) operation allows $O(1)$ access to the stack's most recently added element without modifying the collection's state. At an advanced level, this is a non-destructive read essential for",
                     "metadata": {
                         "mode": "advanced",
                         "depth": "advanced",
@@ -218,18 +231,18 @@
                     }
                 },
                 {
-                    "timestamp": "2026-06-20T09:09:56.048329+00:00",
-                    "fingerprint": "557578998c54f4a8ce62df9f08f42a69f05fa9f417b00b2b9c5193b3da143d1b",
-                    "preview": "## linked_list \u2014 linked_list_applications\n\n**Overview**\nLinked lists excel in scenarios requiring frequent $O(1)$ insertions and deletions where memory is non-contiguous or the total data volume is unpredictable. At an advanced level, they ",
+                    "timestamp": "2026-06-20T12:35:49.941691+00:00",
+                    "fingerprint": "d0692b2fba9d1665450c7b0b6d336005ad4add7787e46d59cf70108292f3bfdd",
+                    "preview": "## stack \u2014 stack_peek\n\n**Overview**\nThe `peek` (or `top`) operation allows $O(1)$ access to the stack's most recently added element without modifying the collection's state. At an advanced level, this is a non-destructive read essential for",
                     "metadata": {}
                 }
             ]
         }
     },
     "content_fingerprints": {
-        "linked_list": {
-            "linked_list_applications": [
-                "557578998c54f4a8ce62df9f08f42a69f05fa9f417b00b2b9c5193b3da143d1b"
+        "stack": {
+            "stack_peek": [
+                "d0692b2fba9d1665450c7b0b6d336005ad4add7787e46d59cf70108292f3bfdd"
             ]
         }
     },

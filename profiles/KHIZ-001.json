@@ -3,16 +3,33 @@
     "name": "Khizer",
     "level": "intermediate",
     "current_topic": null,
-    "progress": ["Python variables", "Control flow (if/else)", "Loops"],
+    "progress": [
+        "Python variables",
+        "Control flow (if/else)",
+        "Loops"
+    ],
     "engagement": "high",
     "last_score": 0.78,
     "learning_history": [
-        {"topic": "Python variables", "score": 0.82},
-        {"topic": "Control flow (if/else)", "score": 0.75},
-        {"topic": "Loops", "score": 0.79}
+        {
+            "topic": "Python variables",
+            "score": 0.82
+        },
+        {
+            "topic": "Control flow (if/else)",
+            "score": 0.75
+        },
+        {
+            "topic": "Loops",
+            "score": 0.79
+        }
     ],
     "frustration_level": 0,
     "engagement_score": 8,
     "learning_style": "balanced",
-    "last_active": "2026-03-29T16:00:00"
+    "last_active": "2026-03-29T16:00:00",
+    "pretest_score": 0.82,
+    "posttest_score": 0.79,
+    "learning_gain": -0.03,
+    "normalized_learning_gain": -0.1667
 }

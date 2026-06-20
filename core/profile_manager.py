@@ -8,6 +8,7 @@ from typing import List, Dict, Any, Optional, cast
 from datetime import datetime, timezone
 import json
 import os
+import tempfile
 from core.student_profile_schema import StudentProfile
 
 
@@ -65,13 +66,27 @@ class ProfileManager:
         """
         Persist updated student state back to JSON.
         Automatically stamps last_active timestamp.
+        Uses atomic write (temp file + rename) to prevent corruption on crash.
         """
         state["last_active"] = datetime.now(timezone.utc).isoformat()
         # Normalise keys for consistency
         state.setdefault("student_id", student_id)
         path = self._path(student_id)
-        with open(path, "w", encoding="utf-8") as f:
-            json.dump(state, f, indent=4)
+        # Write to a temp file in the same directory then atomically rename
+        # so a crash mid-write never leaves a corrupt file.
+        dir_name = os.path.dirname(os.path.abspath(path))
+        fd, tmp_path = tempfile.mkstemp(dir=dir_name, suffix=".tmp")
+        try:
+            with os.fdopen(fd, "w", encoding="utf-8") as f:
+                json.dump(state, f, indent=4)
+            os.replace(tmp_path, path)
+        except Exception:
+            # Clean up the temp file if something went wrong
+            try:
+                os.unlink(tmp_path)
+            except OSError:
+                pass
+            raise
 
     def create_profile(
         self,
