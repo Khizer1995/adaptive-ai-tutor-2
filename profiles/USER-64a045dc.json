@@ -1,0 +1,95 @@
+{
+    "student_id": "USER-64a045dc",
+    "name": "Student",
+    "level": "intermediate",
+    "subject": "dsa",
+    "current_topic": "array",
+    "progress": [],
+    "engagement": "medium",
+    "last_score": 0.6667,
+    "learning_history": [
+        {
+            "timestamp": "2026-06-20T15:21:31.157609+00:00",
+            "topic": "array",
+            "subtopic": "array_introduction",
+            "score": 0.6667,
+            "question_count": 6
+        },
+        {
+            "timestamp": "2026-06-20T16:14:18.771353+00:00",
+            "topic": "array",
+            "subtopic": "array_searching",
+            "score": 0.6667,
+            "question_count": 6
+        }
+    ],
+    "frustration_level": 0,
+    "engagement_score": 5,
+    "learning_style": "balanced",
+    "last_active": "2026-06-20T16:33:19.154018+00:00",
+    "accuracy_history": [],
+    "learning_gain_history": [],
+    "learning_gain": 0.0,
+    "normalized_learning_gain": 0.0,
+    "pretest_score": null,
+    "posttest_score": null,
+    "assessment_scores": {},
+    "assessment_history": [],
+    "knowledge_state": {
+        "concepts": {
+            "array": {
+                "mastery": 0.604,
+                "confidence": 0.408,
+                "attempts": 6,
+                "scaffold_level": "high",
+                "weak_areas": [],
+                "strong_areas": [],
+                "completed": false
+            }
+        },
+        "version": 2
+    },
+    "knowledge_events": [
+        {
+            "topic": "array",
+            "mastery": 0.23,
+            "confidence": 0.27,
+            "scaffold_level": "high",
+            "observed_score": 0.3
+        },
+        {
+            "topic": "array",
+            "mastery": 0.468,
+            "confidence": 0.305,
+            "scaffold_level": "high",
+            "observed_score": 0.6667
+        },
+        {
+            "topic": "array",
+            "mastery": 0.529,
+            "confidence": 0.364,
+            "scaffold_level": "high",
+            "observed_score": 0.67
+        },
+        {
+            "topic": "array",
+            "mastery": 0.604,
+            "confidence": 0.408,
+            "scaffold_level": "high",
+            "observed_score": 0.6667
+        }
+    ],
+    "delivered_chunks": {
+        "array": {
+            "chunk_ids": [
+                "hybrid_0",
+                "hybrid_1",
+                "hybrid_2",
+                "hybrid_3",
+                "hybrid_4",
+                "hybrid_5"
+            ],
+            "concepts": []
+        }
+    }
+}

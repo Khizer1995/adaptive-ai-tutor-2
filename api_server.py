@@ -38,7 +38,7 @@ Issue #7  Learning state not maintained:
   weak_areas, strong_areas, and level persistently in the student profile.
 """
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
@@ -49,7 +49,7 @@ import asyncio
 import hashlib
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 from difflib import get_close_matches
 
 load_dotenv()
@@ -70,11 +70,12 @@ from core.logging_utils import Timer
 from core.metrics_collector import log_learning_cycle_metrics
 from core.adaptive_engine import after_quiz_submit, record_content, get_all_topics
 
-app = FastAPI()
+app = FastAPI(title="Cognitive Adaptive AI Tutor API", version="2.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -87,7 +88,78 @@ file_manager = FileManagerAgent()
 monitor_agent = MonitorAgent()
 validation_agent = ValidationAgent()
 
+# ── Authentication ────────────────────────────────────────────────────────────
+from core.auth import AuthManager
+auth_manager = AuthManager()
+
+# Legacy fallback student ID (used only when no auth token is present)
+# in non-protected diagnostic/health endpoints.
 STUDENT_ID = "KISH-001"
+
+
+def _derive_student_id(user_id: str) -> str:
+    """Convert a Supabase UUID into a short student profile ID."""
+    return f"USER-{user_id[:8]}"
+
+
+def require_auth(authorization: str = Header(None)) -> Dict[str, Any]:
+    """
+    FastAPI dependency — validates Bearer token and returns user dict.
+    Inject with: user: Dict = Depends(require_auth)
+    """
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(
+            status_code=401,
+            detail="Authentication required. Please login first.",
+        )
+    token = authorization.replace("Bearer ", "", 1).strip()
+    user = auth_manager.verify_token(token)
+    if not user:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid or expired token. Please login again.",
+        )
+    user["student_id"] = _derive_student_id(user["user_id"])
+    return user
+
+
+def _get_student_state_for(student_id: str) -> dict:
+    """Load student state for a given student_id, creating profile if needed."""
+    try:
+        return pm.load(student_id)
+    except FileNotFoundError:
+        return {
+            "student_id": student_id,
+            "name": "Student",
+            "subject": "dsa",
+            "level": "beginner",
+            "current_topic": "array",
+            "progress": [],
+            "engagement": "medium",
+            "last_score": 0.3,
+            "learning_history": [],
+            "knowledge_state": {
+                "concepts": {
+                    "array": {
+                        "mastery": 0.2,
+                        "confidence": 0.25,
+                        "attempts": 0,
+                        "scaffold_level": "high",
+                        "weak_areas": [],
+                        "strong_areas": [],
+                        "completed": False,
+                    }
+                },
+                "version": 2,
+            },
+            "delivered_chunks": {},
+            "quiz_seen_questions": {},
+            "weak_areas": {},
+            "strong_areas": {},
+            "quiz_attempts": {},
+            "generated_content_history": {},
+            "content_fingerprints": {},
+        }
 SURVEY_RESPONSES_PATH = Path("data/survey_responses.jsonl")
 SURVEY_QUESTIONS: List[Dict[str, str]] = [
     {"id": "usability_easy_to_use",      "section": "Usability",   "question": "The system was easy to use"},
@@ -118,42 +190,9 @@ TeacherReviewAgent.review = auto_approve_review
 # Student state helpers
 # ──────────────────────────────────────────────────────────────────────────────
 
-def get_student_state():
-    try:
-        return pm.load(STUDENT_ID)
-    except FileNotFoundError:
-        return {
-            "student_id": STUDENT_ID,
-            "name": "Student",
-            "subject": "dsa",
-            "level": "beginner",
-            "current_topic": "stack",
-            "progress": [],
-            "engagement": "medium",
-            "last_score": 0.3,
-            "learning_history": [],
-            "knowledge_state": {
-                "concepts": {
-                    "stack": {
-                        "mastery": 0.2,
-                        "confidence": 0.25,
-                        "attempts": 0,
-                        "scaffold_level": "high",
-                        "weak_areas": [],
-                        "strong_areas": [],
-                        "completed": False,
-                    }
-                },
-                "version": 2,
-            },
-            "delivered_chunks": {},
-            "quiz_seen_questions": {},
-            "weak_areas": {},
-            "strong_areas": {},
-            "quiz_attempts": {},
-            "generated_content_history": {},
-            "content_fingerprints": {},
-        }
+def get_student_state(student_id: str = STUDENT_ID) -> dict:
+    """Load student state (defaults to legacy STUDENT_ID for backward compat)."""
+    return _get_student_state_for(student_id)
 
 
 def _question_hash(question: str) -> str:
@@ -247,6 +286,7 @@ def _run_adaptive_learning_flow(
     state: Dict[str, Any],
     rag_status: Dict[str, Any] | None = None,
     quiz_pass_rate: float | None = None,
+    user_id: str | None = None,
 ) -> Dict[str, Any]:
     e2e_timer = Timer()
     macro = decision_engine.decide_macro_plan(state)
@@ -303,7 +343,7 @@ def _run_adaptive_learning_flow(
         decision_iterations=1,
         quiz_pass_rate=quiz_pass_rate,
     )
-    pm.save(STUDENT_ID, updated_state)
+    pm.save(updated_state.get("student_id", STUDENT_ID), updated_state, user_id=user_id)
     return {
         "macro": macro,
         "decision": decision,
@@ -457,17 +497,136 @@ def _score_answer_batch(answers: List[QuizBatchAnswer]) -> tuple[int, int, float
 
 
 # ──────────────────────────────────────────────────────────────────────────────
+# Authentication Request/Response Models
+# ──────────────────────────────────────────────────────────────────────────────
+
+class SignupRequest(BaseModel):
+    email: str
+    password: str
+    name: Optional[str] = None
+
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+
+class LogoutRequest(BaseModel):
+    token: str
+
+
+class PasswordResetRequest(BaseModel):
+    email: str
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Authentication Endpoints
+# ──────────────────────────────────────────────────────────────────────────────
+
+@app.post("/auth/signup")
+async def auth_signup(request: SignupRequest):
+    """Create a new user account and initialise student profile."""
+    result = auth_manager.signup(
+        email=request.email,
+        password=request.password,
+        name=request.name,
+    )
+    if not result["success"]:
+        raise HTTPException(status_code=400, detail=result["error"])
+
+    user_id = result["user_id"]
+    student_id = _derive_student_id(user_id)
+    name = request.name or request.email.split("@")[0]
+
+    # Create the student profile JSON if it does not already exist.
+    if student_id not in pm.list_profiles():
+        pm.create_profile(
+            student_id=student_id,
+            name=name,
+            level="beginner",
+            learning_style="balanced",
+            user_id=user_id,
+        )
+    else:
+        # Profile already exists — still push its data to Supabase
+        existing = pm.load(student_id)
+        pm.save(student_id, existing, user_id=user_id)
+
+    result["student_id"] = student_id
+    result["name"] = name
+    return result
+
+
+@app.post("/auth/login")
+async def auth_login(request: LoginRequest):
+    """Authenticate an existing user and return a JWT token."""
+    result = auth_manager.login(
+        email=request.email,
+        password=request.password,
+    )
+    if not result["success"]:
+        raise HTTPException(status_code=401, detail=result["error"])
+
+    user_id = result["user_id"]
+    student_id = _derive_student_id(user_id)
+    result["student_id"] = student_id
+
+    # Ensure profile exists (first login after manual signup, etc.)
+    if student_id not in pm.list_profiles():
+        pm.create_profile(
+            student_id=student_id,
+            name=result.get("name", request.email.split("@")[0]),
+            level="beginner",
+            learning_style="balanced",
+            user_id=user_id,
+        )
+    else:
+        # Profile exists — sync it to Supabase on every login
+        existing = pm.load(student_id)
+        pm.save(student_id, existing, user_id=user_id)
+
+    return result
+
+
+@app.post("/auth/logout")
+async def auth_logout(request: LogoutRequest):
+    """Invalidate a user session."""
+    result = auth_manager.logout(request.token)
+    return result
+
+
+@app.get("/auth/me")
+async def auth_me(user: Dict = Depends(require_auth)):
+    """Return info about the currently authenticated user."""
+    return {
+        "user_id": user["user_id"],
+        "email": user["email"],
+        "name": user.get("name"),
+        "student_id": user["student_id"],
+    }
+
+
+@app.post("/auth/reset-password")
+async def auth_reset_password(request: PasswordResetRequest):
+    """Send a password reset email."""
+    result = auth_manager.reset_password_request(request.email)
+    # Always return success to avoid email enumeration.
+    return {"success": True, "message": "If that email exists, a reset link has been sent."}
+
+
+# ──────────────────────────────────────────────────────────────────────────────
 # Routes
 # ──────────────────────────────────────────────────────────────────────────────
 
 @app.get("/")
 def root():
-    return {"status": "Cognitive Adaptive AI Tutor API running"}
+    return {"status": "Cognitive Adaptive AI Tutor API running", "version": "2.0.0"}
 
 
 @app.get("/student/state")
-def get_state():
-    state = get_student_state()
+def get_state(user: Dict = Depends(require_auth)):
+    student_id = user["student_id"]
+    state = get_student_state(student_id)
     macro = state.get("macro_decision", {}) or {}
     macro_with_action = macro.copy()
     if "action" not in macro_with_action and "macro_action" in macro_with_action:
@@ -475,7 +634,7 @@ def get_state():
 
     return {
         "student_id": state.get("student_id"),
-        "name": state.get("name"),
+        "name": state.get("name") or user.get("name"),
         "subject": state.get("subject", "dsa"),
         "level": state.get("level", "beginner"),
         "engagement": state.get("engagement", "medium"),
@@ -503,13 +662,13 @@ def get_state():
 
 
 @app.get("/student/topics")
-def get_topics():
+def get_topics(user: Dict = Depends(require_auth)):
     """
     Issue #5 fix: returns ALL curriculum topics (not just the ones that happen
     to be in the student's knowledge_state) together with subtopic lists so the
     sidebar can render a complete, navigable topic tree.
     """
-    state = get_student_state()
+    state = get_student_state(user["student_id"])
     knowledge_state = state.get("knowledge_state", {})
     concepts = knowledge_state.get("concepts", {})
     subtopic_progress = state.get("subtopic_progress", {})
@@ -553,18 +712,19 @@ def get_topics():
 
 
 @app.get("/curriculum/topics")
-def get_curriculum_topics():
+def get_curriculum_topics(user: Dict = Depends(require_auth)):
     """Full curriculum definition without per-student enrichment."""
     return {"topics": get_all_curriculum_topics()}
 
 
 @app.post("/study/survey")
-def submit_study_survey(body: StudySurveyRequest):
-    state = get_student_state()
+def submit_study_survey(body: StudySurveyRequest, user: Dict = Depends(require_auth)):
+    student_id = user["student_id"]
+    state = get_student_state(student_id)
     responses = _validated_survey_scores(body.responses)
     payload = {
         "timestamp": datetime.now(timezone.utc).isoformat(),
-        "student_id": body.student_id or state.get("student_id", STUDENT_ID),
+        "student_id": student_id,
         "topic": body.topic or state.get("current_topic"),
         "subtopic": body.subtopic or state.get("current_subtopic"),
         "responses": responses,
@@ -607,8 +767,9 @@ def get_study_results():
 
 
 @app.post("/tutor/explain")
-def get_explanation(body: TopicRequest):
-    state = get_student_state()
+def get_explanation(body: TopicRequest, user: Dict = Depends(require_auth)):
+    student_id = user["student_id"]
+    state = get_student_state(student_id)
     state["current_topic"] = body.topic
     if body.subtopic:
         state["current_subtopic"] = body.subtopic
@@ -622,20 +783,20 @@ def get_explanation(body: TopicRequest):
     })
     rag_status = _ensure_rag_ready()
 
-    flow = _run_adaptive_learning_flow(state, rag_status=rag_status)
+    flow = _run_adaptive_learning_flow(state, rag_status=rag_status, user_id=user["user_id"])
     macro = flow["macro"]
     validated = flow["validated"]
     updated_state = flow["updated_state"]
     rag_chunk_records = validated.get("rag_chunk_records", []) or []
     append_delivered_chunks(updated_state, body.topic, rag_chunk_records)
 
-    # ── Issue #2 fix: record the content so anti-repetition guard fires ──────
+    # -- Issue #2 fix: record the content so anti-repetition guard fires ------
     learning_path = validated.get("learning_path", "")
     if learning_path and body.subtopic:
         record_content(updated_state, body.topic, body.subtopic, learning_path)
 
     next_recommendation = build_next_recommendation(updated_state, body.topic)
-    pm.save(STUDENT_ID, updated_state)
+    pm.save(student_id, updated_state, user_id=user["user_id"])
 
     return {
         "topic": body.topic,
@@ -655,15 +816,29 @@ def get_explanation(body: TopicRequest):
 
 
 @app.get("/tutor/explain/stream")
-async def stream_explanation(topic: str, subtopic: str | None = None):
+async def stream_explanation(
+    topic: str,
+    subtopic: str | None = None,
+    authorization: str = Header(None),
+    token: str | None = None,          # fallback for browsers using EventSource
+):
     """
     Issue #1 fix: state is loaded fresh on every call so the latest
     last_score/mastery feed into the adaptive prompt.
     Issue #4 fix: this endpoint returns ONLY learning content — no quiz.
+    SSE endpoints cannot use Depends() directly — auth is handled inline.
+    EventSource in browsers cannot send custom headers, so the JWT is
+    accepted as a ?token=<jwt> query param as a fallback.
     """
+    # Prefer Authorization header; fall back to ?token= query param
+    effective_auth = authorization or (f"Bearer {token}" if token else None)
+    user = require_auth(effective_auth)
+    student_id = user["student_id"]
+
+
     async def event_generator():
         try:
-            state = get_student_state()
+            state = get_student_state(student_id)
             state["current_topic"] = topic
             if subtopic:
                 state["current_subtopic"] = subtopic
@@ -678,7 +853,7 @@ async def stream_explanation(topic: str, subtopic: str | None = None):
             })
             rag_status = _ensure_rag_ready()
 
-            flow = _run_adaptive_learning_flow(state, rag_status=rag_status)
+            flow = _run_adaptive_learning_flow(state, rag_status=rag_status, user_id=user["user_id"])
             macro = flow["macro"]
             validated = flow["validated"]
             updated_state = flow["updated_state"]
@@ -693,7 +868,7 @@ async def stream_explanation(topic: str, subtopic: str | None = None):
                 record_content(updated_state, topic, current_subtopic, learning_path)
 
             next_recommendation = build_next_recommendation(updated_state, topic)
-            pm.save(STUDENT_ID, updated_state)
+            pm.save(student_id, updated_state, user_id=user["user_id"])
 
             meta = {
                 "topic": topic,
@@ -735,7 +910,7 @@ async def stream_explanation(topic: str, subtopic: str | None = None):
 
 
 @app.post("/quiz/generate")
-def get_quiz(body: TopicRequest):
+def get_quiz(body: TopicRequest, user: Dict = Depends(require_auth)):
     """
     Issue #3 fix: seen question hashes are loaded, passed to the quiz
     generator, and stored back after generation so repeated calls produce
@@ -744,7 +919,8 @@ def get_quiz(body: TopicRequest):
     Issue #4 fix: this is the ONLY place quiz questions are generated;
     the /tutor/explain/stream endpoint no longer generates them.
     """
-    state = get_student_state()
+    student_id = user["student_id"]
+    state = get_student_state(student_id)
     state["current_topic"] = body.topic
     if body.subtopic:
         state["current_subtopic"] = body.subtopic
@@ -818,7 +994,7 @@ def get_quiz(body: TopicRequest):
         current_subtopic,
         seen_hashes.union({_question_hash(q.get("question", "")) for q in questions if isinstance(q, dict)}),
     )
-    pm.save(STUDENT_ID, state)
+    pm.save(student_id, state, user_id=user["user_id"])
 
     validated_questions: List[Dict[str, Any]] = []
     for q in questions:
@@ -912,15 +1088,15 @@ def _generate_assessment_questions(
     }
 
 
-def _handle_assessment(body: AssessmentRequest, assessment_type: str) -> Dict[str, Any]:
-    state = get_student_state()
+def _handle_assessment(body: AssessmentRequest, assessment_type: str, student_id: str, user_id: str | None = None) -> Dict[str, Any]:
+    state = get_student_state(student_id)
     subtopic = body.subtopic or state.get("current_subtopic") or f"{body.topic}_assessment"
 
     if body.answers is None:
         state["current_topic"] = body.topic
         state["current_subtopic"] = subtopic
         state["last_assessment_type"] = assessment_type
-        pm.save(STUDENT_ID, state)
+        pm.save(student_id, state, user_id=user_id)
         return _generate_assessment_questions(state, body.topic, subtopic, assessment_type)
 
     correct_count, total, score = _score_answer_batch(body.answers)
@@ -935,7 +1111,7 @@ def _handle_assessment(body: AssessmentRequest, assessment_type: str) -> Dict[st
         "question_count": total,
     })
     state = record_assessment_score(state, body.topic, subtopic, assessment_type, score)
-    pm.save(STUDENT_ID, state)
+    pm.save(student_id, state, user_id=user_id)
 
     assessment_entry = (
         state.get("assessment_scores", {}).get(body.topic, {}).get(subtopic, {})
@@ -957,17 +1133,17 @@ def _handle_assessment(body: AssessmentRequest, assessment_type: str) -> Dict[st
 
 
 @app.post("/quiz/pretest")
-def pretest_quiz(body: AssessmentRequest):
-    return _handle_assessment(body, "pretest")
+def pretest_quiz(body: AssessmentRequest, user: Dict = Depends(require_auth)):
+    return _handle_assessment(body, "pretest", user["student_id"], user_id=user["user_id"])
 
 
 @app.post("/quiz/posttest")
-def posttest_quiz(body: AssessmentRequest):
-    return _handle_assessment(body, "posttest")
+def posttest_quiz(body: AssessmentRequest, user: Dict = Depends(require_auth)):
+    return _handle_assessment(body, "posttest", user["student_id"], user_id=user["user_id"])
 
 
 @app.post("/quiz/submit")
-def submit_answer(body: QuizBatchSubmitRequest):
+def submit_answer(body: QuizBatchSubmitRequest, user: Dict = Depends(require_auth)):
     """
     Issue #1 & #7 fix:
     • Calls after_quiz_submit() from adaptive_engine which invokes
@@ -976,7 +1152,8 @@ def submit_answer(body: QuizBatchSubmitRequest):
     • The NEXT call to /tutor/explain/stream will load this updated state and
       produce a properly adapted explanation.
     """
-    state = get_student_state()
+    student_id = user["student_id"]
+    state = get_student_state(student_id)
     state["current_topic"] = body.topic
     state["current_subtopic"] = body.subtopic
 
@@ -1019,7 +1196,7 @@ def submit_answer(body: QuizBatchSubmitRequest):
         state.get("macro_decision", {}),
     )
 
-    pm.save(STUDENT_ID, updated_state)
+    pm.save(student_id, updated_state, user_id=user["user_id"])
 
     # Determine adaptive recommendation for the UI.
     concepts = updated_state.get("knowledge_state", {}).get("concepts", {})
@@ -1064,7 +1241,7 @@ def submit_answer(body: QuizBatchSubmitRequest):
 
 
 @app.post("/curriculum/next")
-def curriculum_next(body: CurriculumNextRequest):
+def curriculum_next(body: CurriculumNextRequest, user: Dict = Depends(require_auth)):
     next_subtopic, topic_complete = get_next_subtopic(body.current_topic, body.current_subtopic)
     return {
         "next_subtopic": next_subtopic,

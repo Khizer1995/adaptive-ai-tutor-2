@@ -10,6 +10,10 @@ import json
 import os
 import tempfile
 from core.student_profile_schema import StudentProfile
+try:
+    from core.supabase_sync import sync_student_state as _supabase_sync
+except Exception:  # supabase not configured — degrade gracefully
+    _supabase_sync = None  # type: ignore[assignment]
 
 
 class ProfileManager:
@@ -62,11 +66,19 @@ class ProfileManager:
         profile = StudentProfile.from_dict(raw)
         return cast(Dict[str, Any], profile.to_dict())
 
-    def save(self, student_id: str, state: dict) -> None:
+    def save(self, student_id: str, state: dict, user_id: Optional[str] = None) -> None:
         """
         Persist updated student state back to JSON.
         Automatically stamps last_active timestamp.
         Uses atomic write (temp file + rename) to prevent corruption on crash.
+
+        Parameters
+        ----------
+        student_id : Profile ID, e.g. "USER-a1b2c3d4".
+        state      : Full student state dict.
+        user_id    : Supabase Auth UUID. When provided the state is also
+                     mirrored to Supabase (user_profiles, learning_state,
+                     knowledge_state). Omit for legacy / unauthenticated saves.
         """
         state["last_active"] = datetime.now(timezone.utc).isoformat()
         # Normalise keys for consistency
@@ -88,16 +100,31 @@ class ProfileManager:
                 pass
             raise
 
+        # Mirror to Supabase (best-effort — never raises)
+        if _supabase_sync is not None:
+            try:
+                _supabase_sync(state, user_id=user_id)
+            except Exception as exc:  # noqa: BLE001
+                import logging
+                logging.getLogger(__name__).warning(
+                    "Supabase sync skipped for %s: %s", student_id, exc
+                )
+
     def create_profile(
         self,
         student_id: str,
         name: str,
         level: str = "beginner",
         learning_style: str = "balanced",
+        user_id: Optional[str] = None,
     ) -> dict:
         """
         Create and persist a new student profile.
         Returns the profile dict.
+
+        Parameters
+        ----------
+        user_id : When provided the new profile is also written to Supabase.
         """
         profile = StudentProfile(
             student_id=student_id,
@@ -112,6 +139,16 @@ class ProfileManager:
         path = self._path(student_id)
         with open(path, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=4)
+
+        # Mirror to Supabase on creation (best-effort)
+        if _supabase_sync is not None and user_id:
+            try:
+                _supabase_sync(data, user_id=user_id)
+            except Exception as exc:  # noqa: BLE001
+                import logging
+                logging.getLogger(__name__).warning(
+                    "Supabase sync on create_profile skipped for %s: %s", student_id, exc
+                )
         return data
 
     def list_profiles(self) -> List[str]:

@@ -1,10 +1,11 @@
-﻿import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism'
-import { Bot, Check, X, ChevronDown, ChevronRight, AlertTriangle, TrendingUp, BookOpen, Zap } from 'lucide-react'
+import { Bot, Check, X, ChevronDown, ChevronRight, AlertTriangle, TrendingUp, BookOpen, Zap, LogOut, User } from 'lucide-react'
 import StudyQuestionnaire from './StudyQuestionnaire'
+import { useAuth } from './context/AuthContext'
 
 const API = 'http://localhost:8000'
 const UNLOCK_THRESHOLD = 0.7
@@ -113,6 +114,7 @@ function ScoreRing({ score }) {
 // clicks "Start Learning Assessment", not automatically after content loads.
 
 function QuizSection({ topic, subtopic, open, onBatchComplete, onToast, onMoveFurther }) {
+  const { accessToken } = useAuth()
   const [questions, setQuestions] = useState([])
   const [idx, setIdx] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState('')
@@ -133,8 +135,8 @@ function QuizSection({ topic, subtopic, open, onBatchComplete, onToast, onMoveFu
     setAdaptiveMessage('')
     const res = await fetch(`${API}/quiz/generate`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+      body: JSON.stringify({ topic, subtopic }),
     })
     const data = await res.json()
     setQuestions(data.questions || [])
@@ -180,7 +182,7 @@ function QuizSection({ topic, subtopic, open, onBatchComplete, onToast, onMoveFu
     const score = finalAnswers.length ? correctCount / finalAnswers.length : 0
     const res = await fetch(`${API}/quiz/submit`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
       body: JSON.stringify({ topic, subtopic, score, answers: finalAnswers }),
     })
     const data = await res.json()
@@ -340,6 +342,7 @@ function QuizSection({ topic, subtopic, open, onBatchComplete, onToast, onMoveFu
 // ── Assessment section (pretest / posttest) ──────────────────────────────────
 
 function AssessmentSection({ topic, subtopic, mode, open, onComplete, onToast }) {
+  const { accessToken } = useAuth()
   const [questions, setQuestions] = useState([])
   const [idx, setIdx] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState('')
@@ -356,7 +359,7 @@ function AssessmentSection({ topic, subtopic, mode, open, onComplete, onToast })
     setLoading(true)
     const res = await fetch(`${API}${endpoint}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
       body: JSON.stringify({ topic, subtopic }),
     })
     const data = await res.json()
@@ -404,7 +407,7 @@ function AssessmentSection({ topic, subtopic, mode, open, onComplete, onToast })
   const submitAssessment = async (finalAnswers) => {
     const res = await fetch(`${API}${endpoint}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
       body: JSON.stringify({ topic, subtopic, answers: finalAnswers }),
     })
     const data = await res.json()
@@ -599,6 +602,14 @@ function TopicSidebar({ topics, selectedTopic, currentSubtopic, onSelectSubtopic
 // ── Main App ─────────────────────────────────────────────────────────────────
 
 export default function App() {
+  const { accessToken, userName, logout, studentId } = useAuth()
+
+  // Build auth headers for all fetch() calls
+  const authHeaders = useCallback(
+    () => ({ 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` }),
+    [accessToken]
+  )
+
   const [topics, setTopics] = useState([])
   const [studentState, setStudentState] = useState(null)
   const [selectedTopic, setSelectedTopic] = useState('')
@@ -620,8 +631,8 @@ export default function App() {
 
   const refreshData = useCallback(() =>
     Promise.all([
-      fetch(`${API}/student/state`).then((r) => r.json()),
-      fetch(`${API}/student/topics`).then((r) => r.json()),
+      fetch(`${API}/student/state`,  { headers: authHeaders() }).then((r) => r.json()),
+      fetch(`${API}/student/topics`, { headers: authHeaders() }).then((r) => r.json()),
     ]).then(([state, t]) => {
       setStudentState(state)
       const allTopics = t.topics || []
@@ -633,7 +644,7 @@ export default function App() {
         setCurrentSubtopic(firstSub)
       }
     }),
-  [selectedTopic]) // eslint-disable-line react-hooks/exhaustive-deps
+  [selectedTopic, authHeaders]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => { refreshData() }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -657,7 +668,8 @@ export default function App() {
     setStreaming(true)
     setWaitingFirstChunk(true)
 
-    const url = `${API}/tutor/explain/stream?topic=${encodeURIComponent(topic)}&subtopic=${encodeURIComponent(subtopic || '')}`
+    // Pass token as ?token= query param — EventSource can't send custom headers
+    const url = `${API}/tutor/explain/stream?topic=${encodeURIComponent(topic)}&subtopic=${encodeURIComponent(subtopic || '')}&token=${encodeURIComponent(accessToken || '')}`
     const es = new EventSource(url)
     es.onmessage = (event) => {
       const data = JSON.parse(event.data || '{}')
@@ -732,7 +744,7 @@ export default function App() {
     const payload = { current_topic: selectedTopic, current_subtopic: currentSubtopic }
     const res = await fetch(`${API}/curriculum/next`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: authHeaders(),
       body: JSON.stringify(payload),
     })
     const data = await res.json()
@@ -766,17 +778,37 @@ export default function App() {
 
   return (
     <div className="h-screen overflow-hidden bg-gray-950 font-[Inter,system-ui] text-gray-100">
-      {/* Top progress bar */}
-      <div className="w-full border-b border-gray-800 bg-gray-900 p-3">
-        <div className="mb-2 text-xs text-gray-300">
-          Session Progress · {cycles} cycles · {status}
-          {studentState?.level && (
-            <span className="ml-2 rounded-full border border-teal-500/50 px-2 py-0.5 text-teal-300">
-              {studentState.level}
-            </span>
-          )}
+      {/* Top bar */}
+      <div className="w-full border-b border-gray-800 bg-gray-900 px-3 py-2">
+        <div className="flex items-center justify-between">
+          {/* Left: progress info */}
+          <div className="text-xs text-gray-300">
+            Session Progress · {cycles} cycles · {status}
+            {studentState?.level && (
+              <span className="ml-2 rounded-full border border-teal-500/50 px-2 py-0.5 text-teal-300">
+                {studentState.level}
+              </span>
+            )}
+          </div>
+          {/* Right: user badge + logout */}
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 rounded-full border border-gray-700 bg-gray-800 px-3 py-1">
+              <User size={12} className="text-teal-400" />
+              <span className="text-xs text-gray-300 max-w-[140px] truncate">{userName}</span>
+            </div>
+            <button
+              id="logout-btn"
+              onClick={logout}
+              className="flex items-center gap-1.5 rounded-full border border-gray-700 bg-gray-800 px-3 py-1 text-xs text-gray-400 transition-colors hover:border-red-500/50 hover:bg-red-950/30 hover:text-red-400"
+              title="Sign out"
+            >
+              <LogOut size={12} />
+              Sign out
+            </button>
+          </div>
         </div>
-        <div className="h-2 overflow-hidden rounded-full bg-gray-800">
+        {/* Progress bar */}
+        <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-gray-800">
           <div
             className="h-full bg-gradient-to-r from-teal-500 to-green-500 transition-all duration-500"
             style={{ width: `${progressPct}%` }}
