@@ -7,7 +7,7 @@ import { Bot, Check, X, ChevronDown, ChevronRight, AlertTriangle, TrendingUp, Bo
 import StudyQuestionnaire from './StudyQuestionnaire'
 import { useAuth } from './context/AuthContext'
 
-const API = 'http://localhost:8000'
+const API = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
 const UNLOCK_THRESHOLD = 0.7
 
 // ── Adaptive mode badge colours ─────────────────────────────────────────────
