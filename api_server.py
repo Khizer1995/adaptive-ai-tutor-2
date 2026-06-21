@@ -74,7 +74,12 @@ app = FastAPI(title="Cognitive Adaptive AI Tutor API", version="2.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "https://cognitive-adaptive-ai-tutor.vercel.app",
+        "https://cognitive-adaptive-ai-tutor-git-deploy1-msui.vercel.app",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -1203,6 +1208,22 @@ def submit_answer(body: QuizBatchSubmitRequest, user: Dict = Depends(require_aut
     )
 
     pm.save(student_id, updated_state, user_id=user["user_id"])
+    
+    # Log quiz attempt to learning_history
+    try:
+        from core.supabase_sync import log_quiz_attempt
+        log_quiz_attempt(
+            state=updated_state,
+            user_id=user["user_id"],
+            topic=body.topic,
+            subtopic=body.subtopic,
+            score=score,
+            question_count=total,
+            passed=(score >= UNLOCK_THRESHOLD),
+            record_type="quiz"
+        )
+    except Exception as e:
+        logger.warning(f"Failed to log quiz attempt to Supabase: {e}")
 
     # Determine adaptive recommendation for the UI.
     concepts = updated_state.get("knowledge_state", {}).get("concepts", {})
