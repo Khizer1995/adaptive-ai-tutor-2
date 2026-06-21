@@ -1,0 +1,175 @@
+{
+    "student_id": "USER-7cbcaae5",
+    "name": "Student",
+    "level": "beginner",
+    "subject": "dsa",
+    "current_topic": "tree",
+    "progress": [],
+    "engagement": "high",
+    "last_score": 1.0,
+    "learning_history": [
+        {
+            "timestamp": "2026-06-21T06:27:40.674840+00:00",
+            "topic": "tree",
+            "subtopic": "bst_operations",
+            "score": 1.0,
+            "question_count": 6
+        }
+    ],
+    "frustration_level": 0,
+    "engagement_score": 5,
+    "learning_style": "balanced",
+    "last_active": "2026-06-21T06:28:22.502132+00:00",
+    "accuracy_history": [],
+    "learning_gain_history": [],
+    "learning_gain": 0.0,
+    "normalized_learning_gain": 0.0,
+    "pretest_score": null,
+    "posttest_score": null,
+    "assessment_scores": {},
+    "assessment_history": [],
+    "knowledge_state": {
+        "concepts": {
+            "array": {
+                "mastery": 0.2,
+                "confidence": 0.25,
+                "attempts": 0,
+                "scaffold_level": "high",
+                "weak_areas": [],
+                "strong_areas": [],
+                "completed": false
+            },
+            "tree": {
+                "mastery": 0.777,
+                "confidence": 0.536,
+                "attempts": 4,
+                "scaffold_level": "medium",
+                "weak_areas": [],
+                "strong_areas": [
+                    "bst_operations"
+                ],
+                "completed": false
+            }
+        },
+        "version": 2
+    },
+    "knowledge_events": [
+        {
+            "topic": "tree",
+            "mastery": 0.3,
+            "confidence": 0.35,
+            "scaffold_level": "high",
+            "observed_score": 0.3
+        },
+        {
+            "topic": "tree",
+            "mastery": 0.681,
+            "confidence": 0.47,
+            "scaffold_level": "medium",
+            "observed_score": 1.0
+        },
+        {
+            "topic": "tree",
+            "mastery": 0.777,
+            "confidence": 0.536,
+            "scaffold_level": "medium",
+            "observed_score": 1.0
+        }
+    ],
+    "delivered_chunks": {
+        "tree": {
+            "chunk_ids": [],
+            "concepts": []
+        }
+    },
+    "current_subtopic": "tree_traversal",
+    "macro_decision": {
+        "macro_action": "guided_progression",
+        "target_concepts": [
+            "array"
+        ],
+        "scaffold_policy": "medium",
+        "reason": "IF the learner is neither at-risk nor clearly ready to accelerate THEN use guided progression with medium scaffolding. | IF engagement is low THEN do not allow low scaffolding; clamp scaffold policy to medium. | Target weakest concept 'array' based on mastery snapshot (avg_mastery=0.44, avg_confidence=0.36, trend=stable).",
+        "decision_rationale": "IF the learner is neither at-risk nor clearly ready to accelerate THEN use guided progression with medium scaffolding. | IF engagement is low THEN do not allow low scaffolding; clamp scaffold policy to medium. | Target weakest concept 'array' based on mastery snapshot (avg_mastery=0.44, avg_confidence=0.36, trend=stable)."
+    },
+    "decision": {
+        "next_node": "education_crew",
+        "action": "increase_support",
+        "weights": {
+            "increase_support": 3,
+            "reinforce_basics": 2,
+            "adjust_quiz": 2,
+            "increase_challenge": 0,
+            "challenge_with_variation": 0,
+            "advance_topic": 0,
+            "reduce_support": 1
+        },
+        "fired_weights": [
+            {
+                "action": "increase_support",
+                "total_weight": 3,
+                "reasons": [
+                    "+3: engagement is low"
+                ]
+            },
+            {
+                "action": "reinforce_basics",
+                "total_weight": 2,
+                "reasons": [
+                    "+2: engagement is low"
+                ]
+            },
+            {
+                "action": "adjust_quiz",
+                "total_weight": 2,
+                "reasons": [
+                    "+2: last_score 1.00 is strong but engagement is low"
+                ]
+            },
+            {
+                "action": "reduce_support",
+                "total_weight": 1,
+                "reasons": [
+                    "+1: strong score without improving trend"
+                ]
+            }
+        ],
+        "reason": "Deterministic weighted decision with no randomness. | increase_support=3 from +3: engagement is low | reinforce_basics=2 from +2: engagement is low | adjust_quiz=2 from +2: last_score 1.00 is strong but engagement is low | reduce_support=1 from +1: strong score without improving trend | Selected 'increase_support' because it had the highest total weight (3). Ties resolve by fixed action order: increase_support, reinforce_basics, adjust_quiz, increase_challenge, challenge_with_variation, advance_topic, reduce_support. | Context used: score=1.00, engagement=low, trend=stable, style=balanced, macro_action=guided_progression, scaffold_policy=medium.",
+        "decision_rationale": "Deterministic weighted decision with no randomness. | increase_support=3 from +3: engagement is low | reinforce_basics=2 from +2: engagement is low | adjust_quiz=2 from +2: last_score 1.00 is strong but engagement is low | reduce_support=1 from +1: strong score without improving trend | Selected 'increase_support' because it had the highest total weight (3). Ties resolve by fixed action order: increase_support, reinforce_basics, adjust_quiz, increase_challenge, challenge_with_variation, advance_topic, reduce_support. | Context used: score=1.00, engagement=low, trend=stable, style=balanced, macro_action=guided_progression, scaffold_policy=medium."
+    },
+    "generated_content_history": {
+        "tree": {
+            "tree_traversal": [
+                {
+                    "timestamp": "2026-06-21T06:28:21.372442+00:00",
+                    "fingerprint": "b7cd3f4fb43ddba03927af5f5c49fe7bf4d2db448ee63a22c4b2a3106aa4ed51",
+                    "preview": "## tree \u2014 tree_traversal\n\n**Overview**\nAdvanced tree traversal moves beyond simple recursion to focus on space-time efficiency and iterative control, specifically addressing memory constraints in deep trees (skewed) and the mechanics of non",
+                    "metadata": {
+                        "mode": "advanced",
+                        "depth": "advanced",
+                        "score": 1.0
+                    }
+                },
+                {
+                    "timestamp": "2026-06-21T06:28:22.493795+00:00",
+                    "fingerprint": "b7cd3f4fb43ddba03927af5f5c49fe7bf4d2db448ee63a22c4b2a3106aa4ed51",
+                    "preview": "## tree \u2014 tree_traversal\n\n**Overview**\nAdvanced tree traversal moves beyond simple recursion to focus on space-time efficiency and iterative control, specifically addressing memory constraints in deep trees (skewed) and the mechanics of non",
+                    "metadata": {}
+                }
+            ]
+        }
+    },
+    "content_fingerprints": {
+        "tree": {
+            "tree_traversal": [
+                "b7cd3f4fb43ddba03927af5f5c49fe7bf4d2db448ee63a22c4b2a3106aa4ed51"
+            ]
+        }
+    },
+    "quiz_seen_questions": {},
+    "quiz_attempts": {},
+    "weak_areas": {},
+    "strong_areas": {},
+    "completed_topics": [],
+    "_rag_latency_ms": 106.75
+}
