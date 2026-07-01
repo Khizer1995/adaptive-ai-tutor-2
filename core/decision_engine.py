@@ -1,4 +1,12 @@
+from dataclasses import dataclass
 from core.logging_utils import get_logger, log_jsonl, trace_event
+
+
+@dataclass
+class AblationConfig:
+    use_arbitration: bool = True
+    use_mastery_rerank: bool = True
+    use_validation: bool = True
 
 
 class DecisionEngine:
@@ -12,7 +20,8 @@ class DecisionEngine:
     - Deterministic weight-based decision rules
     """
 
-    def __init__(self):
+    def __init__(self, ablation_config: AblationConfig | None = None):
+        self.ablation_config = ablation_config or AblationConfig()
         self.logger = get_logger("decision_engine", "decision_engine.log")
 
     def _knowledge_snapshot(self, student_state: dict) -> tuple[float, float, str]:
@@ -306,6 +315,23 @@ class DecisionEngine:
             }
             trace_event("arbitration_selected", {"selected": fallback["proposal_id"], "score": 0.0})
             return fallback
+
+        if not self.ablation_config.use_arbitration:
+            scored = [
+                {"proposal_id": p.get("proposal_id"), "owner_agent": p.get("owner_agent"), "score": round(float(p.get("confidence", 0.0)), 4)}
+                for p in crew_proposals
+            ]
+            selected = max(crew_proposals, key=lambda p: float(p.get("confidence", 0.0))).copy()
+            selected["decision"] = decision
+            trace_event(
+                "arbitration_selected",
+                {
+                    "selected": selected.get("proposal_id"),
+                    "owner_agent": selected.get("owner_agent"),
+                    "scores": scored,
+                },
+            )
+            return selected
 
         action = decision.get("action", "adjust_quiz")
         style = student_state.get("learning_style", "balanced")

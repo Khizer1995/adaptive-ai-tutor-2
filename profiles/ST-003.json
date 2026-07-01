@@ -1,0 +1,76 @@
+{
+    "student_id": "ST-003",
+    "subject": "dsa",
+    "level": "intermediate",
+    "current_topic": "queue",
+    "current_subtopic": "queue_enqueue",
+    "engagement": "medium",
+    "last_score": 0.6,
+    "learning_history": [
+        {
+            "topic": "queue",
+            "subtopic": "queue_introduction",
+            "score": 0.6
+        }
+    ],
+    "knowledge_state": {
+        "concepts": {
+            "queue": {
+                "mastery": 0.588,
+                "confidence": 0.6,
+                "attempts": 5,
+                "scaffold_level": "medium"
+            }
+        },
+        "version": 2
+    },
+    "macro_decision": {
+        "macro_action": "guided_progression",
+        "target_concepts": [
+            "queue"
+        ],
+        "scaffold_policy": "medium",
+        "reason": "IF the learner is neither at-risk nor clearly ready to accelerate THEN use guided progression with medium scaffolding. | Target weakest concept 'queue' based on mastery snapshot (avg_mastery=0.58, avg_confidence=0.60, trend=stable).",
+        "decision_rationale": "IF the learner is neither at-risk nor clearly ready to accelerate THEN use guided progression with medium scaffolding. | Target weakest concept 'queue' based on mastery snapshot (avg_mastery=0.58, avg_confidence=0.60, trend=stable)."
+    },
+    "progress": [],
+    "generated_content_history": {
+        "queue": {
+            "queue_enqueue": [
+                {
+                    "timestamp": "2026-07-01T19:12:47.948356+00:00",
+                    "fingerprint": "9194305974835aec4029b2e3841e37129ad40ded1af5891322f82e7a653b05b2",
+                    "preview": "## Queue \u2014 enqueue\n\n**Overview**\nEnqueue is a fundamental operation in a queue data structure where an element is added to the end of the queue. This operation is crucial for maintaining the First-In-First-Out (FIFO) order of elements in a ",
+                    "metadata": {
+                        "mode": "guided",
+                        "depth": "intermediate",
+                        "score": 0.6
+                    }
+                }
+            ]
+        }
+    },
+    "content_fingerprints": {
+        "queue": {
+            "queue_enqueue": [
+                "9194305974835aec4029b2e3841e37129ad40ded1af5891322f82e7a653b05b2"
+            ]
+        }
+    },
+    "quiz_seen_questions": {},
+    "quiz_attempts": {},
+    "weak_areas": {},
+    "strong_areas": {},
+    "completed_topics": [],
+    "_rag_latency_ms": 115.37,
+    "knowledge_events": [
+        {
+            "topic": "queue",
+            "mastery": 0.588,
+            "confidence": 0.6,
+            "scaffold_level": "medium",
+            "observed_score": 0.6
+        }
+    ],
+    "last_active": "2026-07-01T19:12:47.969247+00:00"
+}

@@ -22,16 +22,47 @@ class ValidationResult:
         return asdict(self)
 
 
+from core.decision_engine import AblationConfig
+
+
 class ValidationAgent:
     """
     Validates generated educational content before delivery.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, ablation_config: AblationConfig | None = None) -> None:
+        self.ablation_config = ablation_config or AblationConfig()
         self.logger = get_logger("validation_agent", "validation.log")
 
     def validate_content(self, crew_output: dict, student_state: dict | None = None) -> dict:
         student_state = student_state or {}
+        if not self.ablation_config.use_validation:
+            validated_output = crew_output.copy()
+            validated_output["validation_result"] = {
+                "passed": True,
+                "checks": {},
+                "score": 1.0,
+                "flags": []
+            }
+            validated_output["validation_status"] = "passed"
+            validated_output["validation_score"] = 1.0
+            validated_output["validation_checks_passed"] = {}
+            validated_output["validation_flags"] = []
+            validated_output["adaptive_delivery_level"] = self._expected_delivery_level(student_state)
+            
+            log_jsonl(
+                "validation_log.jsonl",
+                {
+                    "student_id": student_state.get("student_id"),
+                    "topic": student_state.get("current_topic") or self._infer_topic(validated_output),
+                    "subtopic": student_state.get("current_subtopic"),
+                    "validation_result": validated_output["validation_result"],
+                    "adaptive_delivery_level": validated_output["adaptive_delivery_level"],
+                },
+            )
+            self.logger.info("validation skipped (ablation active)")
+            return validated_output
+
         validated_output = crew_output.copy()
 
         topic = str(student_state.get("current_topic") or self._infer_topic(validated_output)).strip()

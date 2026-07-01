@@ -66,7 +66,7 @@ from core.delivery_tracker import append_delivered_chunks, get_delivered_topic_s
 from core.learning_navigation import build_next_recommendation
 from core.curriculum_config import UNLOCK_THRESHOLD, get_next_subtopic, get_all_curriculum_topics
 from core.practical_agent import QuizQuestion
-from core.logging_utils import Timer
+from core.logging_utils import Timer, get_logger
 from core.metrics_collector import log_learning_cycle_metrics
 from core.adaptive_engine import after_quiz_submit, record_content, get_all_topics
 
@@ -92,6 +92,7 @@ crew = EducationCrew()
 file_manager = FileManagerAgent()
 monitor_agent = MonitorAgent()
 validation_agent = ValidationAgent()
+logger = get_logger("api_server", "api_server.log")
 
 # ── Authentication ────────────────────────────────────────────────────────────
 from core.auth import AuthManager

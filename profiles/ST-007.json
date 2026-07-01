@@ -1,0 +1,86 @@
+{
+    "student_id": "ST-007",
+    "subject": "dsa",
+    "level": "beginner",
+    "current_topic": "stack",
+    "current_subtopic": "stack_pop",
+    "engagement": "low",
+    "last_score": 0.25,
+    "learning_history": [
+        {
+            "topic": "stack",
+            "subtopic": "stack_introduction",
+            "score": 0.45
+        },
+        {
+            "topic": "stack",
+            "subtopic": "stack_push",
+            "score": 0.35
+        },
+        {
+            "topic": "stack",
+            "subtopic": "stack_pop",
+            "score": 0.25
+        }
+    ],
+    "knowledge_state": {
+        "concepts": {
+            "stack": {
+                "mastery": 0.237,
+                "confidence": 0.268,
+                "attempts": 7,
+                "scaffold_level": "high"
+            }
+        },
+        "version": 2
+    },
+    "macro_decision": {
+        "macro_action": "stabilize_foundations",
+        "target_concepts": [
+            "stack"
+        ],
+        "scaffold_policy": "high",
+        "reason": "IF last_score (0.25) < 0.45 THEN stabilize foundations with high scaffolding. | Target weakest concept 'stack' based on mastery snapshot (avg_mastery=0.23, avg_confidence=0.25, trend=declining).",
+        "decision_rationale": "IF last_score (0.25) < 0.45 THEN stabilize foundations with high scaffolding. | Target weakest concept 'stack' based on mastery snapshot (avg_mastery=0.23, avg_confidence=0.25, trend=declining)."
+    },
+    "progress": [],
+    "generated_content_history": {
+        "stack": {
+            "stack_pop": [
+                {
+                    "timestamp": "2026-07-01T19:13:35.633465+00:00",
+                    "fingerprint": "69cd676a6ec8c4165354088d65877c24502a8fdc7508e35b99ac1ec3819be135",
+                    "preview": "## Stack \u2014 Stack Pop\n\n**Overview**\nA stack is a data structure that follows the Last-In-First-Out (LIFO) principle, where elements are added and removed from the top. Think of a stack of plates: you add new plates on top and take them off f",
+                    "metadata": {
+                        "mode": "remedial",
+                        "depth": "beginner",
+                        "score": 0.25
+                    }
+                }
+            ]
+        }
+    },
+    "content_fingerprints": {
+        "stack": {
+            "stack_pop": [
+                "69cd676a6ec8c4165354088d65877c24502a8fdc7508e35b99ac1ec3819be135"
+            ]
+        }
+    },
+    "quiz_seen_questions": {},
+    "quiz_attempts": {},
+    "weak_areas": {},
+    "strong_areas": {},
+    "completed_topics": [],
+    "_rag_latency_ms": 2837.33,
+    "knowledge_events": [
+        {
+            "topic": "stack",
+            "mastery": 0.237,
+            "confidence": 0.268,
+            "scaffold_level": "high",
+            "observed_score": 0.25
+        }
+    ],
+    "last_active": "2026-07-01T19:13:35.653236+00:00"
+}

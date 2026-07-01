@@ -1,0 +1,98 @@
+{
+    "student_id": "ST-008",
+    "subject": "dsa",
+    "level": "advanced",
+    "current_topic": "array",
+    "current_subtopic": "heap",
+    "engagement": "high",
+    "last_score": 0.9,
+    "learning_history": [
+        {
+            "topic": "tree",
+            "subtopic": "tree_introduction",
+            "score": 0.8
+        },
+        {
+            "topic": "tree",
+            "subtopic": "bst_operations",
+            "score": 0.9
+        },
+        {
+            "topic": "tree",
+            "subtopic": "tree_traversal",
+            "score": 0.95
+        }
+    ],
+    "knowledge_state": {
+        "concepts": {
+            "tree": {
+                "mastery": 0.92,
+                "confidence": 0.95,
+                "attempts": 3
+            },
+            "array": {
+                "mastery": 0.9,
+                "confidence": 0.616,
+                "attempts": 4,
+                "scaffold_level": "low",
+                "weak_areas": [],
+                "strong_areas": [],
+                "completed": false
+            }
+        },
+        "version": 2
+    },
+    "macro_decision": {
+        "macro_action": "advance_concepts",
+        "target_concepts": [
+            "array"
+        ],
+        "scaffold_policy": "low",
+        "reason": "IF average mastery > 0.75 AND average confidence > 0.70 THEN advance concepts with low scaffolding. | Target weakest concept 'array' based on mastery snapshot (avg_mastery=0.91, avg_confidence=0.76, trend=improving).",
+        "decision_rationale": "IF average mastery > 0.75 AND average confidence > 0.70 THEN advance concepts with low scaffolding. | Target weakest concept 'array' based on mastery snapshot (avg_mastery=0.91, avg_confidence=0.76, trend=improving)."
+    },
+    "progress": [
+        "array"
+    ],
+    "generated_content_history": {
+        "array": {
+            "heap": [
+                {
+                    "timestamp": "2026-07-01T19:13:45.360769+00:00",
+                    "fingerprint": "cdb396bcbeffc2aedba87fd5543f9c6b83aed3d3c064280dd77b256fec538328",
+                    "preview": "## array \u2014 heap\n\n**Overview**\nAdvanced deep-dive into array.\n\n**Key Points**\n\u2022 Analyse time and space complexity trade-offs carefully.\n\u2022 Consider edge cases: empty state, single element, overflow.\n\u2022 Compare against alternative data structur",
+                    "metadata": {
+                        "mode": "advanced",
+                        "depth": "advanced",
+                        "score": 0.9
+                    }
+                }
+            ]
+        }
+    },
+    "content_fingerprints": {
+        "array": {
+            "heap": [
+                "cdb396bcbeffc2aedba87fd5543f9c6b83aed3d3c064280dd77b256fec538328"
+            ]
+        }
+    },
+    "quiz_seen_questions": {},
+    "quiz_attempts": {},
+    "weak_areas": {},
+    "strong_areas": {},
+    "completed_topics": [
+        "array"
+    ],
+    "_rag_latency_ms": 13.68,
+    "knowledge_events": [
+        {
+            "topic": "array",
+            "mastery": 0.9,
+            "confidence": 0.616,
+            "scaffold_level": "low",
+            "observed_score": 0.9
+        }
+    ],
+    "last_active": "2026-07-01T19:13:45.383670+00:00"
+}

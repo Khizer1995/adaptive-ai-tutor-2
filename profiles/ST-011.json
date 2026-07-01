@@ -1,0 +1,86 @@
+{
+    "student_id": "ST-011",
+    "subject": "dsa",
+    "level": "beginner",
+    "current_topic": "linked_list",
+    "current_subtopic": "linked_list_deletion",
+    "engagement": "low",
+    "last_score": 0.22,
+    "learning_history": [
+        {
+            "topic": "linked_list",
+            "subtopic": "linked_list_introduction",
+            "score": 0.35
+        },
+        {
+            "topic": "linked_list",
+            "subtopic": "linked_list_insertion",
+            "score": 0.25
+        },
+        {
+            "topic": "linked_list",
+            "subtopic": "linked_list_deletion",
+            "score": 0.22
+        }
+    ],
+    "knowledge_state": {
+        "concepts": {
+            "linked_list": {
+                "mastery": 0.21,
+                "confidence": 0.297,
+                "attempts": 7,
+                "scaffold_level": "high"
+            }
+        },
+        "version": 2
+    },
+    "macro_decision": {
+        "macro_action": "stabilize_foundations",
+        "target_concepts": [
+            "linked_list"
+        ],
+        "scaffold_policy": "high",
+        "reason": "IF last_score (0.22) < 0.45 THEN stabilize foundations with high scaffolding. | Target weakest concept 'linked_list' based on mastery snapshot (avg_mastery=0.21, avg_confidence=0.28, trend=declining).",
+        "decision_rationale": "IF last_score (0.22) < 0.45 THEN stabilize foundations with high scaffolding. | Target weakest concept 'linked_list' based on mastery snapshot (avg_mastery=0.21, avg_confidence=0.28, trend=declining)."
+    },
+    "progress": [],
+    "generated_content_history": {
+        "linked_list": {
+            "linked_list_deletion": [
+                {
+                    "timestamp": "2026-07-01T19:14:48.440771+00:00",
+                    "fingerprint": "13915695b55af0b04f3d2521b5446dadc04f0313bcd53fdbef69acbe7d311aa7",
+                    "preview": "## Linked List \u2014 Deletion\n\n**Overview**\nDeletion in a linked list involves removing a specific node while maintaining the integrity of the list. This process requires updating the pointers of adjacent nodes to avoid breaking the list.\n\n**Ke",
+                    "metadata": {
+                        "mode": "remedial",
+                        "depth": "beginner",
+                        "score": 0.22
+                    }
+                }
+            ]
+        }
+    },
+    "content_fingerprints": {
+        "linked_list": {
+            "linked_list_deletion": [
+                "13915695b55af0b04f3d2521b5446dadc04f0313bcd53fdbef69acbe7d311aa7"
+            ]
+        }
+    },
+    "quiz_seen_questions": {},
+    "quiz_attempts": {},
+    "weak_areas": {},
+    "strong_areas": {},
+    "completed_topics": [],
+    "_rag_latency_ms": 10.01,
+    "knowledge_events": [
+        {
+            "topic": "linked_list",
+            "mastery": 0.21,
+            "confidence": 0.297,
+            "scaffold_level": "high",
+            "observed_score": 0.22
+        }
+    ],
+    "last_active": "2026-07-01T19:14:48.460270+00:00"
+}
