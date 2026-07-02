@@ -1,0 +1,76 @@
+{
+    "student_id": "ST-010",
+    "subject": "dsa",
+    "level": "intermediate",
+    "current_topic": "array",
+    "current_subtopic": "array_sorting",
+    "engagement": "medium",
+    "last_score": 0.62,
+    "learning_history": [
+        {
+            "topic": "array",
+            "subtopic": "array_introduction",
+            "score": 0.62
+        }
+    ],
+    "knowledge_state": {
+        "concepts": {
+            "array": {
+                "mastery": 0.615,
+                "confidence": 0.621,
+                "attempts": 5,
+                "scaffold_level": "medium"
+            }
+        },
+        "version": 2
+    },
+    "macro_decision": {
+        "macro_action": "guided_progression",
+        "target_concepts": [
+            "array"
+        ],
+        "scaffold_policy": "medium",
+        "reason": "IF the learner is neither at-risk nor clearly ready to accelerate THEN use guided progression with medium scaffolding. | Target weakest concept 'array' based on mastery snapshot (avg_mastery=0.61, avg_confidence=0.63, trend=stable).",
+        "decision_rationale": "IF the learner is neither at-risk nor clearly ready to accelerate THEN use guided progression with medium scaffolding. | Target weakest concept 'array' based on mastery snapshot (avg_mastery=0.61, avg_confidence=0.63, trend=stable)."
+    },
+    "progress": [],
+    "generated_content_history": {
+        "array": {
+            "array_sorting": [
+                {
+                    "timestamp": "2026-07-01T19:14:35.144397+00:00",
+                    "fingerprint": "b448a439b2e554514228f3564bb025e8b823b3f338008b5c556c1e8e2c8bf148",
+                    "preview": "## Array \u2014 Array Sorting\n\n**Overview**\nArray sorting is the process of rearranging the elements of an array in a specific order, such as ascending or descending order. This is a crucial operation in programming, as it allows us to efficient",
+                    "metadata": {
+                        "mode": "guided",
+                        "depth": "intermediate",
+                        "score": 0.62
+                    }
+                }
+            ]
+        }
+    },
+    "content_fingerprints": {
+        "array": {
+            "array_sorting": [
+                "b448a439b2e554514228f3564bb025e8b823b3f338008b5c556c1e8e2c8bf148"
+            ]
+        }
+    },
+    "quiz_seen_questions": {},
+    "quiz_attempts": {},
+    "weak_areas": {},
+    "strong_areas": {},
+    "completed_topics": [],
+    "_rag_latency_ms": 16.85,
+    "knowledge_events": [
+        {
+            "topic": "array",
+            "mastery": 0.615,
+            "confidence": 0.621,
+            "scaffold_level": "medium",
+            "observed_score": 0.62
+        }
+    ],
+    "last_active": "2026-07-01T19:14:35.158310+00:00"
+}

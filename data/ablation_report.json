@@ -1,0 +1,624 @@
+{
+  "configurations": {
+    "full_system": {
+      "metrics": {
+        "scaffolding_accuracy": {
+          "mean": 0.9167,
+          "stddev": 0.2887
+        },
+        "decision_iterations": {
+          "mean": 1.0,
+          "stddev": 0.0
+        },
+        "retrieval_relevance": {
+          "mean": 0.3554,
+          "stddev": 0.2009
+        },
+        "validation_catch_rate": 1.0,
+        "response_latency": {
+          "mean": 10.2926,
+          "stddev": 10.8275
+        }
+      },
+      "scenarios": [
+        {
+          "scenario_id": "scenario_1_low_mastery_stack_push",
+          "macro_decision": "stabilize_foundations",
+          "micro_decision": "increase_support",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "failed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.3018,
+          "latency_seconds": 4.1578
+        },
+        {
+          "scenario_id": "scenario_2_low_mastery_array_intro",
+          "macro_decision": "stabilize_foundations",
+          "micro_decision": "increase_support",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "failed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.4389,
+          "latency_seconds": 1.0869
+        },
+        {
+          "scenario_id": "scenario_3_medium_mastery_queue_enqueue",
+          "macro_decision": "guided_progression",
+          "micro_decision": "adjust_quiz",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "failed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.0,
+          "latency_seconds": 0.7937
+        },
+        {
+          "scenario_id": "scenario_4_medium_mastery_list_insert",
+          "macro_decision": "guided_progression",
+          "micro_decision": "advance_topic",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "failed",
+          "scaffolding_accuracy": 0.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.2322,
+          "latency_seconds": 0.8762
+        },
+        {
+          "scenario_id": "scenario_5_high_mastery_tree_bst",
+          "macro_decision": "advance_concepts",
+          "micro_decision": "advance_topic",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "failed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.4681,
+          "latency_seconds": 8.565
+        },
+        {
+          "scenario_id": "scenario_6_high_mastery_graph_bfs",
+          "macro_decision": "advance_concepts",
+          "micro_decision": "advance_topic",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "failed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.2555,
+          "latency_seconds": 1.9635
+        },
+        {
+          "scenario_id": "scenario_7_struggling_stack_pop",
+          "macro_decision": "stabilize_foundations",
+          "micro_decision": "increase_support",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "failed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.5948,
+          "latency_seconds": 13.0798
+        },
+        {
+          "scenario_id": "scenario_8_excelling_tree_heap",
+          "macro_decision": "advance_concepts",
+          "micro_decision": "advance_topic",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "failed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.3845,
+          "latency_seconds": 13.1854
+        },
+        {
+          "scenario_id": "scenario_9_low_mastery_hash_intro",
+          "macro_decision": "stabilize_foundations",
+          "micro_decision": "increase_support",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "failed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.2474,
+          "latency_seconds": 39.4371
+        },
+        {
+          "scenario_id": "scenario_10_medium_mastery_array_sorting",
+          "macro_decision": "guided_progression",
+          "micro_decision": "adjust_quiz",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "failed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.402,
+          "latency_seconds": 17.1152
+        },
+        {
+          "scenario_id": "scenario_11_struggling_list_delete",
+          "macro_decision": "stabilize_foundations",
+          "micro_decision": "increase_support",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "failed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.7628,
+          "latency_seconds": 12.0205
+        },
+        {
+          "scenario_id": "scenario_12_excelling_graph_dfs",
+          "macro_decision": "advance_concepts",
+          "micro_decision": "advance_topic",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "failed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.1765,
+          "latency_seconds": 11.2301
+        }
+      ]
+    },
+    "no_arbitration": {
+      "metrics": {
+        "scaffolding_accuracy": {
+          "mean": 0.9167,
+          "stddev": 0.2887
+        },
+        "decision_iterations": {
+          "mean": 1.0,
+          "stddev": 0.0
+        },
+        "retrieval_relevance": {
+          "mean": 0.3443,
+          "stddev": 0.2148
+        },
+        "validation_catch_rate": null,
+        "response_latency": {
+          "mean": 15.8582,
+          "stddev": 10.622
+        }
+      },
+      "scenarios": [
+        {
+          "scenario_id": "scenario_1_low_mastery_stack_push",
+          "macro_decision": "stabilize_foundations",
+          "micro_decision": "increase_support",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "failed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.3018,
+          "latency_seconds": 10.3716
+        },
+        {
+          "scenario_id": "scenario_2_low_mastery_array_intro",
+          "macro_decision": "stabilize_foundations",
+          "micro_decision": "increase_support",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "failed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.4389,
+          "latency_seconds": 34.3439
+        },
+        {
+          "scenario_id": "scenario_3_medium_mastery_queue_enqueue",
+          "macro_decision": "guided_progression",
+          "micro_decision": "adjust_quiz",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "failed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.0,
+          "latency_seconds": 8.2877
+        },
+        {
+          "scenario_id": "scenario_4_medium_mastery_list_insert",
+          "macro_decision": "guided_progression",
+          "micro_decision": "advance_topic",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "failed",
+          "scaffolding_accuracy": 0.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.2322,
+          "latency_seconds": 10.2958
+        },
+        {
+          "scenario_id": "scenario_5_high_mastery_tree_bst",
+          "macro_decision": "guided_progression",
+          "micro_decision": "advance_topic",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "failed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.4681,
+          "latency_seconds": 10.4562
+        },
+        {
+          "scenario_id": "scenario_6_high_mastery_graph_bfs",
+          "macro_decision": "guided_progression",
+          "micro_decision": "advance_topic",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "failed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.2555,
+          "latency_seconds": 9.5125
+        },
+        {
+          "scenario_id": "scenario_7_struggling_stack_pop",
+          "macro_decision": "stabilize_foundations",
+          "micro_decision": "increase_support",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "failed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.5948,
+          "latency_seconds": 14.5581
+        },
+        {
+          "scenario_id": "scenario_8_excelling_tree_heap",
+          "macro_decision": "guided_progression",
+          "micro_decision": "advance_topic",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "failed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.3845,
+          "latency_seconds": 11.0832
+        },
+        {
+          "scenario_id": "scenario_9_low_mastery_hash_intro",
+          "macro_decision": "stabilize_foundations",
+          "micro_decision": "increase_support",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "failed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.2474,
+          "latency_seconds": 41.5489
+        },
+        {
+          "scenario_id": "scenario_10_medium_mastery_array_sorting",
+          "macro_decision": "guided_progression",
+          "micro_decision": "adjust_quiz",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "failed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.402,
+          "latency_seconds": 15.4597
+        },
+        {
+          "scenario_id": "scenario_11_struggling_list_delete",
+          "macro_decision": "stabilize_foundations",
+          "micro_decision": "increase_support",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "failed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.7628,
+          "latency_seconds": 12.2324
+        },
+        {
+          "scenario_id": "scenario_12_excelling_graph_dfs",
+          "macro_decision": "guided_progression",
+          "micro_decision": "advance_topic",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "failed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.0436,
+          "latency_seconds": 12.149
+        }
+      ]
+    },
+    "no_mastery_rerank": {
+      "metrics": {
+        "scaffolding_accuracy": {
+          "mean": 0.9167,
+          "stddev": 0.2887
+        },
+        "decision_iterations": {
+          "mean": 1.0,
+          "stddev": 0.0
+        },
+        "retrieval_relevance": {
+          "mean": 0.352,
+          "stddev": 0.2343
+        },
+        "validation_catch_rate": null,
+        "response_latency": {
+          "mean": 12.7575,
+          "stddev": 5.416
+        }
+      },
+      "scenarios": [
+        {
+          "scenario_id": "scenario_1_low_mastery_stack_push",
+          "macro_decision": "stabilize_foundations",
+          "micro_decision": "increase_support",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "failed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.1592,
+          "latency_seconds": 11.4692
+        },
+        {
+          "scenario_id": "scenario_2_low_mastery_array_intro",
+          "macro_decision": "stabilize_foundations",
+          "micro_decision": "increase_support",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "failed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.4389,
+          "latency_seconds": 11.0315
+        },
+        {
+          "scenario_id": "scenario_3_medium_mastery_queue_enqueue",
+          "macro_decision": "guided_progression",
+          "micro_decision": "adjust_quiz",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "failed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.0,
+          "latency_seconds": 6.8964
+        },
+        {
+          "scenario_id": "scenario_4_medium_mastery_list_insert",
+          "macro_decision": "guided_progression",
+          "micro_decision": "advance_topic",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "failed",
+          "scaffolding_accuracy": 0.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.2322,
+          "latency_seconds": 10.0781
+        },
+        {
+          "scenario_id": "scenario_5_high_mastery_tree_bst",
+          "macro_decision": "guided_progression",
+          "micro_decision": "advance_topic",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "failed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.3079,
+          "latency_seconds": 10.468
+        },
+        {
+          "scenario_id": "scenario_6_high_mastery_graph_bfs",
+          "macro_decision": "guided_progression",
+          "micro_decision": "advance_topic",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "failed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.2555,
+          "latency_seconds": 13.2053
+        },
+        {
+          "scenario_id": "scenario_7_struggling_stack_pop",
+          "macro_decision": "stabilize_foundations",
+          "micro_decision": "increase_support",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "failed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.6875,
+          "latency_seconds": 13.9121
+        },
+        {
+          "scenario_id": "scenario_8_excelling_tree_heap",
+          "macro_decision": "advance_concepts",
+          "micro_decision": "advance_topic",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "failed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.3493,
+          "latency_seconds": 9.1121
+        },
+        {
+          "scenario_id": "scenario_9_low_mastery_hash_intro",
+          "macro_decision": "stabilize_foundations",
+          "micro_decision": "increase_support",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "failed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.6022,
+          "latency_seconds": 27.4158
+        },
+        {
+          "scenario_id": "scenario_10_medium_mastery_array_sorting",
+          "macro_decision": "guided_progression",
+          "micro_decision": "adjust_quiz",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "failed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.3324,
+          "latency_seconds": 12.3286
+        },
+        {
+          "scenario_id": "scenario_11_struggling_list_delete",
+          "macro_decision": "stabilize_foundations",
+          "micro_decision": "increase_support",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "failed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.7628,
+          "latency_seconds": 18.0591
+        },
+        {
+          "scenario_id": "scenario_12_excelling_graph_dfs",
+          "macro_decision": "advance_concepts",
+          "micro_decision": "advance_topic",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "failed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.0964,
+          "latency_seconds": 9.1139
+        }
+      ]
+    },
+    "no_validation": {
+      "metrics": {
+        "scaffolding_accuracy": {
+          "mean": 0.9167,
+          "stddev": 0.2887
+        },
+        "decision_iterations": {
+          "mean": 1.0,
+          "stddev": 0.0
+        },
+        "retrieval_relevance": {
+          "mean": 0.3613,
+          "stddev": 0.2061
+        },
+        "validation_catch_rate": null,
+        "response_latency": {
+          "mean": 15.2301,
+          "stddev": 9.0727
+        }
+      },
+      "scenarios": [
+        {
+          "scenario_id": "scenario_1_low_mastery_stack_push",
+          "macro_decision": "stabilize_foundations",
+          "micro_decision": "increase_support",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "passed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.3018,
+          "latency_seconds": 11.488
+        },
+        {
+          "scenario_id": "scenario_2_low_mastery_array_intro",
+          "macro_decision": "stabilize_foundations",
+          "micro_decision": "increase_support",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "passed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.4389,
+          "latency_seconds": 35.3536
+        },
+        {
+          "scenario_id": "scenario_3_medium_mastery_queue_enqueue",
+          "macro_decision": "guided_progression",
+          "micro_decision": "adjust_quiz",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "passed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.0,
+          "latency_seconds": 7.0389
+        },
+        {
+          "scenario_id": "scenario_4_medium_mastery_list_insert",
+          "macro_decision": "guided_progression",
+          "micro_decision": "advance_topic",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "passed",
+          "scaffolding_accuracy": 0.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.389,
+          "latency_seconds": 9.9213
+        },
+        {
+          "scenario_id": "scenario_5_high_mastery_tree_bst",
+          "macro_decision": "guided_progression",
+          "micro_decision": "advance_topic",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "passed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.4681,
+          "latency_seconds": 9.4625
+        },
+        {
+          "scenario_id": "scenario_6_high_mastery_graph_bfs",
+          "macro_decision": "advance_concepts",
+          "micro_decision": "advance_topic",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "passed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.2555,
+          "latency_seconds": 14.2116
+        },
+        {
+          "scenario_id": "scenario_7_struggling_stack_pop",
+          "macro_decision": "stabilize_foundations",
+          "micro_decision": "increase_support",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "passed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.5948,
+          "latency_seconds": 14.0854
+        },
+        {
+          "scenario_id": "scenario_8_excelling_tree_heap",
+          "macro_decision": "advance_concepts",
+          "micro_decision": "advance_topic",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "passed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.3845,
+          "latency_seconds": 9.7282
+        },
+        {
+          "scenario_id": "scenario_9_low_mastery_hash_intro",
+          "macro_decision": "stabilize_foundations",
+          "micro_decision": "increase_support",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "passed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.2474,
+          "latency_seconds": 31.5415
+        },
+        {
+          "scenario_id": "scenario_10_medium_mastery_array_sorting",
+          "macro_decision": "guided_progression",
+          "micro_decision": "adjust_quiz",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "passed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.402,
+          "latency_seconds": 18.2231
+        },
+        {
+          "scenario_id": "scenario_11_struggling_list_delete",
+          "macro_decision": "stabilize_foundations",
+          "micro_decision": "increase_support",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "passed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.7628,
+          "latency_seconds": 13.3034
+        },
+        {
+          "scenario_id": "scenario_12_excelling_graph_dfs",
+          "macro_decision": "advance_concepts",
+          "micro_decision": "advance_topic",
+          "selected_proposal_owner": "tutor_agent",
+          "validation_status": "passed",
+          "scaffolding_accuracy": 1.0,
+          "decision_iterations": 1,
+          "retrieval_relevance": 0.0913,
+          "latency_seconds": 8.4039
+        }
+      ]
+    }
+  }
+}

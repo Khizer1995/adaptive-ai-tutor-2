@@ -1,0 +1,86 @@
+{
+    "student_id": "ST-009",
+    "subject": "dsa",
+    "level": "beginner",
+    "current_topic": "hash_table",
+    "current_subtopic": "hash_table_introduction",
+    "engagement": "low",
+    "last_score": 0.35,
+    "learning_history": [
+        {
+            "topic": "hash_table",
+            "subtopic": "hash_table_introduction",
+            "score": 0.45
+        },
+        {
+            "topic": "hash_table",
+            "subtopic": "hash_table_introduction",
+            "score": 0.25
+        },
+        {
+            "topic": "hash_table",
+            "subtopic": "hash_table_introduction",
+            "score": 0.35
+        }
+    ],
+    "knowledge_state": {
+        "concepts": {
+            "hash_table": {
+                "mastery": 0.342,
+                "confidence": 0.362,
+                "attempts": 7,
+                "scaffold_level": "high"
+            }
+        },
+        "version": 2
+    },
+    "macro_decision": {
+        "macro_action": "stabilize_foundations",
+        "target_concepts": [
+            "hash_table"
+        ],
+        "scaffold_policy": "high",
+        "reason": "IF last_score (0.35) < 0.45 THEN stabilize foundations with high scaffolding. | Target weakest concept 'hash_table' based on mastery snapshot (avg_mastery=0.34, avg_confidence=0.36, trend=fluctuating).",
+        "decision_rationale": "IF last_score (0.35) < 0.45 THEN stabilize foundations with high scaffolding. | Target weakest concept 'hash_table' based on mastery snapshot (avg_mastery=0.34, avg_confidence=0.36, trend=fluctuating)."
+    },
+    "progress": [],
+    "generated_content_history": {
+        "hash_table": {
+            "hash_table_introduction": [
+                {
+                    "timestamp": "2026-07-01T19:14:16.906218+00:00",
+                    "fingerprint": "87cbcd78ea18a9da00b8b64dcd5d6c49973c5ca0845d20edb35d89e825bcdf84",
+                    "preview": "## hash_table \u2014 hash_table_introduction\n\n**Overview**\nHash tables are a type of data structure that stores key-value pairs in a way that allows for efficient retrieval and insertion of data. They are commonly used in databases, caching syst",
+                    "metadata": {
+                        "mode": "remedial",
+                        "depth": "beginner",
+                        "score": 0.35
+                    }
+                }
+            ]
+        }
+    },
+    "content_fingerprints": {
+        "hash_table": {
+            "hash_table_introduction": [
+                "87cbcd78ea18a9da00b8b64dcd5d6c49973c5ca0845d20edb35d89e825bcdf84"
+            ]
+        }
+    },
+    "quiz_seen_questions": {},
+    "quiz_attempts": {},
+    "weak_areas": {},
+    "strong_areas": {},
+    "completed_topics": [],
+    "_rag_latency_ms": 13.46,
+    "knowledge_events": [
+        {
+            "topic": "hash_table",
+            "mastery": 0.342,
+            "confidence": 0.362,
+            "scaffold_level": "high",
+            "observed_score": 0.35
+        }
+    ],
+    "last_active": "2026-07-01T19:14:16.926319+00:00"
+}

@@ -1,0 +1,70 @@
+{
+    "student_id": "ST-002",
+    "subject": "dsa",
+    "level": "beginner",
+    "current_topic": "array",
+    "current_subtopic": "array_introduction",
+    "engagement": "medium",
+    "last_score": 0.4,
+    "learning_history": [],
+    "knowledge_state": {
+        "concepts": {
+            "array": {
+                "mastery": 0.388,
+                "confidence": 0.498,
+                "attempts": 4,
+                "scaffold_level": "high"
+            }
+        },
+        "version": 2
+    },
+    "macro_decision": {
+        "macro_action": "stabilize_foundations",
+        "target_concepts": [
+            "array"
+        ],
+        "scaffold_policy": "high",
+        "reason": "IF last_score (0.40) < 0.45 THEN stabilize foundations with high scaffolding. | Target weakest concept 'array' based on mastery snapshot (avg_mastery=0.38, avg_confidence=0.47, trend=stable).",
+        "decision_rationale": "IF last_score (0.40) < 0.45 THEN stabilize foundations with high scaffolding. | Target weakest concept 'array' based on mastery snapshot (avg_mastery=0.38, avg_confidence=0.47, trend=stable)."
+    },
+    "progress": [],
+    "generated_content_history": {
+        "array": {
+            "array_introduction": [
+                {
+                    "timestamp": "2026-07-01T19:12:40.908661+00:00",
+                    "fingerprint": "6944f52753a532efff5c4f8638654ec28ed4ab2db7da8f5af8f9f2b4c58bd5c3",
+                    "preview": "## Array \u2014 Introduction\n\n**Overview**\nArrays are a fundamental data structure in programming that store a collection of elements of the same data type in a single variable. They are useful for storing and manipulating large amounts of data.",
+                    "metadata": {
+                        "mode": "remedial",
+                        "depth": "beginner",
+                        "score": 0.4
+                    }
+                }
+            ]
+        }
+    },
+    "content_fingerprints": {
+        "array": {
+            "array_introduction": [
+                "6944f52753a532efff5c4f8638654ec28ed4ab2db7da8f5af8f9f2b4c58bd5c3"
+            ]
+        }
+    },
+    "quiz_seen_questions": {},
+    "quiz_attempts": {},
+    "weak_areas": {},
+    "strong_areas": {},
+    "completed_topics": [],
+    "_rag_latency_ms": 13.05,
+    "knowledge_events": [
+        {
+            "topic": "array",
+            "mastery": 0.388,
+            "confidence": 0.498,
+            "scaffold_level": "high",
+            "observed_score": 0.4
+        }
+    ],
+    "last_active": "2026-07-01T19:12:40.926569+00:00"
+}

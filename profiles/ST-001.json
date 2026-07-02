@@ -1,0 +1,76 @@
+{
+    "student_id": "ST-001",
+    "subject": "dsa",
+    "level": "beginner",
+    "current_topic": "stack",
+    "current_subtopic": "stack_push",
+    "engagement": "low",
+    "last_score": 0.3,
+    "learning_history": [
+        {
+            "topic": "stack",
+            "subtopic": "stack_introduction",
+            "score": 0.3
+        }
+    ],
+    "knowledge_state": {
+        "concepts": {
+            "stack": {
+                "mastery": 0.3,
+                "confidence": 0.371,
+                "attempts": 5,
+                "scaffold_level": "high"
+            }
+        },
+        "version": 2
+    },
+    "macro_decision": {
+        "macro_action": "stabilize_foundations",
+        "target_concepts": [
+            "stack"
+        ],
+        "scaffold_policy": "high",
+        "reason": "IF last_score (0.30) < 0.45 THEN stabilize foundations with high scaffolding. | Target weakest concept 'stack' based on mastery snapshot (avg_mastery=0.30, avg_confidence=0.38, trend=stable).",
+        "decision_rationale": "IF last_score (0.30) < 0.45 THEN stabilize foundations with high scaffolding. | Target weakest concept 'stack' based on mastery snapshot (avg_mastery=0.30, avg_confidence=0.38, trend=stable)."
+    },
+    "progress": [],
+    "generated_content_history": {
+        "stack": {
+            "stack_push": [
+                {
+                    "timestamp": "2026-07-01T19:12:05.549822+00:00",
+                    "fingerprint": "47e30fcee7c9f0f96675b833658ed72024fbb273304509c1882df48bea299c81",
+                    "preview": "## Stack \u2014 Stack Push\n\n**Overview**\nA stack is a data structure that follows the Last-In-First-Out (LIFO) principle, where the last item added is the first one to be removed. In this explanation, we'll focus on the `push` operation, which a",
+                    "metadata": {
+                        "mode": "remedial",
+                        "depth": "beginner",
+                        "score": 0.3
+                    }
+                }
+            ]
+        }
+    },
+    "content_fingerprints": {
+        "stack": {
+            "stack_push": [
+                "47e30fcee7c9f0f96675b833658ed72024fbb273304509c1882df48bea299c81"
+            ]
+        }
+    },
+    "quiz_seen_questions": {},
+    "quiz_attempts": {},
+    "weak_areas": {},
+    "strong_areas": {},
+    "completed_topics": [],
+    "_rag_latency_ms": 4089.29,
+    "knowledge_events": [
+        {
+            "topic": "stack",
+            "mastery": 0.3,
+            "confidence": 0.371,
+            "scaffold_level": "high",
+            "observed_score": 0.3
+        }
+    ],
+    "last_active": "2026-07-01T19:12:05.570503+00:00"
+}

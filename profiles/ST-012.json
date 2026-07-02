@@ -1,0 +1,98 @@
+{
+    "student_id": "ST-012",
+    "subject": "dsa",
+    "level": "advanced",
+    "current_topic": "array",
+    "current_subtopic": "graph_dfs",
+    "engagement": "high",
+    "last_score": 0.92,
+    "learning_history": [
+        {
+            "topic": "graph",
+            "subtopic": "graph_introduction",
+            "score": 0.8
+        },
+        {
+            "topic": "graph",
+            "subtopic": "graph_bfs",
+            "score": 0.95
+        },
+        {
+            "topic": "graph",
+            "subtopic": "graph_dfs",
+            "score": 0.92
+        }
+    ],
+    "knowledge_state": {
+        "concepts": {
+            "graph": {
+                "mastery": 0.95,
+                "confidence": 0.9,
+                "attempts": 3
+            },
+            "array": {
+                "mastery": 0.92,
+                "confidence": 0.616,
+                "attempts": 4,
+                "scaffold_level": "low",
+                "weak_areas": [],
+                "strong_areas": [],
+                "completed": false
+            }
+        },
+        "version": 2
+    },
+    "macro_decision": {
+        "macro_action": "advance_concepts",
+        "target_concepts": [
+            "array"
+        ],
+        "scaffold_policy": "low",
+        "reason": "IF average mastery > 0.75 AND average confidence > 0.70 THEN advance concepts with low scaffolding. | Target weakest concept 'array' based on mastery snapshot (avg_mastery=0.94, avg_confidence=0.73, trend=fluctuating).",
+        "decision_rationale": "IF average mastery > 0.75 AND average confidence > 0.70 THEN advance concepts with low scaffolding. | Target weakest concept 'array' based on mastery snapshot (avg_mastery=0.94, avg_confidence=0.73, trend=fluctuating)."
+    },
+    "progress": [
+        "array"
+    ],
+    "generated_content_history": {
+        "array": {
+            "graph_dfs": [
+                {
+                    "timestamp": "2026-07-01T19:14:56.847765+00:00",
+                    "fingerprint": "8f4927b61324a112fd3bdbdf57eea29e25626996158420274a94ca891c6f9960",
+                    "preview": "## Array \u2014 Graph DFS\n\n**Overview**\nArrays in Python can be used to implement graph traversal algorithms like Depth-First Search (DFS) efficiently, especially for sparse graphs. However, arrays have limitations, such as fixed size and type, ",
+                    "metadata": {
+                        "mode": "advanced",
+                        "depth": "advanced",
+                        "score": 0.92
+                    }
+                }
+            ]
+        }
+    },
+    "content_fingerprints": {
+        "array": {
+            "graph_dfs": [
+                "8f4927b61324a112fd3bdbdf57eea29e25626996158420274a94ca891c6f9960"
+            ]
+        }
+    },
+    "quiz_seen_questions": {},
+    "quiz_attempts": {},
+    "weak_areas": {},
+    "strong_areas": {},
+    "completed_topics": [
+        "array"
+    ],
+    "_rag_latency_ms": 17.5,
+    "knowledge_events": [
+        {
+            "topic": "array",
+            "mastery": 0.92,
+            "confidence": 0.616,
+            "scaffold_level": "low",
+            "observed_score": 0.92
+        }
+    ],
+    "last_active": "2026-07-01T19:14:56.866544+00:00"
+}

@@ -1,0 +1,88 @@
+{
+    "student_id": "ST-006",
+    "subject": "dsa",
+    "level": "advanced",
+    "current_topic": "array",
+    "current_subtopic": "graph_bfs",
+    "engagement": "high",
+    "last_score": 0.85,
+    "learning_history": [
+        {
+            "topic": "graph",
+            "subtopic": "graph_introduction",
+            "score": 0.85
+        }
+    ],
+    "knowledge_state": {
+        "concepts": {
+            "graph": {
+                "mastery": 0.9,
+                "confidence": 0.85,
+                "attempts": 1
+            },
+            "array": {
+                "mastery": 0.85,
+                "confidence": 0.616,
+                "attempts": 4,
+                "scaffold_level": "low",
+                "weak_areas": [],
+                "strong_areas": [],
+                "completed": false
+            }
+        },
+        "version": 2
+    },
+    "macro_decision": {
+        "macro_action": "advance_concepts",
+        "target_concepts": [
+            "array"
+        ],
+        "scaffold_policy": "low",
+        "reason": "IF average mastery > 0.75 AND average confidence > 0.70 THEN advance concepts with low scaffolding. | Target weakest concept 'array' based on mastery snapshot (avg_mastery=0.88, avg_confidence=0.71, trend=stable).",
+        "decision_rationale": "IF average mastery > 0.75 AND average confidence > 0.70 THEN advance concepts with low scaffolding. | Target weakest concept 'array' based on mastery snapshot (avg_mastery=0.88, avg_confidence=0.71, trend=stable)."
+    },
+    "progress": [
+        "array"
+    ],
+    "generated_content_history": {
+        "array": {
+            "graph_bfs": [
+                {
+                    "timestamp": "2026-07-01T19:13:21.548488+00:00",
+                    "fingerprint": "8b10d94938629235a80bce1c4f2aeb5cfdd67075dca1646908bf69d89a9d41ab",
+                    "preview": "## Array \u2014 Graph BFS\n\n**Overview**\nBreadth-First Search (BFS) is a graph traversal algorithm that explores all the nodes at the present depth prior to moving on to nodes at the next depth level. It is particularly useful for finding shortes",
+                    "metadata": {
+                        "mode": "advanced",
+                        "depth": "advanced",
+                        "score": 0.85
+                    }
+                }
+            ]
+        }
+    },
+    "content_fingerprints": {
+        "array": {
+            "graph_bfs": [
+                "8b10d94938629235a80bce1c4f2aeb5cfdd67075dca1646908bf69d89a9d41ab"
+            ]
+        }
+    },
+    "quiz_seen_questions": {},
+    "quiz_attempts": {},
+    "weak_areas": {},
+    "strong_areas": {},
+    "completed_topics": [
+        "array"
+    ],
+    "_rag_latency_ms": 16.55,
+    "knowledge_events": [
+        {
+            "topic": "array",
+            "mastery": 0.85,
+            "confidence": 0.616,
+            "scaffold_level": "low",
+            "observed_score": 0.85
+        }
+    ],
+    "last_active": "2026-07-01T19:13:21.567186+00:00"
+}

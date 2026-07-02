@@ -1,0 +1,322 @@
+[
+  {
+    "scenario_id": "scenario_1_low_mastery_stack_push",
+    "concept": "stack",
+    "ideal_chunk_content": "The push operation inserts a new element onto the top of the stack, updating the top index.",
+    "student_profile": {
+      "student_id": "ST-001",
+      "subject": "dsa",
+      "level": "beginner",
+      "current_topic": "stack",
+      "current_subtopic": "stack_push",
+      "engagement": "medium",
+      "last_score": 0.3,
+      "learning_history": [
+        {"topic": "stack", "subtopic": "stack_introduction", "score": 0.3}
+      ],
+      "knowledge_state": {
+        "concepts": {
+          "stack": {
+            "mastery": 0.3,
+            "confidence": 0.4,
+            "attempts": 1
+          }
+        }
+      }
+    }
+  },
+  {
+    "scenario_id": "scenario_2_low_mastery_array_intro",
+    "concept": "array",
+    "ideal_chunk_content": "An array is a contiguous memory structure containing elements of the same type indexed from zero.",
+    "student_profile": {
+      "student_id": "ST-002",
+      "subject": "dsa",
+      "level": "beginner",
+      "current_topic": "array",
+      "current_subtopic": "array_introduction",
+      "engagement": "medium",
+      "last_score": 0.4,
+      "learning_history": [],
+      "knowledge_state": {
+        "concepts": {
+          "array": {
+            "mastery": 0.35,
+            "confidence": 0.35,
+            "attempts": 0
+          }
+        }
+      }
+    }
+  },
+  {
+    "scenario_id": "scenario_3_medium_mastery_queue_enqueue",
+    "concept": "queue",
+    "ideal_chunk_content": "Enqueue adds an element to the rear of the queue, shifting the rear pointer.",
+    "student_profile": {
+      "student_id": "ST-003",
+      "subject": "dsa",
+      "level": "intermediate",
+      "current_topic": "queue",
+      "current_subtopic": "queue_enqueue",
+      "engagement": "medium",
+      "last_score": 0.6,
+      "learning_history": [
+        {"topic": "queue", "subtopic": "queue_introduction", "score": 0.6}
+      ],
+      "knowledge_state": {
+        "concepts": {
+          "queue": {
+            "mastery": 0.55,
+            "confidence": 0.6,
+            "attempts": 1
+          }
+        }
+      }
+    }
+  },
+  {
+    "scenario_id": "scenario_4_medium_mastery_list_insert",
+    "concept": "linked_list",
+    "ideal_chunk_content": "To insert a node, update the next reference of the preceding node to point to the new node.",
+    "student_profile": {
+      "student_id": "ST-004",
+      "subject": "dsa",
+      "level": "intermediate",
+      "current_topic": "linked_list",
+      "current_subtopic": "linked_list_insertion",
+      "engagement": "high",
+      "last_score": 0.65,
+      "learning_history": [
+        {"topic": "linked_list", "subtopic": "linked_list_introduction", "score": 0.65}
+      ],
+      "knowledge_state": {
+        "concepts": {
+          "linked_list": {
+            "mastery": 0.62,
+            "confidence": 0.58,
+            "attempts": 1
+          }
+        }
+      }
+    }
+  },
+  {
+    "scenario_id": "scenario_5_high_mastery_tree_bst",
+    "concept": "tree",
+    "ideal_chunk_content": "A Binary Search Tree key property is that the left child value is less than the root, and the right child is greater.",
+    "student_profile": {
+      "student_id": "ST-005",
+      "subject": "dsa",
+      "level": "advanced",
+      "current_topic": "tree",
+      "current_subtopic": "bst_operations",
+      "engagement": "medium",
+      "last_score": 0.8,
+      "learning_history": [
+        {"topic": "tree", "subtopic": "tree_introduction", "score": 0.8}
+      ],
+      "knowledge_state": {
+        "concepts": {
+          "tree": {
+            "mastery": 0.85,
+            "confidence": 0.8,
+            "attempts": 1
+          }
+        }
+      }
+    }
+  },
+  {
+    "scenario_id": "scenario_6_high_mastery_graph_bfs",
+    "concept": "graph",
+    "ideal_chunk_content": "Breadth-First Search uses a queue to visit vertices level-by-level starting from a source node.",
+    "student_profile": {
+      "student_id": "ST-006",
+      "subject": "dsa",
+      "level": "advanced",
+      "current_topic": "graph",
+      "current_subtopic": "graph_bfs",
+      "engagement": "high",
+      "last_score": 0.85,
+      "learning_history": [
+        {"topic": "graph", "subtopic": "graph_introduction", "score": 0.85}
+      ],
+      "knowledge_state": {
+        "concepts": {
+          "graph": {
+            "mastery": 0.9,
+            "confidence": 0.85,
+            "attempts": 1
+          }
+        }
+      }
+    }
+  },
+  {
+    "scenario_id": "scenario_7_struggling_stack_pop",
+    "concept": "stack",
+    "ideal_chunk_content": "The pop operation removes and returns the element at the top of the stack, decrementing the size.",
+    "student_profile": {
+      "student_id": "ST-007",
+      "subject": "dsa",
+      "level": "beginner",
+      "current_topic": "stack",
+      "current_subtopic": "stack_pop",
+      "engagement": "low",
+      "last_score": 0.25,
+      "learning_history": [
+        {"topic": "stack", "subtopic": "stack_introduction", "score": 0.45},
+        {"topic": "stack", "subtopic": "stack_push", "score": 0.35},
+        {"topic": "stack", "subtopic": "stack_pop", "score": 0.25}
+      ],
+      "knowledge_state": {
+        "concepts": {
+          "stack": {
+            "mastery": 0.2,
+            "confidence": 0.15,
+            "attempts": 3
+          }
+        }
+      }
+    }
+  },
+  {
+    "scenario_id": "scenario_8_excelling_tree_heap",
+    "concept": "tree",
+    "ideal_chunk_content": "A max-heap maintains the property that the parent node key is always greater than or equal to its children.",
+    "student_profile": {
+      "student_id": "ST-008",
+      "subject": "dsa",
+      "level": "advanced",
+      "current_topic": "tree",
+      "current_subtopic": "heap",
+      "engagement": "high",
+      "last_score": 0.9,
+      "learning_history": [
+        {"topic": "tree", "subtopic": "tree_introduction", "score": 0.8},
+        {"topic": "tree", "subtopic": "bst_operations", "score": 0.9},
+        {"topic": "tree", "subtopic": "tree_traversal", "score": 0.95}
+      ],
+      "knowledge_state": {
+        "concepts": {
+          "tree": {
+            "mastery": 0.92,
+            "confidence": 0.95,
+            "attempts": 3
+          }
+        }
+      }
+    }
+  },
+  {
+    "scenario_id": "scenario_9_low_mastery_hash_intro",
+    "concept": "hash_table",
+    "ideal_chunk_content": "A hash table maps keys to values using a hash function to compute index positions.",
+    "student_profile": {
+      "student_id": "ST-009",
+      "subject": "dsa",
+      "level": "beginner",
+      "current_topic": "hash_table",
+      "current_subtopic": "hash_table_introduction",
+      "engagement": "low",
+      "last_score": 0.35,
+      "learning_history": [
+        {"topic": "hash_table", "subtopic": "hash_table_introduction", "score": 0.45},
+        {"topic": "hash_table", "subtopic": "hash_table_introduction", "score": 0.25},
+        {"topic": "hash_table", "subtopic": "hash_table_introduction", "score": 0.35}
+      ],
+      "knowledge_state": {
+        "concepts": {
+          "hash_table": {
+            "mastery": 0.32,
+            "confidence": 0.38,
+            "attempts": 3
+          }
+        }
+      }
+    }
+  },
+  {
+    "scenario_id": "scenario_10_medium_mastery_array_sorting",
+    "concept": "array",
+    "ideal_chunk_content": "Bubble sort compares adjacent elements and swaps them if they are in the wrong order.",
+    "student_profile": {
+      "student_id": "ST-010",
+      "subject": "dsa",
+      "level": "intermediate",
+      "current_topic": "array",
+      "current_subtopic": "array_sorting",
+      "engagement": "medium",
+      "last_score": 0.62,
+      "learning_history": [
+        {"topic": "array", "subtopic": "array_introduction", "score": 0.62}
+      ],
+      "knowledge_state": {
+        "concepts": {
+          "array": {
+            "mastery": 0.6,
+            "confidence": 0.65,
+            "attempts": 1
+          }
+        }
+      }
+    }
+  },
+  {
+    "scenario_id": "scenario_11_struggling_list_delete",
+    "concept": "linked_list",
+    "ideal_chunk_content": "To delete a node, change the next reference of the previous node to bypass the target node.",
+    "student_profile": {
+      "student_id": "ST-011",
+      "subject": "dsa",
+      "level": "beginner",
+      "current_topic": "linked_list",
+      "current_subtopic": "linked_list_deletion",
+      "engagement": "low",
+      "last_score": 0.22,
+      "learning_history": [
+        {"topic": "linked_list", "subtopic": "linked_list_introduction", "score": 0.35},
+        {"topic": "linked_list", "subtopic": "linked_list_insertion", "score": 0.25},
+        {"topic": "linked_list", "subtopic": "linked_list_deletion", "score": 0.22}
+      ],
+      "knowledge_state": {
+        "concepts": {
+          "linked_list": {
+            "mastery": 0.18,
+            "confidence": 0.22,
+            "attempts": 3
+          }
+        }
+      }
+    }
+  },
+  {
+    "scenario_id": "scenario_12_excelling_graph_dfs",
+    "concept": "graph",
+    "ideal_chunk_content": "Depth-First Search uses a stack or recursion to explore as far as possible along each branch before backtracking.",
+    "student_profile": {
+      "student_id": "ST-012",
+      "subject": "dsa",
+      "level": "advanced",
+      "current_topic": "graph",
+      "current_subtopic": "graph_dfs",
+      "engagement": "high",
+      "last_score": 0.92,
+      "learning_history": [
+        {"topic": "graph", "subtopic": "graph_introduction", "score": 0.8},
+        {"topic": "graph", "subtopic": "graph_bfs", "score": 0.95},
+        {"topic": "graph", "subtopic": "graph_dfs", "score": 0.92}
+      ],
+      "knowledge_state": {
+        "concepts": {
+          "graph": {
+            "mastery": 0.95,
+            "confidence": 0.9,
+            "attempts": 3
+          }
+        }
+      }
+    }
+  }
+]

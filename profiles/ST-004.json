@@ -1,0 +1,84 @@
+{
+    "student_id": "ST-004",
+    "subject": "dsa",
+    "level": "intermediate",
+    "current_topic": "array",
+    "current_subtopic": "linked_list_insertion",
+    "engagement": "medium",
+    "last_score": 0.65,
+    "learning_history": [
+        {
+            "topic": "linked_list",
+            "subtopic": "linked_list_introduction",
+            "score": 0.65
+        }
+    ],
+    "knowledge_state": {
+        "concepts": {
+            "linked_list": {
+                "mastery": 0.62,
+                "confidence": 0.58,
+                "attempts": 1
+            },
+            "array": {
+                "mastery": 0.65,
+                "confidence": 0.498,
+                "attempts": 4,
+                "scaffold_level": "medium",
+                "weak_areas": [],
+                "strong_areas": [],
+                "completed": false
+            }
+        },
+        "version": 2
+    },
+    "macro_decision": {
+        "macro_action": "guided_progression",
+        "target_concepts": [
+            "linked_list"
+        ],
+        "scaffold_policy": "medium",
+        "reason": "IF the learner is neither at-risk nor clearly ready to accelerate THEN use guided progression with medium scaffolding. | Target weakest concept 'linked_list' based on mastery snapshot (avg_mastery=0.64, avg_confidence=0.53, trend=stable).",
+        "decision_rationale": "IF the learner is neither at-risk nor clearly ready to accelerate THEN use guided progression with medium scaffolding. | Target weakest concept 'linked_list' based on mastery snapshot (avg_mastery=0.64, avg_confidence=0.53, trend=stable)."
+    },
+    "progress": [],
+    "generated_content_history": {
+        "array": {
+            "linked_list_insertion": [
+                {
+                    "timestamp": "2026-07-01T19:12:57.871116+00:00",
+                    "fingerprint": "c528daec3494dabb2b7593ad8f81eb54d4f070b11503221fbe2e15100a08179d",
+                    "preview": "## Array \u2014 Linked List Insertion\n\n**Overview**\nStoring elements in an array-based linked list requires careful consideration of insertion operations to maintain contiguous cell storage.\n\n**Key Points**\n* Linked lists are dynamic data struct",
+                    "metadata": {
+                        "mode": "guided",
+                        "depth": "intermediate",
+                        "score": 0.65
+                    }
+                }
+            ]
+        }
+    },
+    "content_fingerprints": {
+        "array": {
+            "linked_list_insertion": [
+                "c528daec3494dabb2b7593ad8f81eb54d4f070b11503221fbe2e15100a08179d"
+            ]
+        }
+    },
+    "quiz_seen_questions": {},
+    "quiz_attempts": {},
+    "weak_areas": {},
+    "strong_areas": {},
+    "completed_topics": [],
+    "_rag_latency_ms": 14.6,
+    "knowledge_events": [
+        {
+            "topic": "array",
+            "mastery": 0.65,
+            "confidence": 0.498,
+            "scaffold_level": "medium",
+            "observed_score": 0.65
+        }
+    ],
+    "last_active": "2026-07-01T19:12:57.891768+00:00"
+}

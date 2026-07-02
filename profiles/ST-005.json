@@ -1,0 +1,88 @@
+{
+    "student_id": "ST-005",
+    "subject": "dsa",
+    "level": "advanced",
+    "current_topic": "array",
+    "current_subtopic": "bst_operations",
+    "engagement": "high",
+    "last_score": 0.8,
+    "learning_history": [
+        {
+            "topic": "tree",
+            "subtopic": "tree_introduction",
+            "score": 0.8
+        }
+    ],
+    "knowledge_state": {
+        "concepts": {
+            "tree": {
+                "mastery": 0.85,
+                "confidence": 0.8,
+                "attempts": 1
+            },
+            "array": {
+                "mastery": 0.8,
+                "confidence": 0.616,
+                "attempts": 4,
+                "scaffold_level": "medium",
+                "weak_areas": [],
+                "strong_areas": [],
+                "completed": false
+            }
+        },
+        "version": 2
+    },
+    "macro_decision": {
+        "macro_action": "guided_progression",
+        "target_concepts": [
+            "array"
+        ],
+        "scaffold_policy": "medium",
+        "reason": "IF the learner is neither at-risk nor clearly ready to accelerate THEN use guided progression with medium scaffolding. | Target weakest concept 'array' based on mastery snapshot (avg_mastery=0.82, avg_confidence=0.69, trend=stable).",
+        "decision_rationale": "IF the learner is neither at-risk nor clearly ready to accelerate THEN use guided progression with medium scaffolding. | Target weakest concept 'array' based on mastery snapshot (avg_mastery=0.82, avg_confidence=0.69, trend=stable)."
+    },
+    "progress": [
+        "array"
+    ],
+    "generated_content_history": {
+        "array": {
+            "bst_operations": [
+                {
+                    "timestamp": "2026-07-01T19:13:07.334776+00:00",
+                    "fingerprint": "021390d9ba12c9fec8125624c04e1eb561a34835cf5773361a5ce5ad11d924ff",
+                    "preview": "## Array \u2014 Binary Search Tree (BST) Operations\n\n**Overview**\nArrays can be used to implement Binary Search Trees (BSTs) efficiently, but they require additional operations to maintain the BST property. We'll explore these operations and the",
+                    "metadata": {
+                        "mode": "advanced",
+                        "depth": "advanced",
+                        "score": 0.8
+                    }
+                }
+            ]
+        }
+    },
+    "content_fingerprints": {
+        "array": {
+            "bst_operations": [
+                "021390d9ba12c9fec8125624c04e1eb561a34835cf5773361a5ce5ad11d924ff"
+            ]
+        }
+    },
+    "quiz_seen_questions": {},
+    "quiz_attempts": {},
+    "weak_areas": {},
+    "strong_areas": {},
+    "completed_topics": [
+        "array"
+    ],
+    "_rag_latency_ms": 13.91,
+    "knowledge_events": [
+        {
+            "topic": "array",
+            "mastery": 0.8,
+            "confidence": 0.616,
+            "scaffold_level": "medium",
+            "observed_score": 0.8
+        }
+    ],
+    "last_active": "2026-07-01T19:13:07.355061+00:00"
+}
