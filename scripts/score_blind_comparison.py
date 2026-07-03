@@ -49,7 +49,7 @@ def main():
     ties = 0
     rows_used = 0
 
-    with open(args.ratings, "r", encoding="utf-8") as f:
+    with open(args.ratings, "r", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
         for row in reader:
             scenario_id = row.get("scenario_id", "").strip()
