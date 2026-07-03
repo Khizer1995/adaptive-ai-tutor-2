@@ -1,0 +1,73 @@
+{
+  "configuration": "no_agent_baseline",
+  "scenario_count": 12,
+  "empty_response_count": 0,
+  "metrics": {
+    "response_latency": {
+      "mean": 65.6098,
+      "stddev": 74.5937
+    }
+  },
+  "scenarios": [
+    {
+      "scenario_id": "scenario_1_low_mastery_stack_push",
+      "latency_seconds": 12.6664,
+      "content_length": 2145
+    },
+    {
+      "scenario_id": "scenario_2_low_mastery_array_intro",
+      "latency_seconds": 8.4202,
+      "content_length": 2342
+    },
+    {
+      "scenario_id": "scenario_3_medium_mastery_queue_enqueue",
+      "latency_seconds": 26.2412,
+      "content_length": 2694
+    },
+    {
+      "scenario_id": "scenario_4_medium_mastery_list_insert",
+      "latency_seconds": 29.1372,
+      "content_length": 2428
+    },
+    {
+      "scenario_id": "scenario_5_high_mastery_tree_bst",
+      "latency_seconds": 99.8163,
+      "content_length": 2754
+    },
+    {
+      "scenario_id": "scenario_6_high_mastery_graph_bfs",
+      "latency_seconds": 10.1364,
+      "content_length": 2611
+    },
+    {
+      "scenario_id": "scenario_7_struggling_stack_pop",
+      "latency_seconds": 89.6366,
+      "content_length": 1510
+    },
+    {
+      "scenario_id": "scenario_8_excelling_tree_heap",
+      "latency_seconds": 227.7711,
+      "content_length": 5850
+    },
+    {
+      "scenario_id": "scenario_9_low_mastery_hash_intro",
+      "latency_seconds": 20.7058,
+      "content_length": 1829
+    },
+    {
+      "scenario_id": "scenario_10_medium_mastery_array_sorting",
+      "latency_seconds": 37.3384,
+      "content_length": 2839
+    },
+    {
+      "scenario_id": "scenario_11_struggling_list_delete",
+      "latency_seconds": 29.4274,
+      "content_length": 3316
+    },
+    {
+      "scenario_id": "scenario_12_excelling_graph_dfs",
+      "latency_seconds": 196.0203,
+      "content_length": 7522
+    }
+  ]
+}
