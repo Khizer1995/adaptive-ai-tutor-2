@@ -1,0 +1,13 @@
+scenario_id,rater_name,clarity_a_1to5,clarity_b_1to5,correctness_a_1to5,correctness_b_1to5,adaptiveness_a_1to5,adaptiveness_b_1to5,overall_preference_a_or_b_or_tie,notes
+scenario_1_low_mastery_stack_push,,,,,,,,,
+scenario_2_low_mastery_array_intro,,,,,,,,,
+scenario_3_medium_mastery_queue_enqueue,,,,,,,,,
+scenario_4_medium_mastery_list_insert,,,,,,,,,
+scenario_5_high_mastery_tree_bst,,,,,,,,,
+scenario_6_high_mastery_graph_bfs,,,,,,,,,
+scenario_7_struggling_stack_pop,,,,,,,,,
+scenario_8_excelling_tree_heap,,,,,,,,,
+scenario_9_low_mastery_hash_intro,,,,,,,,,
+scenario_10_medium_mastery_array_sorting,,,,,,,,,
+scenario_11_struggling_list_delete,,,,,,,,,
+scenario_12_excelling_graph_dfs,,,,,,,,,

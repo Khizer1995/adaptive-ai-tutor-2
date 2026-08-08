@@ -1,0 +1,53 @@
+{
+  "seed": 42,
+  "mapping": {
+    "scenario_1_low_mastery_stack_push": {
+      "system_a": "no_agent_baseline",
+      "system_b": "full_system"
+    },
+    "scenario_2_low_mastery_array_intro": {
+      "system_a": "full_system",
+      "system_b": "no_agent_baseline"
+    },
+    "scenario_3_medium_mastery_queue_enqueue": {
+      "system_a": "full_system",
+      "system_b": "no_agent_baseline"
+    },
+    "scenario_4_medium_mastery_list_insert": {
+      "system_a": "full_system",
+      "system_b": "no_agent_baseline"
+    },
+    "scenario_5_high_mastery_tree_bst": {
+      "system_a": "no_agent_baseline",
+      "system_b": "full_system"
+    },
+    "scenario_6_high_mastery_graph_bfs": {
+      "system_a": "no_agent_baseline",
+      "system_b": "full_system"
+    },
+    "scenario_7_struggling_stack_pop": {
+      "system_a": "no_agent_baseline",
+      "system_b": "full_system"
+    },
+    "scenario_8_excelling_tree_heap": {
+      "system_a": "full_system",
+      "system_b": "no_agent_baseline"
+    },
+    "scenario_9_low_mastery_hash_intro": {
+      "system_a": "full_system",
+      "system_b": "no_agent_baseline"
+    },
+    "scenario_10_medium_mastery_array_sorting": {
+      "system_a": "full_system",
+      "system_b": "no_agent_baseline"
+    },
+    "scenario_11_struggling_list_delete": {
+      "system_a": "full_system",
+      "system_b": "no_agent_baseline"
+    },
+    "scenario_12_excelling_graph_dfs": {
+      "system_a": "no_agent_baseline",
+      "system_b": "full_system"
+    }
+  }
+}
