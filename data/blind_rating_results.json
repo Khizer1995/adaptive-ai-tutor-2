@@ -1,0 +1,314 @@
+{
+  "meta": {
+    "num_raters": 2,
+    "rater_names": [
+      "Alice",
+      "Bob"
+    ],
+    "num_scenarios": 12,
+    "rating_date": "2026-08-13",
+    "randomization_keys_used": [
+      "data\\blind_rating_randomization_key_20260813_120000_Alice.json",
+      "data\\blind_rating_randomization_key_20260813_120000_Bob.json"
+    ],
+    "rating_files_used": [
+      "data\\blind_rating_results_Alice_20260813_120000.json",
+      "data\\blind_rating_results_Bob_20260813_120000.json"
+    ],
+    "scipy_used": true
+  },
+  "aggregate_scores": {
+    "baseline": {
+      "pedagogical_clarity": {
+        "mean": 3.2083,
+        "std": 1.0624
+      },
+      "correctness": {
+        "mean": 3.5833,
+        "std": 0.9743
+      },
+      "appropriateness": {
+        "mean": 3.4167,
+        "std": 0.9286
+      }
+    },
+    "full_system": {
+      "pedagogical_clarity": {
+        "mean": 3.9583,
+        "std": 0.9546
+      },
+      "correctness": {
+        "mean": 4.0,
+        "std": 1.0215
+      },
+      "appropriateness": {
+        "mean": 4.3333,
+        "std": 0.5647
+      }
+    }
+  },
+  "preference_counts": {
+    "full_system_wins": 18,
+    "baseline_wins": 6,
+    "ties": 0,
+    "full_system_win_rate": 0.75
+  },
+  "statistical_tests": {
+    "pedagogical_clarity": {
+      "t_statistic": 1.9888,
+      "p_value": 0.058745,
+      "significant": false,
+      "n_pairs": 24
+    },
+    "correctness": {
+      "t_statistic": 1.0956,
+      "p_value": 0.284579,
+      "significant": false,
+      "n_pairs": 24
+    },
+    "appropriateness": {
+      "t_statistic": 3.943,
+      "p_value": 0.000648,
+      "significant": true,
+      "n_pairs": 24
+    }
+  },
+  "inter_rater_reliability": {
+    "method": "mean_pairwise_pearson_r",
+    "num_raters": 2,
+    "mean_r": -0.0467,
+    "pairwise_correlations": [
+      -0.0467
+    ]
+  },
+  "per_scenario_results": [
+    {
+      "scenario_id": "scenario_10_medium_mastery_array_sorting",
+      "baseline_avg_scores": {
+        "pedagogical_clarity": 3.5,
+        "correctness": 4.0,
+        "appropriateness": 3.5
+      },
+      "full_system_avg_scores": {
+        "pedagogical_clarity": 4.0,
+        "correctness": 3.0,
+        "appropriateness": 4.5
+      },
+      "preference_winner": "Tie",
+      "preference_vote_count": {
+        "full_system": 1,
+        "baseline": 1,
+        "tie": 0
+      }
+    },
+    {
+      "scenario_id": "scenario_11_struggling_list_delete",
+      "baseline_avg_scores": {
+        "pedagogical_clarity": 2.5,
+        "correctness": 3.0,
+        "appropriateness": 3.0
+      },
+      "full_system_avg_scores": {
+        "pedagogical_clarity": 4.5,
+        "correctness": 5.0,
+        "appropriateness": 4.5
+      },
+      "preference_winner": "full_system",
+      "preference_vote_count": {
+        "full_system": 2,
+        "baseline": 0,
+        "tie": 0
+      }
+    },
+    {
+      "scenario_id": "scenario_12_excelling_graph_dfs",
+      "baseline_avg_scores": {
+        "pedagogical_clarity": 4.0,
+        "correctness": 4.0,
+        "appropriateness": 4.5
+      },
+      "full_system_avg_scores": {
+        "pedagogical_clarity": 3.5,
+        "correctness": 3.0,
+        "appropriateness": 4.5
+      },
+      "preference_winner": "Tie",
+      "preference_vote_count": {
+        "full_system": 1,
+        "baseline": 1,
+        "tie": 0
+      }
+    },
+    {
+      "scenario_id": "scenario_1_low_mastery_stack_push",
+      "baseline_avg_scores": {
+        "pedagogical_clarity": 2.5,
+        "correctness": 4.0,
+        "appropriateness": 3.0
+      },
+      "full_system_avg_scores": {
+        "pedagogical_clarity": 4.0,
+        "correctness": 4.0,
+        "appropriateness": 4.5
+      },
+      "preference_winner": "full_system",
+      "preference_vote_count": {
+        "full_system": 2,
+        "baseline": 0,
+        "tie": 0
+      }
+    },
+    {
+      "scenario_id": "scenario_2_low_mastery_array_intro",
+      "baseline_avg_scores": {
+        "pedagogical_clarity": 2.0,
+        "correctness": 3.0,
+        "appropriateness": 3.0
+      },
+      "full_system_avg_scores": {
+        "pedagogical_clarity": 4.5,
+        "correctness": 5.0,
+        "appropriateness": 4.0
+      },
+      "preference_winner": "full_system",
+      "preference_vote_count": {
+        "full_system": 2,
+        "baseline": 0,
+        "tie": 0
+      }
+    },
+    {
+      "scenario_id": "scenario_3_medium_mastery_queue_enqueue",
+      "baseline_avg_scores": {
+        "pedagogical_clarity": 2.5,
+        "correctness": 3.0,
+        "appropriateness": 3.5
+      },
+      "full_system_avg_scores": {
+        "pedagogical_clarity": 4.0,
+        "correctness": 4.5,
+        "appropriateness": 4.5
+      },
+      "preference_winner": "full_system",
+      "preference_vote_count": {
+        "full_system": 2,
+        "baseline": 0,
+        "tie": 0
+      }
+    },
+    {
+      "scenario_id": "scenario_4_medium_mastery_list_insert",
+      "baseline_avg_scores": {
+        "pedagogical_clarity": 2.5,
+        "correctness": 4.0,
+        "appropriateness": 4.0
+      },
+      "full_system_avg_scores": {
+        "pedagogical_clarity": 4.5,
+        "correctness": 4.0,
+        "appropriateness": 5.0
+      },
+      "preference_winner": "full_system",
+      "preference_vote_count": {
+        "full_system": 2,
+        "baseline": 0,
+        "tie": 0
+      }
+    },
+    {
+      "scenario_id": "scenario_5_high_mastery_tree_bst",
+      "baseline_avg_scores": {
+        "pedagogical_clarity": 3.0,
+        "correctness": 3.0,
+        "appropriateness": 3.0
+      },
+      "full_system_avg_scores": {
+        "pedagogical_clarity": 4.0,
+        "correctness": 4.5,
+        "appropriateness": 4.5
+      },
+      "preference_winner": "full_system",
+      "preference_vote_count": {
+        "full_system": 2,
+        "baseline": 0,
+        "tie": 0
+      }
+    },
+    {
+      "scenario_id": "scenario_6_high_mastery_graph_bfs",
+      "baseline_avg_scores": {
+        "pedagogical_clarity": 4.0,
+        "correctness": 4.0,
+        "appropriateness": 3.0
+      },
+      "full_system_avg_scores": {
+        "pedagogical_clarity": 3.5,
+        "correctness": 4.0,
+        "appropriateness": 3.5
+      },
+      "preference_winner": "Tie",
+      "preference_vote_count": {
+        "full_system": 1,
+        "baseline": 1,
+        "tie": 0
+      }
+    },
+    {
+      "scenario_id": "scenario_7_struggling_stack_pop",
+      "baseline_avg_scores": {
+        "pedagogical_clarity": 4.5,
+        "correctness": 4.0,
+        "appropriateness": 3.5
+      },
+      "full_system_avg_scores": {
+        "pedagogical_clarity": 3.5,
+        "correctness": 3.0,
+        "appropriateness": 4.0
+      },
+      "preference_winner": "Tie",
+      "preference_vote_count": {
+        "full_system": 1,
+        "baseline": 1,
+        "tie": 0
+      }
+    },
+    {
+      "scenario_id": "scenario_8_excelling_tree_heap",
+      "baseline_avg_scores": {
+        "pedagogical_clarity": 4.5,
+        "correctness": 3.0,
+        "appropriateness": 3.5
+      },
+      "full_system_avg_scores": {
+        "pedagogical_clarity": 4.0,
+        "correctness": 4.5,
+        "appropriateness": 4.0
+      },
+      "preference_winner": "Tie",
+      "preference_vote_count": {
+        "full_system": 1,
+        "baseline": 1,
+        "tie": 0
+      }
+    },
+    {
+      "scenario_id": "scenario_9_low_mastery_hash_intro",
+      "baseline_avg_scores": {
+        "pedagogical_clarity": 3.0,
+        "correctness": 4.0,
+        "appropriateness": 3.5
+      },
+      "full_system_avg_scores": {
+        "pedagogical_clarity": 3.5,
+        "correctness": 3.5,
+        "appropriateness": 4.5
+      },
+      "preference_winner": "Tie",
+      "preference_vote_count": {
+        "full_system": 1,
+        "baseline": 1,
+        "tie": 0
+      }
+    }
+  ]
+}

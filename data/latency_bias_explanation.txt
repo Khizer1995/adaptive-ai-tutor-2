@@ -1,0 +1,37 @@
+DIAGNOSIS: Sequential run order with warm embedding cache
+==========================================================
+
+run_ablation.py runs configurations in fixed order: full_system -> no_arbitration -> no_mastery_rerank -> no_validation.
+For each config, ALL 12 scenarios run before the next config begins.
+
+ROOT CAUSE ? EMBEDDING CACHE:
+AdaptiveRetriever instantiated ONCE before the config loop (lines 80-81). By the time
+no_arbitration runs, all 12 ideal_chunk embeddings are in the in-memory cache. The
+retrieval relevance computation (lines 162-175) calls embedder.embed() per scenario per
+config ? essentially free for configs 2-4 vs cold for config 1.
+
+SECONDARY CAUSE ? LLM API CACHING:
+Gemini 2.0 Flash API implements server-side response caching. Subsequent configs with
+similar prompts may benefit from cache hits that config 1 (full_system) did not.
+
+DIRECTION OF BIAS:
+This bias UNDERSTATES full_system latency. It ran cold; ablated variants ran warm.
+Correcting would make full_system SLOWER relative to ablated variants (expected direction).
+
+WHAT IS STILL VALID:
+- Scaffolding accuracy (91.67%) ? unaffected
+- Retrieval relevance (cosine similarity) ? cache-invariant
+- Approximate latency magnitude (10-16s range) ? plausible for this pipeline
+
+WHAT IS NOT VALID:
+- Exact latency ordering (full_system fastest) ? confounded by caching
+- 6.4x faster claim ? also undermined by baseline std>mean (see Problem 4)
+
+LIMITATIONS PARAGRAPH (paste into paper):
+Ablation latency results should be interpreted with caution. The ablation script
+executed configurations sequentially in a fixed order, with a shared sentence-transformer
+embedding cache that warmed during the first (full_system) configuration's run. This
+introduces a run-order bias that artificially deflates the full system's measured latency
+relative to ablated variants. All configurations show broadly comparable latency
+(10-16s range). A randomized interleaved rerun is required for valid latency comparison
+and is flagged as future work.

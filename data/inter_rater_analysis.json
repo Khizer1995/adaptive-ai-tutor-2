@@ -1,0 +1,265 @@
+{
+  "summary": {
+    "overall_win_rate": 0.75,
+    "rater_1_win_rate_for_full_system": 1.0,
+    "rater_2_win_rate_for_full_system": 0.5,
+    "n_scenarios_both_agreed_full_system": 6,
+    "n_scenarios_both_agreed_baseline": 0,
+    "n_scenarios_preference_disagreement": 6,
+    "win_rate_is_consistent_across_raters": false,
+    "win_rate_interpretation": "WIN RATE UNRELIABLE: Rater1=100%, Rater2=50%. Downgrade to qualitative."
+  },
+  "inter_rater_reliability": {
+    "reported_pearson_r": -0.0467,
+    "preference_direction_pearson_r": null,
+    "preference_direction_cohen_kappa": 0.0,
+    "interpretation": "Pearson r=-0.047 reflects score-magnitude disagreement, not direction. Preference-direction Kappa=0.0 is the more relevant reliability measure for the win-rate claim."
+  },
+  "cohen_kappa_note": "Individual rater files removed after test run. Kappa computed from reconstructed preference direction vectors (2=full_system, 1=tie, 0=baseline). Retain individual files in future evaluations.",
+  "per_scenario_agreement": [
+    {
+      "scenario_id": "scenario_10_medium_mastery_array_sorting",
+      "preference_vote_count": {
+        "full_system": 1,
+        "baseline": 1,
+        "tie": 0
+      },
+      "preference_winner": "Tie",
+      "agreement_type": "disagree_split",
+      "fs_score_spread": 1.5,
+      "bs_score_spread": 0.5
+    },
+    {
+      "scenario_id": "scenario_11_struggling_list_delete",
+      "preference_vote_count": {
+        "full_system": 2,
+        "baseline": 0,
+        "tie": 0
+      },
+      "preference_winner": "full_system",
+      "agreement_type": "agree_full_system",
+      "fs_score_spread": 0.5,
+      "bs_score_spread": 0.5
+    },
+    {
+      "scenario_id": "scenario_12_excelling_graph_dfs",
+      "preference_vote_count": {
+        "full_system": 1,
+        "baseline": 1,
+        "tie": 0
+      },
+      "preference_winner": "Tie",
+      "agreement_type": "disagree_split",
+      "fs_score_spread": 1.5,
+      "bs_score_spread": 0.5
+    },
+    {
+      "scenario_id": "scenario_1_low_mastery_stack_push",
+      "preference_vote_count": {
+        "full_system": 2,
+        "baseline": 0,
+        "tie": 0
+      },
+      "preference_winner": "full_system",
+      "agreement_type": "agree_full_system",
+      "fs_score_spread": 0.5,
+      "bs_score_spread": 1.5
+    },
+    {
+      "scenario_id": "scenario_2_low_mastery_array_intro",
+      "preference_vote_count": {
+        "full_system": 2,
+        "baseline": 0,
+        "tie": 0
+      },
+      "preference_winner": "full_system",
+      "agreement_type": "agree_full_system",
+      "fs_score_spread": 1.0,
+      "bs_score_spread": 1.0
+    },
+    {
+      "scenario_id": "scenario_3_medium_mastery_queue_enqueue",
+      "preference_vote_count": {
+        "full_system": 2,
+        "baseline": 0,
+        "tie": 0
+      },
+      "preference_winner": "full_system",
+      "agreement_type": "agree_full_system",
+      "fs_score_spread": 0.5,
+      "bs_score_spread": 1.0
+    },
+    {
+      "scenario_id": "scenario_4_medium_mastery_list_insert",
+      "preference_vote_count": {
+        "full_system": 2,
+        "baseline": 0,
+        "tie": 0
+      },
+      "preference_winner": "full_system",
+      "agreement_type": "agree_full_system",
+      "fs_score_spread": 1.0,
+      "bs_score_spread": 1.5
+    },
+    {
+      "scenario_id": "scenario_5_high_mastery_tree_bst",
+      "preference_vote_count": {
+        "full_system": 2,
+        "baseline": 0,
+        "tie": 0
+      },
+      "preference_winner": "full_system",
+      "agreement_type": "agree_full_system",
+      "fs_score_spread": 0.5,
+      "bs_score_spread": 0.0
+    },
+    {
+      "scenario_id": "scenario_6_high_mastery_graph_bfs",
+      "preference_vote_count": {
+        "full_system": 1,
+        "baseline": 1,
+        "tie": 0
+      },
+      "preference_winner": "Tie",
+      "agreement_type": "disagree_split",
+      "fs_score_spread": 0.5,
+      "bs_score_spread": 1.0
+    },
+    {
+      "scenario_id": "scenario_7_struggling_stack_pop",
+      "preference_vote_count": {
+        "full_system": 1,
+        "baseline": 1,
+        "tie": 0
+      },
+      "preference_winner": "Tie",
+      "agreement_type": "disagree_split",
+      "fs_score_spread": 1.0,
+      "bs_score_spread": 1.0
+    },
+    {
+      "scenario_id": "scenario_8_excelling_tree_heap",
+      "preference_vote_count": {
+        "full_system": 1,
+        "baseline": 1,
+        "tie": 0
+      },
+      "preference_winner": "Tie",
+      "agreement_type": "disagree_split",
+      "fs_score_spread": 0.5,
+      "bs_score_spread": 1.5
+    },
+    {
+      "scenario_id": "scenario_9_low_mastery_hash_intro",
+      "preference_vote_count": {
+        "full_system": 1,
+        "baseline": 1,
+        "tie": 0
+      },
+      "preference_winner": "Tie",
+      "agreement_type": "disagree_split",
+      "fs_score_spread": 1.0,
+      "bs_score_spread": 1.0
+    }
+  ],
+  "top_5_most_disagreed_scenarios": [
+    {
+      "scenario_id": "scenario_4_medium_mastery_list_insert",
+      "preference_vote_count": {
+        "full_system": 2,
+        "baseline": 0,
+        "tie": 0
+      },
+      "preference_winner": "full_system",
+      "agreement_type": "agree_full_system",
+      "fs_score_spread": 1.0,
+      "bs_score_spread": 1.5
+    },
+    {
+      "scenario_id": "scenario_10_medium_mastery_array_sorting",
+      "preference_vote_count": {
+        "full_system": 1,
+        "baseline": 1,
+        "tie": 0
+      },
+      "preference_winner": "Tie",
+      "agreement_type": "disagree_split",
+      "fs_score_spread": 1.5,
+      "bs_score_spread": 0.5
+    },
+    {
+      "scenario_id": "scenario_12_excelling_graph_dfs",
+      "preference_vote_count": {
+        "full_system": 1,
+        "baseline": 1,
+        "tie": 0
+      },
+      "preference_winner": "Tie",
+      "agreement_type": "disagree_split",
+      "fs_score_spread": 1.5,
+      "bs_score_spread": 0.5
+    },
+    {
+      "scenario_id": "scenario_1_low_mastery_stack_push",
+      "preference_vote_count": {
+        "full_system": 2,
+        "baseline": 0,
+        "tie": 0
+      },
+      "preference_winner": "full_system",
+      "agreement_type": "agree_full_system",
+      "fs_score_spread": 0.5,
+      "bs_score_spread": 1.5
+    },
+    {
+      "scenario_id": "scenario_2_low_mastery_array_intro",
+      "preference_vote_count": {
+        "full_system": 2,
+        "baseline": 0,
+        "tie": 0
+      },
+      "preference_winner": "full_system",
+      "agreement_type": "agree_full_system",
+      "fs_score_spread": 1.0,
+      "bs_score_spread": 1.0
+    }
+  ],
+  "per_dimension_aggregate_scores": {
+    "pedagogical_clarity": {
+      "full_system_mean": 3.9583,
+      "baseline_mean": 3.2083,
+      "delta": 0.75
+    },
+    "correctness": {
+      "full_system_mean": 4.0,
+      "baseline_mean": 3.5833,
+      "delta": 0.4167
+    },
+    "appropriateness": {
+      "full_system_mean": 4.3333,
+      "baseline_mean": 3.4167,
+      "delta": 0.9166
+    }
+  },
+  "statistical_tests": {
+    "pedagogical_clarity": {
+      "t_statistic": 1.9888,
+      "p_value": 0.058745,
+      "significant": false,
+      "n_pairs": 24
+    },
+    "correctness": {
+      "t_statistic": 1.0956,
+      "p_value": 0.284579,
+      "significant": false,
+      "n_pairs": 24
+    },
+    "appropriateness": {
+      "t_statistic": 3.943,
+      "p_value": 0.000648,
+      "significant": true,
+      "n_pairs": 24
+    }
+  },
+  "appropriateness_p_reliability": "UNRELIABLE: per-rater inconsistency undermines significance. Move to Limitations."
+}

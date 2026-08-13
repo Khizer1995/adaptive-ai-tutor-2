@@ -1,0 +1,76 @@
+{
+  "baseline": {
+    "label": "baseline",
+    "n": 12,
+    "mean": 65.6098,
+    "std": 74.5937,
+    "median": 29.2823,
+    "min": 8.4202,
+    "max": 227.7711,
+    "q1": 20.7058,
+    "q3": 99.8163,
+    "iqr": 79.1105,
+    "n_outliers_above_100s": 2,
+    "outlier_scenario_ids": [
+      "scenario_8_excelling_tree_heap",
+      "scenario_12_excelling_graph_dfs"
+    ],
+    "std_gt_mean": true,
+    "raw_values": [
+      12.6664,
+      8.4202,
+      26.2412,
+      29.1372,
+      99.8163,
+      10.1364,
+      89.6366,
+      227.7711,
+      20.7058,
+      37.3384,
+      29.4274,
+      196.0203
+    ]
+  },
+  "full_system": {
+    "label": "full_system",
+    "n": 12,
+    "mean": 10.2926,
+    "std": 10.8275,
+    "median": 9.8975,
+    "min": 0.7937,
+    "max": 39.4371,
+    "q1": 1.9635,
+    "q3": 13.1854,
+    "iqr": 11.2219,
+    "n_outliers_above_100s": 0,
+    "outlier_scenario_ids": [],
+    "std_gt_mean": true,
+    "raw_values": [
+      4.1578,
+      1.0869,
+      0.7937,
+      0.8762,
+      8.565,
+      1.9635,
+      13.0798,
+      13.1854,
+      39.4371,
+      17.1152,
+      12.0205,
+      11.2301
+    ]
+  },
+  "comparison": {
+    "std_exceeds_mean_baseline": true,
+    "n_baseline_outliers_above_100s": 2,
+    "outlier_scenario_ids": [
+      "scenario_8_excelling_tree_heap",
+      "scenario_12_excelling_graph_dfs"
+    ],
+    "speedup_by_mean": 6.37,
+    "speedup_by_median": 2.96,
+    "speedup_by_median_excl_outliers": 2.8,
+    "recommended_primary_claim": "median-based"
+  },
+  "explanation": "Baseline mean 65.6098s with std 74.5937s (std>mean). 2 scenarios exceeded 100s. Median 29.2823s is robust central tendency. Full system median 9.8975s = 2.96x faster by median. Excl. outliers: 2.8x faster."
+}

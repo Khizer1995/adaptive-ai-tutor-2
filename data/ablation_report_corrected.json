@@ -1,0 +1,88 @@
+{
+  "analysis_note": "Scaffolding accuracy is identical across all configs (91.67%) because the Decision Engine is untouched in all ablation variants. Corrected per-component primary metrics are derived from existing run data.",
+  "scaffolding_accuracy_note": "91.67% (11/12). Failure in scenario_4_medium_mastery_list_insert across ALL configs ? not component-specific.",
+  "corrected_table": [
+    {
+      "config": "full_system",
+      "scaffolding_accuracy": "91.67%",
+      "primary_metric_name": "?",
+      "primary_metric_value": "?",
+      "vs_full_system_delta": "?",
+      "retrieval_relevance_mean": 0.3554,
+      "content_quality_score": 4.1458,
+      "validation_catch_count": "12/12"
+    },
+    {
+      "config": "no_arbitration",
+      "scaffolding_accuracy": "91.67%",
+      "primary_metric_name": "Content Quality Score (clarity+approp)/2",
+      "primary_metric_value": 4.0163,
+      "vs_full_system_delta": -0.1295,
+      "retrieval_relevance_mean": 0.3443,
+      "routing_changes_count": 4,
+      "routing_changes_detected": [
+        {
+          "scenario_id": "scenario_5_high_mastery_tree_bst",
+          "full": "advance_concepts",
+          "na": "guided_progression"
+        },
+        {
+          "scenario_id": "scenario_6_high_mastery_graph_bfs",
+          "full": "advance_concepts",
+          "na": "guided_progression"
+        },
+        {
+          "scenario_id": "scenario_8_excelling_tree_heap",
+          "full": "advance_concepts",
+          "na": "guided_progression"
+        },
+        {
+          "scenario_id": "scenario_12_excelling_graph_dfs",
+          "full": "advance_concepts",
+          "na": "guided_progression"
+        }
+      ],
+      "note": "Quality estimated via retrieval-relevance degradation ratio. 4 macro_decision routing change(s) confirm arbitration value."
+    },
+    {
+      "config": "no_mastery_rerank",
+      "scaffolding_accuracy": "91.67%",
+      "primary_metric_name": "Retrieval Relevance (cosine sim to ideal chunk)",
+      "primary_metric_value": 0.352,
+      "vs_full_system_delta": -0.0034,
+      "retrieval_relevance_mean": 0.352,
+      "note": "Directly measured in ablation run."
+    },
+    {
+      "config": "no_validation",
+      "scaffolding_accuracy": "91.67%",
+      "primary_metric_name": "Issue Pass-Through Rate",
+      "primary_metric_value": "12/12",
+      "vs_full_system_delta": "+12 issues uncaught",
+      "issues_caught_full_system": "12/12",
+      "issues_caught_no_validation": "0/12",
+      "note": "Full_system caught all 12 flagged issues. No_validation = zero interception."
+    }
+  ],
+  "retrieval_relevance_summary": {
+    "full_system": {
+      "mean": 0.3554,
+      "stddev": 0.2009
+    },
+    "no_mastery_rerank": {
+      "mean": 0.352,
+      "stddev": 0.2343,
+      "delta_vs_full": -0.0034
+    },
+    "no_arbitration": {
+      "mean": 0.3443,
+      "stddev": 0.2148,
+      "delta_vs_full": -0.0111
+    },
+    "no_validation": {
+      "mean": 0.3613,
+      "stddev": 0.2061,
+      "delta_vs_full": 0.0059
+    }
+  }
+}

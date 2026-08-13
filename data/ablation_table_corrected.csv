@@ -1,0 +1,5 @@
+Config,Scaffolding Acc,Primary Metric Name,Primary Metric Value,vs Full System (delta)
+full_system,91.67%,?,?,?
+no_arbitration,91.67%,Content Quality Score (clarity+approp)/2,4.0163,-0.1295
+no_mastery_rerank,91.67%,Retrieval Relevance (cosine sim to ideal chunk),0.352,-0.0034
+no_validation,91.67%,Issue Pass-Through Rate,12/12,+12 issues uncaught

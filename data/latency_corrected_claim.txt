@@ -1,0 +1,10 @@
+CORRECTED LATENCY CLAIM (ready to paste into paper)
+=====================================================
+
+PROBLEM WITH ORIGINAL CLAIM:
+The '6.4x faster' claim was based on mean latency (full: 10.2926s, baseline: 65.6098s). The baseline mean is unreliable: std (74.5937s) > mean. 2 scenario(s) exceeded 100s: scenario_8_excelling_tree_heap, scenario_12_excelling_graph_dfs.
+
+CORRECTED CLAIM:
+The full-system pipeline achieves a median response latency of 9.8975s (IQR: 11.2219s) compared to a baseline median of 29.2823s (IQR: 79.1105s), representing a 2.96x speed improvement by median. Excluding 2 baseline outlier run(s) above 100s yields a baseline median of 27.6892s, still 2.8x slower than the full system. Mean latency is reported as a secondary statistic (full: 10.2926s +/- 10.8275s; baseline: 65.6098s +/- 74.5937s) but should not be used as the primary speed claim.
+
+NOTE: Full system latency is also right-skewed (max=39.4371s). Both systems are best compared using median +/- IQR.

@@ -1,0 +1,8 @@
+LIMITATIONS ? Inter-Rater Reliability
+======================================
+
+Inter-rater reliability in the blind evaluation was low (Pearson r = -0.0467), indicating that while raters agreed on preference direction in many scenarios, their numeric scores showed near-zero correlation. Raters were not calibrated with explicit rubric examples before rating, which commonly produces magnitude disagreement even when direction agreement is high.
+
+Per-rater win rates: Rater 1 preferred the full system in 100% of scenarios; Rater 2 in 50%. Raters disagreed on preference direction in 6 scenarios; the 75% win rate is not reliable and should be reported as qualitative only.
+
+The statistically significant result for skill-level appropriateness (p = 0.000648) should be interpreted alongside this caveat. Future evaluations should include a calibration phase with anchor examples and target Cohen's Kappa >= 0.60 before aggregating scores across raters.

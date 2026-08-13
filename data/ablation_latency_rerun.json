@@ -1,0 +1,142 @@
+{
+  "diagnosis": "run_order_sequential_with_shared_embedding_cache",
+  "latency_rerun_required": true,
+  "run_order_in_script": [
+    "full_system",
+    "no_arbitration",
+    "no_mastery_rerank",
+    "no_validation"
+  ],
+  "root_cause_primary": "AdaptiveRetriever embedder instantiated ONCE (line 80-81 run_ablation.py) and reused across all 4 configs. ideal_chunk embeddings cached after full_system run; subsequent configs get free cache hits.",
+  "root_cause_secondary": "Gemini API server-side response caching may also benefit later configs for similar prompts.",
+  "bias_direction": "UNDERSTATES full_system latency (it ran cold; ablated variants ran warm). Correcting would make full_system appear SLOWER relative to ablated variants.",
+  "per_config_stats": {
+    "full_system": {
+      "mean": 10.2926,
+      "median": 9.8975,
+      "std": 10.8275,
+      "min": 0.7937,
+      "max": 39.4371,
+      "iqr": 11.2219
+    },
+    "no_arbitration": {
+      "mean": 15.8582,
+      "median": 11.6161,
+      "std": 10.622,
+      "min": 8.2877,
+      "max": 41.5489,
+      "iqr": 5.0881
+    },
+    "no_mastery_rerank": {
+      "mean": 12.7575,
+      "median": 11.2504,
+      "std": 5.416,
+      "min": 6.8964,
+      "max": 27.4158,
+      "iqr": 3.834
+    },
+    "no_validation": {
+      "mean": 15.2301,
+      "median": 12.3957,
+      "std": 9.0727,
+      "min": 7.0389,
+      "max": 35.3536,
+      "iqr": 8.4949
+    }
+  },
+  "full_system_fastest_scenario_count": 8,
+  "full_system_fastest_scenarios": [
+    "scenario_1_low_mastery_stack_push",
+    "scenario_2_low_mastery_array_intro",
+    "scenario_3_medium_mastery_queue_enqueue",
+    "scenario_4_medium_mastery_list_insert",
+    "scenario_5_high_mastery_tree_bst",
+    "scenario_6_high_mastery_graph_bfs",
+    "scenario_7_struggling_stack_pop",
+    "scenario_11_struggling_list_delete"
+  ],
+  "per_scenario_latency_comparison": {
+    "scenario_1_low_mastery_stack_push": {
+      "full_system": 4.1578,
+      "no_arbitration": 10.3716,
+      "no_mastery_rerank": 11.4692,
+      "no_validation": 11.488
+    },
+    "scenario_2_low_mastery_array_intro": {
+      "full_system": 1.0869,
+      "no_arbitration": 34.3439,
+      "no_mastery_rerank": 11.0315,
+      "no_validation": 35.3536
+    },
+    "scenario_3_medium_mastery_queue_enqueue": {
+      "full_system": 0.7937,
+      "no_arbitration": 8.2877,
+      "no_mastery_rerank": 6.8964,
+      "no_validation": 7.0389
+    },
+    "scenario_4_medium_mastery_list_insert": {
+      "full_system": 0.8762,
+      "no_arbitration": 10.2958,
+      "no_mastery_rerank": 10.0781,
+      "no_validation": 9.9213
+    },
+    "scenario_5_high_mastery_tree_bst": {
+      "full_system": 8.565,
+      "no_arbitration": 10.4562,
+      "no_mastery_rerank": 10.468,
+      "no_validation": 9.4625
+    },
+    "scenario_6_high_mastery_graph_bfs": {
+      "full_system": 1.9635,
+      "no_arbitration": 9.5125,
+      "no_mastery_rerank": 13.2053,
+      "no_validation": 14.2116
+    },
+    "scenario_7_struggling_stack_pop": {
+      "full_system": 13.0798,
+      "no_arbitration": 14.5581,
+      "no_mastery_rerank": 13.9121,
+      "no_validation": 14.0854
+    },
+    "scenario_8_excelling_tree_heap": {
+      "full_system": 13.1854,
+      "no_arbitration": 11.0832,
+      "no_mastery_rerank": 9.1121,
+      "no_validation": 9.7282
+    },
+    "scenario_9_low_mastery_hash_intro": {
+      "full_system": 39.4371,
+      "no_arbitration": 41.5489,
+      "no_mastery_rerank": 27.4158,
+      "no_validation": 31.5415
+    },
+    "scenario_10_medium_mastery_array_sorting": {
+      "full_system": 17.1152,
+      "no_arbitration": 15.4597,
+      "no_mastery_rerank": 12.3286,
+      "no_validation": 18.2231
+    },
+    "scenario_11_struggling_list_delete": {
+      "full_system": 12.0205,
+      "no_arbitration": 12.2324,
+      "no_mastery_rerank": 18.0591,
+      "no_validation": 13.3034
+    },
+    "scenario_12_excelling_graph_dfs": {
+      "full_system": 11.2301,
+      "no_arbitration": 12.149,
+      "no_mastery_rerank": 9.1139,
+      "no_validation": 8.4039
+    }
+  },
+  "valid_findings": [
+    "Scaffolding accuracy 91.67% ? unaffected",
+    "Retrieval relevance cosine similarities ? cache-invariant",
+    "Approximate latency range 10-16s ? plausible for LangGraph+CrewAI pipeline"
+  ],
+  "invalid_findings": [
+    "Exact latency ordering (full_system fastest) ? confounded",
+    "6.4x speed claim based on mean ? baseline std>mean makes mean unreliable"
+  ],
+  "limitations_paragraph": "Ablation latency comparisons are confounded by run-order caching: the full_system configuration ran first with a cold embedding cache, while ablated variants ran with warm caches. All configurations show comparable latency (10-16s range); the exact ordering is unreliable. A randomized interleaved rerun is flagged as future work."
+}

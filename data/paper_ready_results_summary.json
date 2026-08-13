@@ -1,0 +1,155 @@
+{
+  "_metadata": {
+    "generated_by": "scripts/fix_evaluation_problems.py",
+    "source_files": [
+      "data/ablation_report.json",
+      "data/baseline_report.json",
+      "data/blind_rating_results.json",
+      "data/eval_report.json"
+    ],
+    "note": "All values derived from actual measured data. No values estimated or invented. 'not_found' = genuinely absent."
+  },
+  "ablation": {
+    "corrected_table": {
+      "full_system": {
+        "scaffolding_accuracy": "91.67%",
+        "primary_metric": "?",
+        "primary_value": "?",
+        "delta_vs_full": "?"
+      },
+      "no_arbitration": {
+        "scaffolding_accuracy": "91.67%",
+        "primary_metric": "Content Quality Score (clarity+approp)/2",
+        "primary_value": 4.0163,
+        "delta_vs_full": -0.1295
+      },
+      "no_mastery_rerank": {
+        "scaffolding_accuracy": "91.67%",
+        "primary_metric": "Retrieval Relevance (cosine sim to ideal chunk)",
+        "primary_value": 0.352,
+        "delta_vs_full": -0.0034
+      },
+      "no_validation": {
+        "scaffolding_accuracy": "91.67%",
+        "primary_metric": "Issue Pass-Through Rate",
+        "primary_value": "12/12",
+        "delta_vs_full": "+12 issues uncaught"
+      }
+    },
+    "scaffolding_accuracy": {
+      "value": "91.67% (11/12 correct)",
+      "applies_to": "ALL four configurations identically",
+      "interpretation": "Confirms Decision Engine routing is robust and independent of ablated components."
+    },
+    "no_arbitration_primary_metric": {
+      "name": "Content Quality Score (clarity+approp)/2",
+      "full_system_value": 4.1458,
+      "no_arbitration_value": 4.0163,
+      "delta": -0.1295,
+      "routing_changes_detected": 4
+    },
+    "no_mastery_rerank_primary_metric": {
+      "name": "Retrieval Relevance (cosine similarity to ideal chunk)",
+      "full_system_value": 0.3554,
+      "no_mastery_rerank_value": 0.352,
+      "delta": -0.0034
+    },
+    "no_validation_primary_metric": {
+      "name": "Issue Pass-Through Rate",
+      "full_system_caught": "12/12 (100%)",
+      "no_validation_caught": "0/12 (0%)",
+      "issues_passing_through": "12/12"
+    },
+    "latency_note": "Confounded by run-order embedding cache. All configs ~10-16s. latency_rerun_required=True.",
+    "latency_rerun_required": true
+  },
+  "blind_rating": {
+    "overall_win_rate": "75% (full_system preferred)",
+    "rater_1_win_rate": "100%",
+    "rater_2_win_rate": "50%",
+    "win_rate_consistent_across_raters": false,
+    "win_rate_claim": "Win rates inconsistent ? report as qualitative only.",
+    "aggregate_scores": {
+      "full_system": {
+        "pedagogical_clarity": 3.9583,
+        "correctness": 4.0,
+        "appropriateness": 4.3333
+      },
+      "baseline": {
+        "pedagogical_clarity": 3.2083,
+        "correctness": 3.5833,
+        "appropriateness": 3.4167
+      }
+    },
+    "statistical_tests": {
+      "pedagogical_clarity_p": 0.058745,
+      "correctness_p": 0.284579,
+      "appropriateness_p": 0.000648,
+      "appropriateness_significant": true,
+      "reliability_note": "p=0.000648 for appropriateness (significant). Clarity (p=0.059) and correctness (p=0.285) did NOT reach significance ? honest reporting required."
+    },
+    "inter_rater_note": "Pearson r=-0.0467 (near-zero). Preference-direction Kappa=0.0. Rubric calibration recommended for future evaluations."
+  },
+  "latency": {
+    "full_system_median": "9.8975s",
+    "full_system_mean": "10.2926s",
+    "full_system_iqr": "11.2219s",
+    "baseline_median": "29.2823s",
+    "baseline_mean": "65.6098s",
+    "baseline_iqr": "79.1105s",
+    "n_baseline_outliers_above_100s": 2,
+    "outlier_scenarios": [
+      "scenario_8_excelling_tree_heap",
+      "scenario_12_excelling_graph_dfs"
+    ],
+    "speed_claim_by_mean": "6.37x (UNRELIABLE ? std>mean)",
+    "speed_claim_by_median": "2.96x faster by median (PREFERRED)",
+    "speed_claim_by_median_excl_outliers": "2.8x faster excluding outliers",
+    "primary_speed_claim": "Full system is 2.96x faster than baseline by median latency (9.8975s vs 29.2823s). Excluding 2 outlier(s): 2.8x.",
+    "baseline_std_exceeds_mean_warning": true
+  },
+  "scaffolding_accuracy": "91.67% (all 4 ablation configs) ? Decision Engine robust",
+  "user_satisfaction": {
+    "participants": 4,
+    "dimensions": {
+      "usability": 4.45,
+      "adaptation": 4.3125,
+      "engagement": 4.25
+    },
+    "overall_mean": 4.34,
+    "formatted": "4.34/5.0 (n=4, team pilot)",
+    "note": "Respondents are the 4 development team members. External user study required before generalised satisfaction claims."
+  },
+  "learning_outcomes": {
+    "participants": 1,
+    "mean_gain": -0.03,
+    "note": "NEGATIVE GAIN (-0.03), n=1. Underpowered. Report in limitations only."
+  },
+  "limitations_paragraphs": [
+    {
+      "id": "inter-rater",
+      "title": "Inter-Rater Reliability",
+      "text": "Inter-rater reliability was low (Pearson r=-0.0467). Per-rater win rates (100%/50%) are reported separately. Rubric calibration and >= 3 raters recommended."
+    },
+    {
+      "id": "latency-caching",
+      "title": "Ablation Latency Caching Artifact",
+      "text": "Fixed config run order with shared embedding cache artificially deflates full_system latency. All configs show ~10-16s; ordering unreliable. Randomized rerun needed."
+    },
+    {
+      "id": "ablation-metric",
+      "title": "Ablation Primary Metric Alignment",
+      "text": "Scaffolding accuracy (originally reported) is identical across all configs since the Decision Engine is untouched. Corrected per-component metrics derived from existing data."
+    },
+    {
+      "id": "n=1-learning-outcome",
+      "title": "Underpowered Learning Outcome Study",
+      "text": "Learning gain measurement: n=1, gain=-0.03. Insufficient to draw conclusions about learning effectiveness."
+    },
+    {
+      "id": "baseline-latency-outliers",
+      "title": "Baseline Latency Non-Normality",
+      "text": "Baseline std (74.5937s) > mean (65.6098s). 2 outlier run(s) above 100s. Median reported as primary speed metric."
+    }
+  ]
+}
