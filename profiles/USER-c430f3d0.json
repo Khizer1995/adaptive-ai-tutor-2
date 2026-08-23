@@ -1,0 +1,360 @@
+{
+    "student_id": "USER-c430f3d0",
+    "name": "Student",
+    "level": "advanced",
+    "subject": "dsa",
+    "current_topic": "graph",
+    "progress": [
+        "queue",
+        "tree",
+        "array"
+    ],
+    "engagement": "medium",
+    "last_score": 0.6667,
+    "learning_history": [
+        {
+            "type": "pretest",
+            "topic": "queue",
+            "subtopic": "queue_dequeue",
+            "score": 0.75,
+            "question_count": 4
+        },
+        {
+            "timestamp": "2026-08-20T10:36:38.612821+00:00",
+            "topic": "queue",
+            "subtopic": "queue_dequeue",
+            "score": 0.8333,
+            "question_count": 6
+        },
+        {
+            "timestamp": "2026-08-20T10:52:56.183498+00:00",
+            "topic": "queue",
+            "subtopic": "queue_circular",
+            "score": 0.6667,
+            "question_count": 6
+        },
+        {
+            "type": "pretest",
+            "topic": "tree",
+            "subtopic": "bst_operations",
+            "score": 0.5,
+            "question_count": 6
+        },
+        {
+            "timestamp": "2026-08-20T11:02:31.283583+00:00",
+            "topic": "tree",
+            "subtopic": "bst_operations",
+            "score": 1.0,
+            "question_count": 6
+        },
+        {
+            "timestamp": "2026-08-20T11:03:50.077889+00:00",
+            "topic": "tree",
+            "subtopic": "tree_traversal",
+            "score": 0.5,
+            "question_count": 6
+        },
+        {
+            "type": "pretest",
+            "topic": "hash_table",
+            "subtopic": "collision_open",
+            "score": 0.5,
+            "question_count": 6
+        },
+        {
+            "timestamp": "2026-08-20T11:37:44.965059+00:00",
+            "topic": "hash_table",
+            "subtopic": "collision_open",
+            "score": 0.8333,
+            "question_count": 6
+        },
+        {
+            "type": "pretest",
+            "topic": "graph",
+            "subtopic": "graph_bfs",
+            "score": 0.6667,
+            "question_count": 6
+        }
+    ],
+    "frustration_level": 0,
+    "engagement_score": 5,
+    "learning_style": "balanced",
+    "last_active": "2026-08-20T11:43:08.238409+00:00",
+    "accuracy_history": [],
+    "learning_gain_history": [],
+    "learning_gain": 0.0,
+    "normalized_learning_gain": 0.0,
+    "pretest_score": 0.6667,
+    "posttest_score": null,
+    "assessment_scores": {
+        "queue": {
+            "queue_dequeue": {
+                "pretest_score": 0.75
+            }
+        },
+        "tree": {
+            "bst_operations": {
+                "pretest_score": 0.5
+            }
+        },
+        "hash_table": {
+            "collision_open": {
+                "pretest_score": 0.5
+            }
+        },
+        "graph": {
+            "graph_bfs": {
+                "pretest_score": 0.6667
+            }
+        }
+    },
+    "assessment_history": [
+        {
+            "type": "pretest",
+            "topic": "queue",
+            "subtopic": "queue_dequeue",
+            "score": 0.75
+        },
+        {
+            "type": "pretest",
+            "topic": "tree",
+            "subtopic": "bst_operations",
+            "score": 0.5
+        },
+        {
+            "type": "pretest",
+            "topic": "hash_table",
+            "subtopic": "collision_open",
+            "score": 0.5
+        },
+        {
+            "type": "pretest",
+            "topic": "graph",
+            "subtopic": "graph_bfs",
+            "score": 0.6667
+        }
+    ],
+    "knowledge_state": {
+        "concepts": {
+            "array": {
+                "mastery": 0.683,
+                "confidence": 0.554,
+                "attempts": 5,
+                "scaffold_level": "medium",
+                "weak_areas": [],
+                "strong_areas": [],
+                "completed": false
+            },
+            "queue": {
+                "mastery": 0.725,
+                "confidence": 0.558,
+                "attempts": 4,
+                "scaffold_level": "medium",
+                "weak_areas": [],
+                "strong_areas": [
+                    "queue_dequeue"
+                ],
+                "completed": true
+            },
+            "tree": {
+                "mastery": 0.604,
+                "confidence": 0.561,
+                "attempts": 6,
+                "scaffold_level": "medium",
+                "weak_areas": [],
+                "strong_areas": [
+                    "bst_operations"
+                ],
+                "completed": true
+            },
+            "hash_table": {
+                "mastery": 0.682,
+                "confidence": 0.548,
+                "attempts": 3,
+                "scaffold_level": "medium",
+                "weak_areas": [],
+                "strong_areas": [
+                    "collision_open"
+                ],
+                "completed": false
+            },
+            "graph": {
+                "mastery": 0.8333,
+                "confidence": 0.35,
+                "attempts": 0,
+                "scaffold_level": "high",
+                "weak_areas": [],
+                "strong_areas": [],
+                "completed": false
+            }
+        },
+        "version": 2
+    },
+    "knowledge_events": [
+        {
+            "topic": "array",
+            "mastery": 0.365,
+            "confidence": 0.36,
+            "scaffold_level": "high",
+            "observed_score": 0.75
+        },
+        {
+            "topic": "queue",
+            "mastery": 0.795,
+            "confidence": 0.56,
+            "scaffold_level": "medium",
+            "observed_score": 0.8333
+        },
+        {
+            "topic": "array",
+            "mastery": 0.504,
+            "confidence": 0.448,
+            "scaffold_level": "high",
+            "observed_score": 0.83
+        },
+        {
+            "topic": "queue",
+            "mastery": 0.725,
+            "confidence": 0.558,
+            "scaffold_level": "medium",
+            "observed_score": 0.6667
+        },
+        {
+            "topic": "array",
+            "mastery": 0.554,
+            "confidence": 0.478,
+            "scaffold_level": "medium",
+            "observed_score": 0.67
+        },
+        {
+            "topic": "tree",
+            "mastery": 0.617,
+            "confidence": 0.4,
+            "scaffold_level": "high",
+            "observed_score": 0.5
+        },
+        {
+            "topic": "tree",
+            "mastery": 0.826,
+            "confidence": 0.548,
+            "scaffold_level": "medium",
+            "observed_score": 1.0
+        },
+        {
+            "topic": "array",
+            "mastery": 0.688,
+            "confidence": 0.542,
+            "scaffold_level": "medium",
+            "observed_score": 1.0
+        },
+        {
+            "topic": "tree",
+            "mastery": 0.648,
+            "confidence": 0.551,
+            "scaffold_level": "medium",
+            "observed_score": 0.5
+        },
+        {
+            "topic": "tree",
+            "mastery": 0.604,
+            "confidence": 0.561,
+            "scaffold_level": "medium",
+            "observed_score": 0.5
+        },
+        {
+            "topic": "hash_table",
+            "mastery": 0.5,
+            "confidence": 0.4,
+            "scaffold_level": "high",
+            "observed_score": 0.5
+        },
+        {
+            "topic": "hash_table",
+            "mastery": 0.682,
+            "confidence": 0.548,
+            "scaffold_level": "medium",
+            "observed_score": 0.8333
+        },
+        {
+            "topic": "array",
+            "mastery": 0.683,
+            "confidence": 0.554,
+            "scaffold_level": "medium",
+            "observed_score": 0.67
+        }
+    ],
+    "delivered_chunks": {
+        "queue": {
+            "chunk_ids": [
+                "hybrid_0",
+                "hybrid_1",
+                "hybrid_2",
+                "hybrid_3",
+                "hybrid_4",
+                "hybrid_5"
+            ],
+            "concepts": []
+        },
+        "tree": {
+            "chunk_ids": [
+                "hybrid_0",
+                "hybrid_1",
+                "hybrid_2",
+                "hybrid_3",
+                "hybrid_4"
+            ],
+            "concepts": []
+        },
+        "hash_table": {
+            "chunk_ids": [
+                "hybrid_0",
+                "hybrid_1",
+                "hybrid_2",
+                "hybrid_3",
+                "hybrid_4"
+            ],
+            "concepts": []
+        },
+        "graph": {
+            "chunk_ids": [
+                "hybrid_0",
+                "hybrid_1",
+                "hybrid_2",
+                "hybrid_3",
+                "hybrid_4"
+            ],
+            "concepts": []
+        }
+    },
+    "current_subtopic": "graph_bfs",
+    "quiz_seen_questions": {
+        "graph": {
+            "graph_bfs": [
+                "04528afe9282937e92693c96860e52a8",
+                "39ae4be0f8212e73531233cb2bfb590c",
+                "83c46aec9b864e842a7a147ff71f8ce5",
+                "88b3877f5cb49dad110037b65187bcbd"
+            ]
+        }
+    },
+    "macro_decision": {
+        "macro_action": "guided_progression",
+        "target_concepts": [
+            "tree"
+        ],
+        "scaffold_policy": "medium",
+        "reason": "IF the learner is neither at-risk nor clearly ready to accelerate THEN use guided progression with medium scaffolding. | Target weakest concept 'tree' based on mastery snapshot (avg_mastery=0.71, avg_confidence=0.51, trend=fluctuating).",
+        "decision_rationale": "IF the learner is neither at-risk nor clearly ready to accelerate THEN use guided progression with medium scaffolding. | Target weakest concept 'tree' based on mastery snapshot (avg_mastery=0.71, avg_confidence=0.51, trend=fluctuating)."
+    },
+    "_rag_latency_ms": 36.21,
+    "generated_content_history": {},
+    "content_fingerprints": {},
+    "quiz_attempts": {},
+    "weak_areas": {},
+    "strong_areas": {},
+    "completed_topics": [
+        "queue",
+        "tree",
+        "array"
+    ]
+}

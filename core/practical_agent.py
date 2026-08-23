@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import difflib
 import hashlib
+import random
 from typing import Any, Dict, List
 from difflib import SequenceMatcher
 
@@ -32,7 +33,7 @@ class QuizQuestion(BaseModel):
         if matches:
             self.correct_answer = option_map[matches[0]]
             return self
-        self.correct_answer = self.options[0]
+        self.correct_answer = random.choice(self.options)
         return self
 
 
@@ -61,9 +62,12 @@ class PracticalAgent:
     def _fallback_question(
         self, topic: str, prompt: str, correct: str, wrong: List[str], explanation: str
     ) -> Dict[str, Any]:
+        # Shuffle options so the correct answer is NOT always at position 0.
+        options = [correct] + wrong[:3]
+        random.shuffle(options)
         return {
             "question": prompt,
-            "options": [correct] + wrong[:3],
+            "options": options,
             "correct_answer": correct,
             "explanation": explanation,
         }
@@ -289,6 +293,9 @@ class PracticalAgent:
             if active_seen:
                 candidate_pool = self._filter_seen(candidate_pool, active_seen)
             normalized = candidate_pool[:q_count]
+            # Shuffle option order in every question so the correct answer is
+            # never predictably at a fixed position.
+            normalized = [self._shuffle_options(q) for q in normalized]
 
             trace_event("quiz_generated", {
                 "topic": topic,
@@ -302,7 +309,7 @@ class PracticalAgent:
             filtered_fallback = self._deduplicate_questions(fallback)
             if active_seen:
                 filtered_fallback = self._filter_seen(filtered_fallback, active_seen)
-            return filtered_fallback[:q_count]
+            return [self._shuffle_options(q) for q in filtered_fallback[:q_count]]
 
     def _extract_questions(self, content: str) -> List[Dict[str, Any]]:
         """Robust extraction of a JSON array from LLM output."""
@@ -381,3 +388,20 @@ class PracticalAgent:
             fresh.append(candidate)
             seen_hashes.add(q_hash)
         return fresh
+
+    @staticmethod
+    def _shuffle_options(question: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Shuffle the option list so the correct answer is not always in the
+        same position.  The `correct_answer` value is preserved as-is; only
+        the display order of `options` changes.
+        """
+        options = list(question.get("options") or [])
+        if len(options) < 2:
+            return question
+        correct = question.get("correct_answer", "")
+        random.shuffle(options)
+        question = dict(question)          # shallow copy — don't mutate caller's dict
+        question["options"] = options
+        question["correct_answer"] = correct   # value unchanged; UI matches by value
+        return question

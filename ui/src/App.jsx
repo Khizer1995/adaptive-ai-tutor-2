@@ -15,12 +15,12 @@ const ADAPTIVE_MODE_STYLES = {
   remedial: {
     label: 'Remedial Mode — Simplified',
     icon: AlertTriangle,
-    cls: 'border-orange-500/50 bg-orange-950/30 text-orange-300',
+    cls: 'border-amber-500/50 bg-amber-950/30 text-amber-300',
   },
   guided: {
     label: 'Guided Mode — Standard',
     icon: BookOpen,
-    cls: 'border-teal-500/40 bg-teal-950/20 text-teal-300',
+    cls: 'border-indigo-500/40 bg-indigo-950/20 text-indigo-300',
   },
   advanced: {
     label: 'Advanced Mode — Deep Dive',
@@ -33,19 +33,19 @@ const normalize = (s = '') => s.trim().toLowerCase().replace(/\s+/g, ' ')
 
 function masteryPillClass(mastery) {
   if (mastery < 0.4) return 'bg-red-800'
-  if (mastery <= 0.7) return 'bg-yellow-700'
-  return 'bg-green-700'
+  if (mastery <= 0.7) return 'bg-amber-700'
+  return 'bg-emerald-700'
 }
 
 // ── Shared components ────────────────────────────────────────────────────────
 
 function ThinkingState() {
   return (
-    <div className="rounded-2xl border border-gray-800 bg-gray-900 p-4">
-      <div className="mb-2 flex gap-2 text-teal-400">
-        <span className="h-2 w-2 animate-bounce rounded-full bg-teal-400" />
-        <span className="h-2 w-2 animate-bounce rounded-full bg-teal-400" style={{ animationDelay: '0.12s' }} />
-        <span className="h-2 w-2 animate-bounce rounded-full bg-teal-400" style={{ animationDelay: '0.24s' }} />
+    <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
+      <div className="mb-2 flex gap-2 text-indigo-400">
+        <span className="h-2 w-2 animate-bounce rounded-full bg-indigo-400" />
+        <span className="h-2 w-2 animate-bounce rounded-full bg-indigo-400" style={{ animationDelay: '0.12s' }} />
+        <span className="h-2 w-2 animate-bounce rounded-full bg-indigo-400" style={{ animationDelay: '0.24s' }} />
       </div>
       <p className="text-sm text-gray-300">Analysing your learning state and adapting content…</p>
     </div>
@@ -90,14 +90,14 @@ function TutorMarkdown({ text, streaming }) {
       >
         {text}
       </ReactMarkdown>
-      {streaming && <span className="ml-1 inline-block h-4 w-[2px] animate-pulse bg-teal-400 align-middle" />}
+      {streaming && <span className="ml-1 inline-block h-4 w-[2px] animate-pulse bg-indigo-400 align-middle" />}
     </div>
   )
 }
 
 function ScoreRing({ score }) {
   const pct = Math.round(score * 100)
-  const color = pct >= 70 ? '#14b8a6' : pct >= 50 ? '#f59e0b' : '#ef4444'
+  const color = pct >= 70 ? '#6366f1' : pct >= 50 ? '#f59e0b' : '#ef4444'
   return (
     <div className="relative h-20 w-20">
       <svg viewBox="0 0 36 36" className="h-20 w-20 -rotate-90">
@@ -151,14 +151,14 @@ function QuizSection({ topic, subtopic, open, onBatchComplete, onToast, onMoveFu
 
   if (!open) return null
   if (loading) return (
-    <div className="mt-4 rounded-2xl border border-gray-800 bg-gray-900 p-4 text-sm text-gray-400">
+    <div className="mt-4 rounded-2xl border border-slate-800 bg-slate-900 p-4 text-sm text-slate-400">
       Generating adaptive quiz…
     </div>
   )
 
   const question = questions[idx]
   if (!question && !summary) return (
-    <div className="mt-4 rounded-2xl border border-gray-800 bg-gray-900 p-4 text-sm text-gray-400">
+    <div className="mt-4 rounded-2xl border border-slate-800 bg-slate-900 p-4 text-sm text-slate-400">
       No quiz available for this subtopic.
     </div>
   )
@@ -218,19 +218,19 @@ function QuizSection({ topic, subtopic, open, onBatchComplete, onToast, onMoveFu
         ? 'Solid progress. Let us continue.'
         : 'Let us reinforce this before moving on.'
     return (
-      <div className="mt-4 rounded-2xl border border-gray-800 bg-gray-900 p-4">
+          <div className="mt-4 rounded-2xl border border-slate-800 bg-slate-900 p-4">
         <div className="flex items-center gap-4">
           <ScoreRing score={summary.score} />
           <div>
             <p className="text-base font-semibold">
               {summary.correctCount}/{summary.total} correct — {Math.round(summary.score * 100)}%
             </p>
-            <p className="mt-1 text-sm text-gray-300">{msg}</p>
+            <p className="mt-1 text-sm text-slate-300">{msg}</p>
           </div>
         </div>
         {/* Issue #1: adaptive message shown after quiz */}
         {adaptiveMessage && (
-          <div className="mt-3 rounded-lg border border-teal-500/30 bg-teal-950/20 px-3 py-2 text-xs text-teal-300">
+          <div className="mt-3 rounded-lg border border-indigo-500/30 bg-indigo-950/20 px-3 py-2 text-xs text-indigo-300">
             <TrendingUp size={12} className="mr-1 inline" />
             {adaptiveMessage}
           </div>
@@ -240,7 +240,7 @@ function QuizSection({ topic, subtopic, open, onBatchComplete, onToast, onMoveFu
             <button
               id="quiz-move-further-btn"
               onClick={onMoveFurther}
-              className="rounded-lg bg-teal-500 px-4 py-2 text-sm font-semibold text-gray-950"
+              className="rounded-lg bg-indigo-500 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-400 transition"
             >
               Move Further →
             </button>
@@ -248,7 +248,7 @@ function QuizSection({ topic, subtopic, open, onBatchComplete, onToast, onMoveFu
             <button
               id="quiz-retry-btn"
               onClick={loadQuiz}
-              className="rounded-lg border border-gray-700 px-4 py-2 text-sm"
+              className="rounded-lg border border-slate-700 px-4 py-2 text-sm"
             >
               Try Again
             </button>
@@ -259,16 +259,16 @@ function QuizSection({ topic, subtopic, open, onBatchComplete, onToast, onMoveFu
   }
 
   return (
-    <div className="mt-4 rounded-2xl border border-gray-800 bg-gray-900 p-4">
+    <div className="mt-4 rounded-2xl border border-slate-800 bg-slate-900 p-4">
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-teal-300">Learning Assessment</h3>
-        <span className="text-xs text-gray-400">Question {idx + 1} of {questions.length}</span>
+        <h3 className="text-sm font-semibold text-indigo-300">Learning Assessment</h3>
+        <span className="text-xs text-slate-400">Question {idx + 1} of {questions.length}</span>
       </div>
       <div className="mb-3 flex gap-1.5">
         {questions.map((_, i) => (
           <span
             key={i}
-            className={`h-2.5 w-2.5 rounded-full ${i < answered.length ? 'bg-teal-400' : 'border border-teal-400/80 bg-transparent'}`}
+            className={`h-2.5 w-2.5 rounded-full ${i < answered.length ? 'bg-indigo-400' : 'border border-indigo-400/80 bg-transparent'}`}
           />
         ))}
       </div>
@@ -285,16 +285,16 @@ function QuizSection({ topic, subtopic, open, onBatchComplete, onToast, onMoveFu
               disabled={feedbackVisible}
               onClick={() => setSelectedAnswer(op)}
               className={`w-full rounded-xl border p-3 text-left text-sm transition-all duration-300 ${
-                showCorrect ? 'border-green-400 bg-green-900' :
+                showCorrect ? 'border-emerald-400 bg-emerald-900' :
                 showWrong ? 'border-red-400 bg-red-900' :
-                normalize(selectedAnswer) === normalize(op) ? 'border-teal-400 bg-teal-950' :
-                'border-gray-700 hover:border-teal-400'
+                normalize(selectedAnswer) === normalize(op) ? 'border-indigo-400 bg-indigo-950' :
+                'border-slate-700 hover:border-indigo-400'
               } animate-[fadein_280ms_ease-out]`}
               style={{ animationDelay: `${i * 70}ms` }}
             >
               <span className="inline-flex items-center gap-2">
                 <span>{op}</span>
-                {showCorrect && <Check size={14} className="text-green-300" />}
+                {showCorrect && <Check size={14} className="text-emerald-300" />}
                 {showWrong && <X size={14} className="text-red-300" />}
               </span>
             </button>
@@ -302,15 +302,11 @@ function QuizSection({ topic, subtopic, open, onBatchComplete, onToast, onMoveFu
         })}
       </div>
 
-      {import.meta.env.DEV && (
-        <div className="mt-2 text-xs text-gray-500">
-          Selected: {selectedAnswer || '(none)'} | Correct: {question.correct_answer} |
-          Match: {normalize(selectedAnswer) === normalize(question.correct_answer) ? '✓' : '✗'}
-        </div>
-      )}
+
+
 
       {feedbackVisible && (
-        <p className="mt-3 rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-gray-300">
+        <p className="mt-3 rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-300">
           {question.explanation}
         </p>
       )}
@@ -321,7 +317,7 @@ function QuizSection({ topic, subtopic, open, onBatchComplete, onToast, onMoveFu
             id="quiz-submit-btn"
             onClick={submitCurrent}
             disabled={!selectedAnswer}
-            className="rounded-lg bg-teal-500 px-3 py-2 text-xs font-semibold text-gray-950 disabled:opacity-50"
+            className="rounded-lg bg-indigo-500 px-3 py-2 text-xs font-semibold text-white disabled:opacity-50 hover:bg-indigo-400 transition"
           >
             Submit Answer
           </button>
@@ -329,7 +325,7 @@ function QuizSection({ topic, subtopic, open, onBatchComplete, onToast, onMoveFu
           <button
             id="quiz-next-btn"
             onClick={nextQuestion}
-            className="rounded-lg bg-teal-500 px-3 py-2 text-xs font-semibold text-gray-950"
+            className="rounded-lg bg-indigo-500 px-3 py-2 text-xs font-semibold text-white hover:bg-indigo-400 transition"
           >
             Next Question →
           </button>
@@ -379,14 +375,14 @@ function AssessmentSection({ topic, subtopic, mode, open, onComplete, onToast })
 
   if (!open) return null
   if (loading) return (
-    <div className="rounded-2xl border border-gray-800 bg-gray-900 p-4 text-sm text-gray-400">
+    <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4 text-sm text-slate-400">
       Preparing assessment…
     </div>
   )
 
   const question = questions[idx]
   if (!question && !summary) return (
-    <div className="rounded-2xl border border-gray-800 bg-gray-900 p-4 text-sm text-gray-400">
+    <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4 text-sm text-slate-400">
       No assessment available.
     </div>
   )
@@ -428,7 +424,7 @@ function AssessmentSection({ topic, subtopic, mode, open, onComplete, onToast })
 
   if (summary) {
     return (
-      <div className="rounded-2xl border border-teal-500/40 bg-teal-950/30 p-4">
+      <div className="rounded-2xl border border-indigo-500/40 bg-indigo-950/30 p-4">
         <div className="flex items-center gap-4">
           <ScoreRing score={Number(summary.score || 0)} />
           <div>
@@ -436,7 +432,7 @@ function AssessmentSection({ topic, subtopic, mode, open, onComplete, onToast })
               {title} Score: {Math.round((summary.score || 0) * 100)}%
             </p>
             {mode === 'posttest' && (
-              <p className="mt-1 text-sm text-gray-300">
+              <p className="mt-1 text-sm text-slate-300">
                 Pre {Math.round((summary.pretest_score || 0) * 100)}% · Post{' '}
                 {Math.round((summary.posttest_score || 0) * 100)}% · Gain{' '}
                 {Math.round((summary.learning_gain || 0) * 100)}%
@@ -449,12 +445,12 @@ function AssessmentSection({ topic, subtopic, mode, open, onComplete, onToast })
   }
 
   return (
-    <div className="rounded-2xl border border-teal-500/40 bg-gray-900 p-4">
+    <div className="rounded-2xl border border-indigo-500/40 bg-slate-900 p-4">
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-teal-300">{title}</h3>
-        <span className="text-xs text-gray-400">Question {idx + 1} of {questions.length}</span>
+        <h3 className="text-sm font-semibold text-indigo-300">{title}</h3>
+        <span className="text-xs text-slate-400">Question {idx + 1} of {questions.length}</span>
       </div>
-      <p className="mb-3 text-sm text-gray-100">{question.question}</p>
+      <p className="mb-3 text-sm text-slate-100">{question.question}</p>
       <div className="space-y-2">
         {(question.options || []).map((op, i) => {
           const showCorrect = feedbackVisible && normalize(op) === normalize(question.correct_answer)
@@ -466,15 +462,15 @@ function AssessmentSection({ topic, subtopic, mode, open, onComplete, onToast })
               disabled={feedbackVisible}
               onClick={() => setSelectedAnswer(op)}
               className={`w-full rounded-xl border p-3 text-left text-sm transition ${
-                showCorrect ? 'border-green-400 bg-green-900' :
+                showCorrect ? 'border-emerald-400 bg-emerald-900' :
                 showWrong ? 'border-red-400 bg-red-900' :
-                normalize(selectedAnswer) === normalize(op) ? 'border-teal-400 bg-teal-950' :
-                'border-gray-700 hover:border-teal-400'
+                normalize(selectedAnswer) === normalize(op) ? 'border-indigo-400 bg-indigo-950' :
+                'border-slate-700 hover:border-indigo-400'
               }`}
             >
               <span className="inline-flex items-center gap-2">
                 <span>{op}</span>
-                {showCorrect && <Check size={14} className="text-green-300" />}
+                {showCorrect && <Check size={14} className="text-emerald-300" />}
                 {showWrong && <X size={14} className="text-red-300" />}
               </span>
             </button>
@@ -482,7 +478,7 @@ function AssessmentSection({ topic, subtopic, mode, open, onComplete, onToast })
         })}
       </div>
       {feedbackVisible && (
-        <p className="mt-3 text-sm text-gray-300">{question.explanation}</p>
+        <p className="mt-3 text-sm text-slate-300">{question.explanation}</p>
       )}
       <div className="mt-3">
         {!feedbackVisible ? (
@@ -490,7 +486,7 @@ function AssessmentSection({ topic, subtopic, mode, open, onComplete, onToast })
             id="assessment-submit-btn"
             onClick={submitCurrent}
             disabled={!selectedAnswer}
-            className="rounded-lg bg-teal-500 px-3 py-2 text-xs font-semibold text-gray-950 disabled:opacity-50"
+            className="rounded-lg bg-indigo-500 px-3 py-2 text-xs font-semibold text-white disabled:opacity-50 hover:bg-indigo-400 transition"
           >
             Submit Answer
           </button>
@@ -498,7 +494,7 @@ function AssessmentSection({ topic, subtopic, mode, open, onComplete, onToast })
           <button
             id="assessment-next-btn"
             onClick={nextQuestion}
-            className="rounded-lg bg-teal-500 px-3 py-2 text-xs font-semibold text-gray-950"
+            className="rounded-lg bg-indigo-500 px-3 py-2 text-xs font-semibold text-white hover:bg-indigo-400 transition"
           >
             Next Question &gt;
           </button>
@@ -541,37 +537,37 @@ function TopicSidebar({ topics, selectedTopic, currentSubtopic, onSelectSubtopic
               onClick={() => toggleTopic(t.name)}
               className={`flex w-full items-center justify-between rounded-xl border p-3 text-left transition ${
                 isSelected
-                  ? 'border-teal-500 bg-teal-950'
-                  : 'border-gray-800 bg-gray-900 hover:border-teal-500'
+                  ? 'border-indigo-500 bg-indigo-950'
+                  : 'border-slate-800 bg-slate-900 hover:border-indigo-500'
               }`}
             >
               <div>
                 <div className="text-sm capitalize">{t.name.replace(/_/g, ' ')}</div>
                 <div className="mt-1 flex items-center gap-2">
-                  <div className="h-1.5 w-16 overflow-hidden rounded-full bg-gray-700">
+                  <div className="h-1.5 w-16 overflow-hidden rounded-full bg-slate-700">
                     <div
-                      className="h-full bg-teal-500 transition-all duration-500"
+                      className="h-full bg-indigo-500 transition-all duration-500"
                       style={{ width: `${Math.round(mastery * 100)}%` }}
                     />
                   </div>
-                  <span className="text-[10px] text-gray-400">{Math.round(mastery * 100)}%</span>
+                  <span className="text-[10px] text-slate-400">{Math.round(mastery * 100)}%</span>
                   {t.completed && (
-                    <span className="rounded-full bg-green-800 px-1.5 py-0.5 text-[10px] text-green-200">
+                    <span className="rounded-full bg-emerald-800 px-1.5 py-0.5 text-[10px] text-emerald-200">
                       ✓
                     </span>
                   )}
                 </div>
               </div>
               {isExpanded ? (
-                <ChevronDown size={14} className="shrink-0 text-gray-400" />
+                <ChevronDown size={14} className="shrink-0 text-slate-400" />
               ) : (
-                <ChevronRight size={14} className="shrink-0 text-gray-400" />
+                <ChevronRight size={14} className="shrink-0 text-slate-400" />
               )}
             </button>
 
             {/* Subtopic list */}
             {isExpanded && (t.subtopics || []).length > 0 && (
-              <div className="ml-3 mt-1 space-y-0.5 border-l border-gray-700 pl-3">
+              <div className="ml-3 mt-1 space-y-0.5 border-l border-slate-700 pl-3">
                 {t.subtopics.map((sub) => {
                   const isActiveSub = currentSubtopic === sub.id
                   return (
@@ -581,12 +577,12 @@ function TopicSidebar({ topics, selectedTopic, currentSubtopic, onSelectSubtopic
                       onClick={() => onSelectSubtopic(t.name, sub.id)}
                       className={`flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-left text-xs transition ${
                         isActiveSub
-                          ? 'bg-teal-900 text-teal-200'
-                          : 'text-gray-400 hover:bg-gray-800 hover:text-gray-200'
+                          ? 'bg-indigo-900 text-indigo-200'
+                          : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
                       }`}
                     >
                       <span className="truncate">{sub.title}</span>
-                      {sub.passed && <Check size={10} className="ml-1 shrink-0 text-green-400" />}
+                      {sub.passed && <Check size={10} className="ml-1 shrink-0 text-emerald-400" />}
                     </button>
                   )
                 })}
@@ -774,32 +770,52 @@ export default function App() {
   const cycles = (studentState?.accuracy_history || []).length
   const status = (studentState?.macro_decision?.action || 'active').replaceAll('_', ' ')
   const progressPct = Math.max(0, Math.min(100, (score / 0.85) * 100))
-  const hasPretest = studentState?.pretest_score !== null && studentState?.pretest_score !== undefined
+
+  // Per-topic pretest / posttest tracking — check assessment_scores keyed by topic
+  const topicAssessmentScores = useMemo(() => {
+    const scores = studentState?.assessment_scores || {}
+    // Flatten: for each topic find if pretest_score or posttest_score exists in any subtopic entry
+    const result = {}
+    for (const [topic, subtopicMap] of Object.entries(scores)) {
+      let pretestDone = false
+      let posttestDone = false
+      for (const entry of Object.values(subtopicMap)) {
+        if (entry?.pretest_score !== null && entry?.pretest_score !== undefined) pretestDone = true
+        if (entry?.posttest_score !== null && entry?.posttest_score !== undefined) posttestDone = true
+      }
+      result[topic] = { pretestDone, posttestDone }
+    }
+    return result
+  }, [studentState])
+
+  const pretestDoneForTopic = !!(selectedTopic && topicAssessmentScores[selectedTopic]?.pretestDone)
+  const posttestDoneForTopic = !!(selectedTopic && topicAssessmentScores[selectedTopic]?.posttestDone)
+
 
   return (
-    <div className="h-screen overflow-hidden bg-gray-950 font-[Inter,system-ui] text-gray-100">
+    <div className="h-screen overflow-hidden bg-[#0a0a16] font-[Inter,system-ui] text-slate-100">
       {/* Top bar */}
-      <div className="w-full border-b border-gray-800 bg-gray-900 px-3 py-2">
+      <div className="w-full border-b-2 border-indigo-700 bg-slate-900 px-3 py-2">
         <div className="flex items-center justify-between">
           {/* Left: progress info */}
-          <div className="text-xs text-gray-300">
+          <div className="text-xs text-slate-300">
             Session Progress · {cycles} cycles · {status}
             {studentState?.level && (
-              <span className="ml-2 rounded-full border border-teal-500/50 px-2 py-0.5 text-teal-300">
+              <span className="ml-2 rounded-full border border-indigo-500/50 px-2 py-0.5 text-indigo-300">
                 {studentState.level}
               </span>
             )}
           </div>
           {/* Right: user badge + logout */}
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5 rounded-full border border-gray-700 bg-gray-800 px-3 py-1">
-              <User size={12} className="text-teal-400" />
-              <span className="text-xs text-gray-300 max-w-[140px] truncate">{userName}</span>
+            <div className="flex items-center gap-1.5 rounded-full border border-slate-700 bg-slate-800 px-3 py-1">
+              <User size={12} className="text-indigo-400" />
+              <span className="text-xs text-slate-300 max-w-[140px] truncate">{userName}</span>
             </div>
             <button
               id="logout-btn"
               onClick={logout}
-              className="flex items-center gap-1.5 rounded-full border border-gray-700 bg-gray-800 px-3 py-1 text-xs text-gray-400 transition-colors hover:border-red-500/50 hover:bg-red-950/30 hover:text-red-400"
+              className="flex items-center gap-1.5 rounded-full border border-slate-700 bg-slate-800 px-3 py-1 text-xs text-slate-400 transition-colors hover:border-red-500/50 hover:bg-red-950/30 hover:text-red-400"
               title="Sign out"
             >
               <LogOut size={12} />
@@ -808,24 +824,24 @@ export default function App() {
           </div>
         </div>
         {/* Progress bar */}
-        <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-gray-800">
+        <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-800">
           <div
-            className="h-full bg-gradient-to-r from-teal-500 to-green-500 transition-all duration-500"
+            className="h-full bg-gradient-to-r from-indigo-500 to-violet-500 transition-all duration-500"
             style={{ width: `${progressPct}%` }}
           />
         </div>
       </div>
 
       {toast && (
-        <div className="fixed right-4 top-4 z-50 rounded-lg border border-teal-500 bg-gray-900 px-4 py-2 text-sm text-teal-300 shadow-lg">
+        <div className="fixed right-4 top-4 z-50 rounded-lg border border-indigo-500 bg-slate-900 px-4 py-2 text-sm text-indigo-300 shadow-lg">
           {toast}
         </div>
       )}
 
       <div className="flex h-[calc(100vh-66px)]">
         {/* Sidebar — Issue #5 fix: full topic tree */}
-        <aside className="w-[300px] shrink-0 overflow-y-auto border-r border-gray-800 bg-gray-900 p-4">
-          <h2 className="mb-3 text-xs uppercase tracking-wider text-teal-300">Topics</h2>
+        <aside className="w-[300px] shrink-0 overflow-y-auto border-r border-slate-800 bg-gradient-to-b from-slate-900 to-[#0a0a18] p-4">
+          <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-indigo-300">Topics</h2>
           <TopicSidebar
             topics={topics}
             selectedTopic={selectedTopic}
@@ -835,11 +851,11 @@ export default function App() {
 
           {heatmap.length > 0 && (
             <>
-              <h3 className="mb-2 mt-6 text-xs uppercase tracking-wider text-teal-300">Mastery Heatmap</h3>
+              <h3 className="mb-2 mt-6 text-xs font-semibold uppercase tracking-wider text-indigo-300">Mastery Heatmap</h3>
               <div className="space-y-2">
                 {heatmap.map((c) => (
-                  <div key={c.name} className="flex items-center justify-between rounded-lg border border-gray-800 bg-gray-900 px-2 py-2">
-                    <span className="text-xs capitalize text-gray-300">{c.name.replace(/_/g, ' ')}</span>
+                  <div key={c.name} className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-900 px-2 py-2">
+                    <span className="text-xs capitalize text-slate-300">{c.name.replace(/_/g, ' ')}</span>
                     <span className={`rounded-full px-2 py-1 text-[10px] text-white transition-colors duration-500 ${masteryPillClass(c.mastery)}`}>
                       {Math.round(c.mastery * 100)}%
                     </span>
@@ -851,47 +867,89 @@ export default function App() {
         </aside>
 
         {/* Main chat area */}
-        <main className="flex-1 bg-[#0d1117] p-4">
-          <div className="mb-3 flex items-center justify-between">
+        <main className="flex-1 bg-[#080814] p-4">
+          {/* ── Topic header + action toolbar ─────────────────────────────── */}
+          <div className="mb-3 flex items-center justify-between flex-wrap gap-2">
             <div>
-              <h1 className="text-sm text-gray-300">
+              <h1 className="text-sm font-semibold tracking-tight text-slate-200">
                 {selectedTopic
                   ? `${selectedTopic.replace(/_/g, ' ')}${currentSubtopic ? ` › ${currentSubtopic}` : ''}`
                   : 'Select a topic to begin'}
               </h1>
+              {/* Progressive flow indicator */}
+              {selectedTopic && (
+                <div className="mt-1 flex items-center gap-1.5 text-[10px] text-slate-500">
+                  <span className={pretestDoneForTopic ? 'text-emerald-400 font-semibold' : 'text-amber-400 font-semibold'}>
+                    1. Pre-Test{pretestDoneForTopic ? ' ✓' : ''}
+                  </span>
+                  <span>→</span>
+                  <span className={contentReady || messages.some(m => m.role === 'tutor' && m.text) ? 'text-indigo-400 font-semibold' : 'text-slate-600'}>
+                    2. Study
+                  </span>
+                  <span>→</span>
+                  <span className="text-slate-600">3. Practice Quiz</span>
+                  <span>→</span>
+                  <span className={posttestDoneForTopic ? 'text-emerald-400 font-semibold' : 'text-slate-600'}>
+                    4. Post-Test{posttestDoneForTopic ? ' ✓' : ''}
+                  </span>
+                </div>
+              )}
             </div>
-            <div className="flex gap-2">
-              {/* Issue #4: "Start Learning Assessment" opens quiz ONLY — separate from content */}
+            <div className="flex flex-wrap gap-2 items-center">
+              {/* Step 1: Pre-Test — always show if topic selected & pretest not done */}
+              {selectedTopic && !pretestDoneForTopic && (
+                <button
+                  id="pretest-btn"
+                  onClick={() => openAssessment('pretest')}
+                  disabled={streaming}
+                  className="flex items-center gap-1.5 rounded-lg border border-amber-500 bg-amber-950/40 px-4 py-2 text-xs font-semibold text-amber-300 disabled:opacity-50 hover:bg-amber-900/50 transition animate-pulse"
+                >
+                  📋 Take Pre-Test
+                </button>
+              )}
+              {/* Pretest done badge */}
+              {selectedTopic && pretestDoneForTopic && (
+                <span className="rounded-lg border border-emerald-600/50 bg-emerald-950/30 px-3 py-2 text-xs text-emerald-400 font-medium">
+                  ✓ Pre-Test Done
+                </span>
+              )}
+              {/* Step 2: Study content — show after pretest */}
+              {selectedTopic && pretestDoneForTopic && (
+                <button
+                  id="explain-btn"
+                  onClick={startStream}
+                  disabled={!selectedTopic || streaming}
+                  className="rounded-lg bg-indigo-500 px-4 py-2 text-xs font-semibold text-white disabled:opacity-50 hover:bg-indigo-400 transition"
+                >
+                  {streaming ? 'Generating…' : `Explain ${selectedTopic ? selectedTopic.replace(/_/g, ' ') : ''}`}
+                </button>
+              )}
+              {/* Step 2 fallback: show explain button even before pretest (so user isn't blocked) */}
+              {selectedTopic && !pretestDoneForTopic && (
+                <button
+                  id="explain-btn-skip"
+                  onClick={startStream}
+                  disabled={!selectedTopic || streaming}
+                  title="You can study first, or take the pre-test to track your improvement"
+                  className="rounded-lg border border-slate-600 px-4 py-2 text-xs text-slate-400 disabled:opacity-50 hover:border-slate-500 transition"
+                >
+                  {streaming ? 'Generating…' : 'Skip Pre-Test & Study'}
+                </button>
+              )}
+              {/* Step 3: Learning Assessment — after content is ready */}
               {contentReady && !quizOpen && (
                 <button
                   id="start-quiz-btn"
                   onClick={openQuiz}
                   disabled={!selectedTopic || streaming}
-                  className="rounded-lg border border-teal-500 px-4 py-2 text-xs font-semibold text-teal-300 disabled:opacity-50 hover:bg-teal-950 transition"
+                  className="rounded-lg border border-indigo-500 px-4 py-2 text-xs font-semibold text-indigo-300 disabled:opacity-50 hover:bg-indigo-950 transition"
                 >
-                  Start Learning Assessment
+                  🎯 Practice Quiz
                 </button>
               )}
-              {!hasPretest && (
-                <button
-                  id="pretest-btn"
-                  onClick={() => openAssessment('pretest')}
-                  disabled={!selectedTopic || streaming}
-                  className="rounded-lg border border-purple-500/60 px-4 py-2 text-xs font-semibold text-purple-300 disabled:opacity-50"
-                >
-                  Pre-Test
-                </button>
-              )}
-              <button
-                id="explain-btn"
-                onClick={startStream}
-                disabled={!selectedTopic || streaming}
-                className="rounded-lg bg-teal-500 px-4 py-2 text-xs font-semibold text-gray-950 disabled:opacity-50"
-              >
-                {streaming ? 'Generating…' : `Explain ${selectedTopic ? selectedTopic.replace(/_/g, ' ') : ''}`}
-              </button>
             </div>
           </div>
+
 
           <div className="h-full max-h-[calc(100vh-140px)] overflow-y-auto scroll-smooth pr-1">
             <div className="space-y-4">
@@ -903,8 +961,8 @@ export default function App() {
                     </div>
                   ) : (
                     <div className="max-w-[85%]">
-                      <div className="mb-1 flex items-center gap-2 text-xs text-teal-300">
-                        <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-teal-500/20 shadow-[0_0_16px_rgba(20,184,166,0.4)]">
+                      <div className="mb-1 flex items-center gap-2 text-xs text-indigo-300">
+                        <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-indigo-500/20 shadow-[0_0_16px_rgba(99,102,241,0.4)]">
                           <Bot size={14} />
                         </span>
                         <span>Tutor</span>
@@ -952,16 +1010,16 @@ export default function App() {
               />
 
               {topicComplete && (
-                <div className="rounded-2xl border border-green-500/40 bg-green-950/40 p-4">
-                  <p className="text-base font-semibold text-green-300">Topic Complete 🎉</p>
-                  <p className="mt-1 text-sm text-gray-300">
+                <div className="rounded-2xl border border-emerald-500/40 bg-emerald-950/40 p-4">
+                  <p className="text-base font-semibold tracking-tight text-emerald-300">Topic Complete 🎉</p>
+                  <p className="mt-1 text-sm text-slate-300">
                     You have finished all subtopics for {selectedTopic?.replace(/_/g, ' ')}.
                     The next topic is now unlocked.
                   </p>
                   <button
                     id="posttest-btn"
                     onClick={() => openAssessment('posttest')}
-                    className="mt-4 rounded-lg bg-teal-500 px-4 py-2 text-sm font-semibold text-gray-950"
+                    className="mt-4 rounded-lg bg-indigo-500 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-400 transition"
                   >
                     Take Complete Assessment
                   </button>
@@ -970,7 +1028,7 @@ export default function App() {
 
               {studentState?.posttest_score !== null && studentState?.posttest_score !== undefined && (
                 <>
-                  <div className="rounded-2xl border border-teal-500/40 bg-gray-900 p-4 text-sm text-gray-300">
+                  <div className="rounded-2xl border border-indigo-500/40 bg-slate-900 p-4 text-sm text-slate-300">
                     Pre-test {Math.round((studentState.pretest_score || 0) * 100)}% · Post-test{' '}
                     {Math.round((studentState.posttest_score || 0) * 100)}% · Learning gain{' '}
                     {Math.round((studentState.learning_gain || 0) * 100)}%

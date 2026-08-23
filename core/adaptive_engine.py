@@ -157,7 +157,9 @@ def build_adaptive_quiz_prompt(
     seen_question_previews: List[str],
 ) -> str:
     """
-    Build a fully adaptive quiz prompt (fixes Issues #3 & #6).
+    Build a fully adaptive quiz prompt grounded in OpenDSA/textbook source material.
+    Every question must be derived from specific facts in the RAG context, not generic
+    knowledge — this ensures questions are unique and drawn from the actual curriculum.
     """
     mode  = ctx["mode"]
     depth = ctx["depth"]
@@ -172,41 +174,55 @@ def build_adaptive_quiz_prompt(
 
     if mode == "remedial":
         difficulty_note = (
-            "Focus on foundational definitional and comprehension questions.  "
-            "Avoid trick questions.  Use simple, unambiguous language."
+            "Focus on foundational definitional and comprehension questions. "
+            "Avoid trick questions. Use simple, unambiguous language."
         )
         types = "definitional (2), true/false (1), application (2), fill-in-blank (1)"
     elif mode == "advanced":
         difficulty_note = (
-            "Include scenario-based, code-tracing, and edge-case questions.  "
+            "Include scenario-based, code-tracing, and edge-case questions. "
             "At least one question should resemble an interview prompt."
         )
-        types = "scenario (2), code/output (2), edge-case (1), comparison (1)"
+        types = "scenario (2), code/output-trace (2), edge-case (1), complexity comparison (1)"
     else:
         difficulty_note = "Mix of definitional, application, and output-tracing questions."
-        types = "definitional (2), application (2), tracing (1), edge-case (1)"
+        types = "definitional (2), application (2), code-trace (1), edge-case (1)"
 
     return (
         f"[Variation seed: {seed}]\n\n"
-        f"Generate EXACTLY {q_count} unique quiz questions for:\n"
+        f"You are generating quiz questions for a DSA/programming course.\n"
         f"Topic: {topic}  |  Subtopic: {subtopic}  |  Mode: {mode}  |  Depth: {depth}\n"
         f"Student last score: {round(score * 100)}%\n\n"
-        f"Difficulty note: {difficulty_note}\n"
+        "══════════════════════════════════════════\n"
+        "TEXTBOOK / OpenDSA SOURCE MATERIAL\n"
+        "(All questions MUST be derived from THIS content)\n"
+        "══════════════════════════════════════════\n"
+        f"{rag_context}\n"
+        "══════════════════════════════════════════\n\n"
+        f"Difficulty: {difficulty_note}\n"
         f"Question types to include: {types}\n\n"
-        f"Use ONLY content from this RAG context:\n{rag_context}\n\n"
-        f"Questions already asked (DO NOT REPEAT OR REPHRASE):\n{seen_block}\n\n"
-        "Return ONLY a valid JSON array.  Each element must be:\n"
+        f"Questions already asked — DO NOT REPEAT OR REPHRASE ANY OF THESE:\n{seen_block}\n\n"
+        f"Generate EXACTLY {q_count} MCQ questions. MANDATORY rules:\n"
+        "  1. SOURCE GROUNDING: Every question must be derived from a specific fact,\n"
+        "     definition, algorithm step, code example, complexity value, or edge-case\n"
+        "     that is EXPLICITLY present in the source material above.\n"
+        "     Do NOT generate questions from general knowledge — each must trace\n"
+        "     back to something stated in the source.\n"
+        "  2. UNIQUENESS: Each question tests a DIFFERENT concept, operation, or aspect\n"
+        "     from every other question in this batch.\n"
+        "  3. DISTRACTORS: Wrong options must be plausible — things a student might\n"
+        "     genuinely confuse with the correct answer, not obviously absurd choices.\n"
+        "  4. EXPLANATION: Each explanation must cite WHY the correct answer is right,\n"
+        "     referencing the specific fact from the source material.\n"
+        "  5. ANSWER POSITION: Distribute the correct answer across all 4 positions.\n"
+        "     Never place it at position 0 (first option) more than once per batch.\n\n"
+        "Return ONLY a valid JSON array with no extra text. Each element:\n"
         "{\n"
-        '  "question": "...",\n'
-        '  "options": ["A", "B", "C", "D"],\n'
-        '  "correct_answer": "<must exactly match one option>",\n'
-        '  "explanation": "<short explanation of why correct>"\n'
-        "}\n\n"
-        "Rules:\n"
-        "  • Every question must test a DIFFERENT concept or aspect.\n"
-        "  • Shuffle which position the correct answer appears in.\n"
-        "  • Plausible distractors — not obviously wrong.\n"
-        "  • Never repeat a question from the 'already asked' list.\n"
+        '  "question": "<question text — may include short code snippet if helpful>",\n'
+        '  "options": ["<opt A>", "<opt B>", "<opt C>", "<opt D>"],\n'
+        '  "correct_answer": "<must exactly match one of the options>",\n'
+        '  "explanation": "<1-2 sentences citing the specific fact from source>"\n'
+        "}\n"
     )
 
 

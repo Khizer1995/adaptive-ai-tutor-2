@@ -957,17 +957,23 @@ def get_quiz(body: TopicRequest, user: Dict = Depends(require_auth)):
     rag_chunk_records: List[Dict[str, Any]] = []
     retrieval_warning = ""
     try:
+        # Use k=4 to pull more OpenDSA/textbook chunks — richer context → more unique questions.
         if "dsa" in subject.lower():
             if delivered_chunk_ids:
                 rag_chunk_records = crew.tutor.retrieve_context_chunk_records(
-                    engineered_query, state, k=2, allowed_chunk_ids=delivered_chunk_ids
+                    engineered_query, state, k=4, allowed_chunk_ids=delivered_chunk_ids
                 )
+                # Top-up with unrestricted chunks if not enough
+                if len(rag_chunk_records) < 3:
+                    rag_chunk_records = crew.tutor.retrieve_context_chunk_records(
+                        engineered_query, state, k=4
+                    )
             else:
                 rag_chunk_records = crew.tutor.retrieve_context_chunk_records(
-                    engineered_query, state, k=3
+                    engineered_query, state, k=4
                 )
         else:
-            rag_chunk_records = crew.tutor.retrieve_context_chunk_records(engineered_query, state, k=2)
+            rag_chunk_records = crew.tutor.retrieve_context_chunk_records(engineered_query, state, k=4)
     except Exception as exc:
         retrieval_warning = f"RAG retrieval fallback used: {exc}"
         rag_chunk_records = []
@@ -1049,14 +1055,20 @@ def _generate_assessment_questions(
     rag_chunk_records: List[Dict[str, Any]] = []
     retrieval_warning = ""
     try:
+        # Use k=4 to pull more OpenDSA/textbook chunks — richer source material = more unique questions.
         if "dsa" in subject.lower() and delivered_chunk_ids:
             rag_chunk_records = crew.tutor.retrieve_context_chunk_records(
-                engineered_query, state, k=2, allowed_chunk_ids=delivered_chunk_ids
+                engineered_query, state, k=4, allowed_chunk_ids=delivered_chunk_ids
             )
+            # Top-up with unrestricted retrieval if delivered chunks are sparse
+            if len(rag_chunk_records) < 3:
+                rag_chunk_records = crew.tutor.retrieve_context_chunk_records(
+                    engineered_query, state, k=4
+                )
         elif "dsa" not in subject.lower():
-            rag_chunk_records = crew.tutor.retrieve_context_chunk_records(engineered_query, state, k=2)
+            rag_chunk_records = crew.tutor.retrieve_context_chunk_records(engineered_query, state, k=4)
         else:
-            rag_chunk_records = crew.tutor.retrieve_context_chunk_records(engineered_query, state, k=3)
+            rag_chunk_records = crew.tutor.retrieve_context_chunk_records(engineered_query, state, k=4)
     except Exception as exc:
         retrieval_warning = f"RAG retrieval fallback used: {exc}"
         rag_chunk_records = []
@@ -1069,8 +1081,14 @@ def _generate_assessment_questions(
     domain_fallback = "DSA fundamentals" if "dsa" in subject.lower() else "Python programming fundamentals"
     rag_context = "\n\n".join(rag_chunks) if rag_chunks else domain_fallback
 
+    # Load persistent seen-hashes for this assessment type + topic + subtopic
+    # so repeated pretest/posttest calls never re-ask the same questions.
+    assessment_seen_key = f"{assessment_type}:{topic}:{subtopic}"
+    assessment_seen_store = state.setdefault("assessment_seen_questions", {})
+    seen_hashes: set[str] = {str(v) for v in assessment_seen_store.get(assessment_seen_key, [])}
+
     questions = crew.practical.generate_quiz_batch(
-        micro, state, rag_context, target_count=6, seen_hashes=set()
+        micro, state, rag_context, target_count=6, seen_hashes=seen_hashes
     )
     if len(questions) < 6:
         questions.extend(
@@ -1079,9 +1097,15 @@ def _generate_assessment_questions(
                 state,
                 rag_context,
                 target_count=6 - len(questions),
-                seen_hashes={_question_hash(q.get("question", "")) for q in questions if isinstance(q, dict)},
+                seen_hashes=seen_hashes,
             )
         )
+
+    # Persist the newly seen hashes so future calls get fresh questions.
+    seen_hashes.update(
+        _question_hash(q.get("question", "")) for q in questions if isinstance(q, dict)
+    )
+    assessment_seen_store[assessment_seen_key] = sorted(seen_hashes)
 
     validated_questions: List[Dict[str, Any]] = []
     for question in questions:
@@ -1108,8 +1132,10 @@ def _handle_assessment(body: AssessmentRequest, assessment_type: str, student_id
         state["current_topic"] = body.topic
         state["current_subtopic"] = subtopic
         state["last_assessment_type"] = assessment_type
+        result = _generate_assessment_questions(state, body.topic, subtopic, assessment_type)
+        # Save AFTER generation so assessment_seen_questions hashes are persisted.
         pm.save(student_id, state, user_id=user_id)
-        return _generate_assessment_questions(state, body.topic, subtopic, assessment_type)
+        return result
 
     correct_count, total, score = _score_answer_batch(body.answers)
     state["current_topic"] = body.topic

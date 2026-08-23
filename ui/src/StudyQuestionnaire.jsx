@@ -85,14 +85,14 @@ export default function StudyQuestionnaire({
 
   if (submitted) {
     return (
-      <div className="rounded-2xl border border-green-500/40 bg-green-950/30 p-4 text-sm text-green-200">
+      <div className="rounded-2xl border border-emerald-500/40 bg-emerald-950/30 p-4 text-sm text-emerald-200">
         Study survey submitted. These responses are ready for Table 2 aggregation.
       </div>
     )
   }
 
   return (
-    <div className="rounded-2xl border border-purple-500/40 bg-gray-900 p-4">
+    <div className="rounded-2xl border border-amber-500/40 bg-slate-900 p-4">
       <div className="mb-4">
         <p className="text-base font-semibold text-purple-200">Post-session Study Questionnaire</p>
         <p className="mt-1 text-sm text-gray-400">Rate each item from 1 (strongly disagree) to 5 (strongly agree).</p>
@@ -100,9 +100,9 @@ export default function StudyQuestionnaire({
 
       <div className="space-y-5">
         {SECTIONS.map((section) => (
-          <section key={section.title} className="rounded-xl border border-gray-800 bg-gray-950/40 p-3">
+          <section key={section.title} className="rounded-xl border border-slate-800 bg-slate-950/40 p-3">
             <div className="mb-3 flex items-baseline gap-2">
-              <h3 className="text-sm font-semibold text-teal-300">{section.title}</h3>
+              <h3 className="text-sm font-semibold text-indigo-300">{section.title}</h3>
               {section.subtitle && <span className="text-xs text-gray-500">{section.subtitle}</span>}
             </div>
             <div className="space-y-3">
@@ -117,8 +117,8 @@ export default function StudyQuestionnaire({
                         onClick={() => setResponses((current) => ({ ...current, [id]: value }))}
                         className={`h-8 w-8 rounded-lg border text-xs font-semibold transition ${
                           responses[id] === value
-                            ? 'border-purple-300 bg-purple-500 text-gray-950'
-                            : 'border-gray-700 bg-gray-900 text-gray-300 hover:border-purple-300'
+                            ? 'border-indigo-300 bg-indigo-500 text-white'
+                            : 'border-slate-700 bg-slate-900 text-slate-300 hover:border-indigo-300'
                         }`}
                         aria-label={`${label}: ${value}`}
                       >
@@ -132,14 +132,14 @@ export default function StudyQuestionnaire({
           </section>
         ))}
 
-        <section className="rounded-xl border border-gray-800 bg-gray-950/40 p-3">
-          <h3 className="mb-3 text-sm font-semibold text-teal-300">Open Text</h3>
-          <label className="block text-sm text-gray-300">
+        <section className="rounded-xl border border-slate-800 bg-slate-950/40 p-3">
+          <h3 className="mb-3 text-sm font-semibold text-indigo-300">Open Text</h3>
+          <label className="block text-sm text-slate-300">
             What did you like most?
             <textarea
               value={likedMost}
               onChange={(event) => setLikedMost(event.target.value)}
-              className="mt-2 min-h-20 w-full rounded-xl border border-gray-700 bg-gray-950 p-3 text-sm text-gray-100 outline-none focus:border-purple-300"
+              className="mt-2 min-h-20 w-full rounded-xl border border-slate-700 bg-slate-950 p-3 text-sm text-slate-100 outline-none focus:border-indigo-300"
               placeholder="Optional"
             />
           </label>
@@ -148,7 +148,7 @@ export default function StudyQuestionnaire({
             <textarea
               value={improve}
               onChange={(event) => setImprove(event.target.value)}
-              className="mt-2 min-h-20 w-full rounded-xl border border-gray-700 bg-gray-950 p-3 text-sm text-gray-100 outline-none focus:border-purple-300"
+              className="mt-2 min-h-20 w-full rounded-xl border border-slate-700 bg-slate-950 p-3 text-sm text-slate-100 outline-none focus:border-indigo-300"
               placeholder="Optional"
             />
           </label>

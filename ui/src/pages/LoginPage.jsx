@@ -68,17 +68,17 @@ export default function LoginPage({ onNavigate }) {
   }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gray-950 px-4 font-[Inter,system-ui]">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#0a0a16] px-4 font-[Inter,system-ui]">
 
       {/* ── Ambient background ──────────────────────────────────────────── */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 left-1/2 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-teal-500/10 blur-[120px]" />
+        <div className="absolute -top-40 left-1/2 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-indigo-500/10 blur-[120px]" />
         <div className="absolute bottom-0 right-0 h-[400px] w-[400px] rounded-full bg-purple-600/8 blur-[100px]" />
         {/* grid pattern */}
         <div
           className="absolute inset-0 opacity-[0.035]"
           style={{
-            backgroundImage: 'linear-gradient(rgba(20,184,166,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(20,184,166,0.5) 1px, transparent 1px)',
+            backgroundImage: 'linear-gradient(rgba(99,102,241,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(99,102,241,0.5) 1px, transparent 1px)',
             backgroundSize: '40px 40px',
           }}
         />
@@ -87,16 +87,16 @@ export default function LoginPage({ onNavigate }) {
       <div className="relative w-full max-w-md">
 
         {/* ── Card ──────────────────────────────────────────────────────── */}
-        <div className="rounded-3xl border border-gray-800/80 bg-gray-900/70 p-8 shadow-2xl shadow-black/60 backdrop-blur-xl">
+        <div className="rounded-3xl border border-slate-800/80 bg-slate-900/70 p-8 shadow-2xl shadow-black/60 backdrop-blur-xl">
 
           {/* Logo + branding */}
           <div className="mb-8 flex flex-col items-center gap-3">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-teal-500/40 bg-teal-500/10 shadow-[0_0_32px_rgba(20,184,166,0.25)]">
-              <BrainCircuit size={32} className="text-teal-400" />
+            <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-indigo-500/40 bg-indigo-500/10 shadow-[0_0_32px_rgba(99,102,241,0.25)]">
+              <BrainCircuit size={32} className="text-indigo-400" />
             </div>
             <div className="text-center">
               <h1 className="text-2xl font-bold tracking-tight text-white">
-                Cognitive<span className="text-teal-400"> AI Tutor</span>
+                Cognitive<span className="text-indigo-400"> AI Tutor</span>
               </h1>
               <p className="mt-1 text-sm text-gray-400">Adaptive learning, personalised for you</p>
             </div>
@@ -129,7 +129,7 @@ export default function LoginPage({ onNavigate }) {
                     value={email}
                     onChange={e => { setEmail(e.target.value); setError('') }}
                     placeholder="you@example.com"
-                    className="w-full rounded-xl border border-gray-700 bg-gray-800/60 py-3 pl-10 pr-4 text-sm text-gray-100 placeholder-gray-600 transition-all duration-200 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                    className="w-full rounded-xl border border-gray-700 bg-gray-800/60 py-3 pl-10 pr-4 text-sm text-gray-100 placeholder-gray-600 transition-all duration-200 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                   />
                 </div>
               </div>
@@ -143,7 +143,7 @@ export default function LoginPage({ onNavigate }) {
                   <button
                     type="button"
                     onClick={() => { setForgotOpen(true); setResetEmail(email); setError('') }}
-                    className="text-xs text-teal-400 hover:text-teal-300 transition-colors"
+                    className="text-xs text-indigo-400 hover:text-indigo-300 transition-colors"
                   >
                     Forgot password?
                   </button>
@@ -158,7 +158,7 @@ export default function LoginPage({ onNavigate }) {
                     value={password}
                     onChange={e => { setPassword(e.target.value); setError('') }}
                     placeholder="••••••••"
-                    className="w-full rounded-xl border border-gray-700 bg-gray-800/60 py-3 pl-10 pr-12 text-sm text-gray-100 placeholder-gray-600 transition-all duration-200 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20"
+                    className="w-full rounded-xl border border-gray-700 bg-gray-800/60 py-3 pl-10 pr-12 text-sm text-gray-100 placeholder-gray-600 transition-all duration-200 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
                   />
                   <button
                     type="button"
@@ -177,7 +177,7 @@ export default function LoginPage({ onNavigate }) {
                 id="login-submit-btn"
                 type="submit"
                 disabled={loading}
-                className="group flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-teal-500 to-teal-400 py-3 text-sm font-semibold text-gray-950 shadow-lg shadow-teal-500/20 transition-all duration-200 hover:from-teal-400 hover:to-teal-300 hover:shadow-teal-500/30 disabled:opacity-60 disabled:cursor-not-allowed"
+                className="group flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-400 py-3 text-sm font-semibold text-gray-950 shadow-lg shadow-indigo-500/20 transition-all duration-200 hover:from-indigo-400 hover:to-indigo-300 hover:shadow-indigo-500/30 disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <Loader2 size={16} className="animate-spin" />
@@ -195,7 +195,7 @@ export default function LoginPage({ onNavigate }) {
                 <button
                   type="button"
                   onClick={() => onNavigate('signup')}
-                  className="font-medium text-teal-400 hover:text-teal-300 transition-colors"
+                  className="font-medium text-indigo-400 hover:text-indigo-300 transition-colors"
                 >
                   Create one free
                 </button>
@@ -213,11 +213,11 @@ export default function LoginPage({ onNavigate }) {
               {resetMsg && (
                 <div className={`flex items-start gap-3 rounded-xl border px-4 py-3 text-sm animate-[fadein_250ms_ease-out] ${
                   resetMsg.startsWith('ok:')
-                    ? 'border-green-500/30 bg-green-950/40 text-green-300'
+                    ? 'border-emerald-500/30 bg-emerald-950/40 text-emerald-300'
                     : 'border-red-500/30 bg-red-950/40 text-red-300'
                 }`}>
                   {resetMsg.startsWith('ok:')
-                    ? <CheckCircle2 size={16} className="mt-0.5 shrink-0 text-green-400" />
+                    ? <CheckCircle2 size={16} className="mt-0.5 shrink-0 text-emerald-400" />
                     : <AlertCircle size={16} className="mt-0.5 shrink-0 text-red-400" />}
                   {resetMsg.replace(/^(ok|error):/, '')}
                 </div>
@@ -234,7 +234,7 @@ export default function LoginPage({ onNavigate }) {
                     value={resetEmail}
                     onChange={e => { setResetEmail(e.target.value); setResetMsg('') }}
                     placeholder="you@example.com"
-                    className="w-full rounded-xl border border-gray-700 bg-gray-800/60 py-3 pl-10 pr-4 text-sm text-gray-100 placeholder-gray-600 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all duration-200"
+                    className="w-full rounded-xl border border-gray-700 bg-gray-800/60 py-3 pl-10 pr-4 text-sm text-gray-100 placeholder-gray-600 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all duration-200"
                   />
                 </div>
               </div>
@@ -243,7 +243,7 @@ export default function LoginPage({ onNavigate }) {
                 id="reset-submit-btn"
                 type="submit"
                 disabled={resetLoading}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-teal-500 to-teal-400 py-3 text-sm font-semibold text-gray-950 shadow-lg shadow-teal-500/20 transition-all duration-200 hover:from-teal-400 hover:to-teal-300 disabled:opacity-60"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 to-indigo-400 py-3 text-sm font-semibold text-gray-950 shadow-lg shadow-indigo-500/20 transition-all duration-200 hover:from-indigo-400 hover:to-indigo-300 disabled:opacity-60"
               >
                 {resetLoading ? <Loader2 size={16} className="animate-spin" /> : 'Send Reset Link'}
               </button>
