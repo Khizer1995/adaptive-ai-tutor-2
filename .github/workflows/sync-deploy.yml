@@ -1,0 +1,29 @@
+name: Sync Deploy Branch
+
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Sync deploy branch with develop
+        run: |
+          git fetch origin deploy || git checkout -b deploy
+          git checkout deploy
+          git merge origin/develop --no-edit || (git merge --abort && exit 1)
+          git push origin deploy

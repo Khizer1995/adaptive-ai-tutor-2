@@ -1,0 +1,53 @@
+{
+  "_metadata": {
+    "generated_by": "evaluation_metrics.py",
+    "rating_source": "data/blind_rating_results.json",
+    "profiles_source": "profiles/",
+    "note": "kappa values from minimum-disagreement reconstruction of 2-rater integer scores from stored means. Individual rater files deleted after original aggregation run."
+  },
+  "inter_rater_reliability": {
+    "method": "quadratic_weighted_cohens_kappa",
+    "scale": "1-5 ordinal rubric",
+    "dimensions": {
+      "appropriateness": {
+        "kappa": 0.2,
+        "interpretation": "fair"
+      },
+      "correctness": {
+        "kappa": 0.7273,
+        "interpretation": "substantial"
+      },
+      "pedagogical_clarity": {
+        "kappa": 0.2222,
+        "interpretation": "fair"
+      }
+    },
+    "flagged_disagreements_threshold": 2,
+    "flagged_pairs": [],
+    "pearson_r_original": -0.0467,
+    "pearson_r_note": "Pearson r=-0.0467 from original aggregation run (inter_rater_analysis.json). Preference-direction kappa=0.0."
+  },
+  "learning_outcomes": {
+    "n": 2,
+    "pretest_mean": 0.4933,
+    "posttest_mean": 0.895,
+    "raw_gain_mean": 0.4017,
+    "hake_gain_mean": 0.4167,
+    "per_participant": [
+      {
+        "participant_id": "KHIZ-001",
+        "pretest_score": 0.82,
+        "posttest_score": 0.79,
+        "raw_gain": -0.03,
+        "hake_gain": -0.1667
+      },
+      {
+        "participant_id": "USER-71cbf510",
+        "pretest_score": 0.1667,
+        "posttest_score": 1.0,
+        "raw_gain": 0.8333,
+        "hake_gain": 1.0
+      }
+    ]
+  }
+}

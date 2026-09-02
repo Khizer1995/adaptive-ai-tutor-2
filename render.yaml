@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: cognitive-ai-tutor-backend
+    env: python
+    region: oregon
+    branch: deploy
+    buildCommand: pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
+    startCommand: uvicorn api_server:app --host 0.0.0.0 --port $PORT --workers 1 --timeout-keep-alive 120
+    plan: starter
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: JWT_SECRET_KEY
+        sync: false

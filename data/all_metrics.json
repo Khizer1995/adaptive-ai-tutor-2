@@ -1,0 +1,204 @@
+{
+  "_metadata": {
+    "generated_by": "evaluation_metrics.py + consolidation script",
+    "description": "Single authoritative metrics file for the Cognitive Adaptive AI Tutor capstone paper.",
+    "sources": [
+      "data/blind_rating_results.json",
+      "data/inter_rater_analysis.json",
+      "data/ablation_report.json",
+      "data/baseline_report.json",
+      "data/metrics_summary.json",
+      "data/survey_responses.jsonl"
+    ]
+  },
+  "blind_evaluation": {
+    "n_scenarios": 12,
+    "n_raters": 2,
+    "rating_date": "2026-08-13",
+    "aggregate_scores": {
+      "full_system": {
+        "pedagogical_clarity": {
+          "mean": 3.9583,
+          "std": 0.9546
+        },
+        "correctness": {
+          "mean": 4.0,
+          "std": 1.0215
+        },
+        "appropriateness": {
+          "mean": 4.3333,
+          "std": 0.5647
+        }
+      },
+      "baseline": {
+        "pedagogical_clarity": {
+          "mean": 3.2083,
+          "std": 1.0624
+        },
+        "correctness": {
+          "mean": 3.5833,
+          "std": 0.9743
+        },
+        "appropriateness": {
+          "mean": 3.4167,
+          "std": 0.9286
+        }
+      }
+    },
+    "preference": {
+      "full_system_wins": 18,
+      "baseline_wins": 6,
+      "ties": 0,
+      "full_system_win_rate": 0.75,
+      "note": "Per-rater win rates inconsistent (Rater1=100%, Rater2=50%). Report qualitatively only."
+    },
+    "statistical_tests": {
+      "pedagogical_clarity": {
+        "t_statistic": 1.9888,
+        "p_value": 0.058745,
+        "significant": false,
+        "n_pairs": 24
+      },
+      "correctness": {
+        "t_statistic": 1.0956,
+        "p_value": 0.284579,
+        "significant": false,
+        "n_pairs": 24
+      },
+      "appropriateness": {
+        "t_statistic": 3.943,
+        "p_value": 0.000648,
+        "significant": true,
+        "n_pairs": 24
+      }
+    }
+  },
+  "inter_rater_reliability": {
+    "pearson_r": -0.0467,
+    "preference_direction_kappa": 0.0,
+    "quadratic_weighted_kappa_by_dimension": {
+      "correctness": {
+        "kappa": 0.727,
+        "interpretation": "substantial"
+      },
+      "pedagogical_clarity": {
+        "kappa": 0.222,
+        "interpretation": "fair"
+      },
+      "appropriateness": {
+        "kappa": 0.2,
+        "interpretation": "fair"
+      }
+    },
+    "method": "quadratic_weighted_cohens_kappa (scikit-learn)",
+    "reconstruction_note": "Individual rater files deleted after original run. Kappa computed from minimum-disagreement integer scores reconstructed from 2-rater means stored in blind_rating_results.json.",
+    "flagged_disagreements": [],
+    "flagged_note": "No pairs flagged at threshold=2 under min-disagreement reconstruction."
+  },
+  "learning_outcomes": {
+    "n": 2,
+    "participant_ids": [
+      "KHIZ-001",
+      "USER-71cbf510"
+    ],
+    "pretest_mean": 0.4933,
+    "posttest_mean": 0.895,
+    "raw_gain_mean": 0.4017,
+    "hake_gain_mean": 0.4167,
+    "per_participant": [
+      {
+        "participant_id": "KHIZ-001",
+        "pretest_score": 0.82,
+        "posttest_score": 0.79,
+        "raw_gain": -0.03,
+        "hake_gain": -0.1667
+      },
+      {
+        "participant_id": "USER-71cbf510",
+        "pretest_score": 0.1667,
+        "posttest_score": 1.0,
+        "raw_gain": 0.8333,
+        "hake_gain": 1.0
+      }
+    ],
+    "note": "n=2, preliminary. USER-71cbf510 posttest manually set to 1.0 (6/6 correct, API not captured due to session interruption)."
+  },
+  "ablation": {
+    "scaffolding_accuracy": "91.67% (11/12 correct, all configurations)",
+    "full_system_content_quality": 4.1458,
+    "no_arbitration_content_quality": 4.0163,
+    "delta_arbitration": -0.1295,
+    "no_mastery_rerank_retrieval_relevance": 0.352,
+    "full_system_retrieval_relevance": 0.3554,
+    "delta_mastery_rerank": -0.0034,
+    "no_validation_issue_passthrough": "12/12 (0% caught)",
+    "full_system_issue_caught": "12/12 (100% caught)",
+    "latency_note": "Confounded by embedding cache. Randomised rerun recommended."
+  },
+  "latency": {
+    "full_system_median": "9.8975s",
+    "full_system_mean": "10.2926s",
+    "full_system_iqr": "11.2219s",
+    "baseline_median": "29.2823s",
+    "baseline_mean": "65.6098s",
+    "baseline_iqr": "79.1105s",
+    "n_baseline_outliers_above_100s": 2,
+    "outlier_scenarios": [
+      "scenario_8_excelling_tree_heap",
+      "scenario_12_excelling_graph_dfs"
+    ],
+    "speed_claim_by_mean": "6.37x (UNRELIABLE ? std>mean)",
+    "speed_claim_by_median": "2.96x faster by median (PREFERRED)",
+    "speed_claim_by_median_excl_outliers": "2.8x faster excluding outliers",
+    "primary_speed_claim": "Full system is 2.96x faster than baseline by median latency (9.8975s vs 29.2823s). Excluding 2 outlier(s): 2.8x.",
+    "baseline_std_exceeds_mean_warning": true
+  },
+  "user_satisfaction": {
+    "n": 4,
+    "participants": [
+      "SHAZ-001",
+      "KHIZ-001",
+      "KISH-001",
+      "MONI-001"
+    ],
+    "dimensions": {
+      "usability": 4.45,
+      "trust": 4.5,
+      "engagement": 4.25
+    },
+    "overall_mean": 4.4,
+    "note": "Respondents are development team members. External user study required."
+  },
+  "system_metrics": {
+    "validation_score_mean": 0.7188,
+    "scaffolding_accuracy_eval": 0.8125,
+    "crewai_latency_mean_s": 14.2425
+  },
+  "limitations": [
+    {
+      "id": "inter-rater",
+      "title": "Inter-Rater Reliability",
+      "text": "Inter-rater reliability was low (Pearson r=-0.0467). Quadratic-weighted Cohen kappa by dimension (min-disagreement reconstruction): correctness=0.727 (substantial), pedagogical_clarity=0.222 (fair), appropriateness=0.200 (fair). Per-rater win rates (100%/50%) are reported separately. Rubric calibration and >= 3 raters recommended for future work."
+    },
+    {
+      "id": "latency-caching",
+      "title": "Ablation Latency Caching Artifact",
+      "text": "Fixed config run order with shared embedding cache artificially deflates full_system latency. All configs show ~10-16s; ordering unreliable. Randomized rerun needed."
+    },
+    {
+      "id": "ablation-metric",
+      "title": "Ablation Primary Metric Alignment",
+      "text": "Scaffolding accuracy (originally reported) is identical across all configs since the Decision Engine is untouched. Corrected per-component metrics derived from existing data."
+    },
+    {
+      "id": "n=1-learning-outcome",
+      "title": "Underpowered Learning Outcome Study",
+      "text": "Learning gain measurement: n=1 (KHIZ-001), pretest=82%, posttest=79%, raw gain=-0.03, Hake normalised gain=-0.1667. Insufficient to draw conclusions about learning effectiveness."
+    },
+    {
+      "id": "baseline-latency-outliers",
+      "title": "Baseline Latency Non-Normality",
+      "text": "Baseline std (74.5937s) > mean (65.6098s). 2 outlier run(s) above 100s. Median reported as primary speed metric."
+    }
+  ]
+}

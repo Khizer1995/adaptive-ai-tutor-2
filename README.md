@@ -221,3 +221,50 @@ python scripts/generate_eval_report.py
 ```
 
 ---
+
+
+---
+
+## 🚀 Deployment
+
+This project is configured for deployment on **Render** (backend) and **Vercel** (frontend).
+
+### Quick Deploy
+
+```bash
+# Push to GitHub
+git push origin develop
+
+# Deploy backend to Render (see DEPLOYMENT_GUIDE.md)
+# Deploy frontend to Vercel (see DEPLOYMENT_GUIDE.md)
+```
+
+### Deployment Documentation
+
+- **📖 Full Guide**: See [`DEPLOYMENT_GUIDE.md`](./DEPLOYMENT_GUIDE.md) for complete step-by-step instructions
+- **⚡ Quick Reference**: See [`QUICK_DEPLOY.md`](./QUICK_DEPLOY.md) for command shortcuts
+- **📊 Summary**: See [`DEPLOYMENT_SUMMARY.md`](./DEPLOYMENT_SUMMARY.md) for overview
+
+### Live URLs
+
+- **Backend API**: Deploy to Render from `deploy` branch
+- **Frontend**: Deploy to Vercel from `develop` branch
+- **Auto-sync**: GitHub Action automatically syncs `develop` → `deploy`
+
+### Environment Variables
+
+Copy `.env.example` to `.env` and configure:
+
+**Backend**:
+- `GROQ_API_KEY`
+- `GEMINI_API_KEY`
+- `SUPABASE_URL`
+- `SUPABASE_SERVICE_KEY`
+- `JWT_SECRET_KEY`
+
+**Frontend** (`ui/.env`):
+- `VITE_API_BASE_URL`
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
+
+---
