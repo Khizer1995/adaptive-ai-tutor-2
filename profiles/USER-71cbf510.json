@@ -1,0 +1,225 @@
+{
+    "student_id": "USER-71cbf510",
+    "name": "Student",
+    "level": "beginner",
+    "subject": "dsa",
+    "current_topic": "tree",
+    "progress": [],
+    "engagement": "high",
+    "last_score": 1.0,
+    "learning_history": [
+        {
+            "type": "pretest",
+            "topic": "tree",
+            "subtopic": "tree_traversal",
+            "score": 0.1667,
+            "question_count": 6
+        },
+        {
+            "timestamp": "2026-09-02T06:35:21.943186+00:00",
+            "topic": "tree",
+            "subtopic": "tree_traversal",
+            "score": 0.6667,
+            "question_count": 6
+        },
+        {
+            "timestamp": "2026-09-02T06:36:11.196460+00:00",
+            "topic": "tree",
+            "subtopic": "tree_traversal",
+            "score": 1.0,
+            "question_count": 6
+        }
+    ],
+    "frustration_level": 0,
+    "engagement_score": 5,
+    "learning_style": "balanced",
+    "last_active": "2026-09-02T06:36:34.308657+00:00",
+    "accuracy_history": [],
+    "learning_gain_history": [],
+    "learning_gain": 0.8333,
+    "normalized_learning_gain": 1.0,
+    "pretest_score": 0.1667,
+    "posttest_score": 1.0,
+    "assessment_scores": {
+        "tree": {
+            "tree_traversal": {
+                "pretest_score": 0.1667,
+                "posttest_score": 1.0
+            }
+        }
+    },
+    "assessment_history": [
+        {
+            "type": "pretest",
+            "topic": "tree",
+            "subtopic": "tree_traversal",
+            "score": 0.1667
+        },
+        {
+            "type": "posttest",
+            "topic": "tree",
+            "subtopic": "tree_traversal",
+            "score": 1.0
+        }
+    ],
+    "knowledge_state": {
+        "concepts": {
+            "array": {
+                "mastery": 0.2,
+                "confidence": 0.25,
+                "attempts": 0,
+                "scaffold_level": "high",
+                "weak_areas": [],
+                "strong_areas": [],
+                "completed": false
+            },
+            "tree": {
+                "mastery": 0.835,
+                "confidence": 0.536,
+                "attempts": 6,
+                "scaffold_level": "medium",
+                "weak_areas": [],
+                "strong_areas": [
+                    "tree_traversal"
+                ],
+                "completed": false
+            }
+        },
+        "version": 2
+    },
+    "knowledge_events": [
+        {
+            "topic": "tree",
+            "mastery": 0.261,
+            "confidence": 0.35,
+            "scaffold_level": "high",
+            "observed_score": 0.17
+        },
+        {
+            "topic": "tree",
+            "mastery": 0.482,
+            "confidence": 0.35,
+            "scaffold_level": "high",
+            "observed_score": 0.6667
+        },
+        {
+            "topic": "tree",
+            "mastery": 0.764,
+            "confidence": 0.47,
+            "scaffold_level": "medium",
+            "observed_score": 1.0
+        },
+        {
+            "topic": "tree",
+            "mastery": 0.835,
+            "confidence": 0.536,
+            "scaffold_level": "medium",
+            "observed_score": 1.0
+        }
+    ],
+    "delivered_chunks": {
+        "tree": {
+            "chunk_ids": [],
+            "concepts": []
+        }
+    },
+    "current_subtopic": "balanced_trees",
+    "macro_decision": {
+        "macro_action": "guided_progression",
+        "target_concepts": [
+            "array"
+        ],
+        "scaffold_policy": "medium",
+        "reason": "IF the learner is neither at-risk nor clearly ready to accelerate THEN use guided progression with medium scaffolding. | IF engagement is low THEN do not allow low scaffolding; clamp scaffold policy to medium. | Target weakest concept 'array' based on mastery snapshot (avg_mastery=0.48, avg_confidence=0.36, trend=improving).",
+        "decision_rationale": "IF the learner is neither at-risk nor clearly ready to accelerate THEN use guided progression with medium scaffolding. | IF engagement is low THEN do not allow low scaffolding; clamp scaffold policy to medium. | Target weakest concept 'array' based on mastery snapshot (avg_mastery=0.48, avg_confidence=0.36, trend=improving)."
+    },
+    "decision": {
+        "next_node": "education_crew",
+        "action": "challenge_with_variation",
+        "weights": {
+            "increase_support": 3,
+            "reinforce_basics": 2,
+            "adjust_quiz": 2,
+            "increase_challenge": 0,
+            "challenge_with_variation": 4,
+            "advance_topic": 2,
+            "reduce_support": 0
+        },
+        "fired_weights": [
+            {
+                "action": "increase_support",
+                "total_weight": 3,
+                "reasons": [
+                    "+3: engagement is low"
+                ]
+            },
+            {
+                "action": "reinforce_basics",
+                "total_weight": 2,
+                "reasons": [
+                    "+2: engagement is low"
+                ]
+            },
+            {
+                "action": "adjust_quiz",
+                "total_weight": 2,
+                "reasons": [
+                    "+2: last_score 1.00 is strong but engagement is low"
+                ]
+            },
+            {
+                "action": "challenge_with_variation",
+                "total_weight": 4,
+                "reasons": [
+                    "+2: trend is improving",
+                    "+2: strong score with improving trend"
+                ]
+            },
+            {
+                "action": "advance_topic",
+                "total_weight": 2,
+                "reasons": [
+                    "+2: trend is improving"
+                ]
+            }
+        ],
+        "reason": "Deterministic weighted decision with no randomness. | increase_support=3 from +3: engagement is low | reinforce_basics=2 from +2: engagement is low | adjust_quiz=2 from +2: last_score 1.00 is strong but engagement is low | challenge_with_variation=4 from +2: trend is improving, +2: strong score with improving trend | advance_topic=2 from +2: trend is improving | Selected 'challenge_with_variation' because it had the highest total weight (4). Ties resolve by fixed action order: increase_support, reinforce_basics, adjust_quiz, increase_challenge, challenge_with_variation, advance_topic, reduce_support. | Context used: score=1.00, engagement=low, trend=improving, style=balanced, macro_action=guided_progression, scaffold_policy=medium.",
+        "decision_rationale": "Deterministic weighted decision with no randomness. | increase_support=3 from +3: engagement is low | reinforce_basics=2 from +2: engagement is low | adjust_quiz=2 from +2: last_score 1.00 is strong but engagement is low | challenge_with_variation=4 from +2: trend is improving, +2: strong score with improving trend | advance_topic=2 from +2: trend is improving | Selected 'challenge_with_variation' because it had the highest total weight (4). Ties resolve by fixed action order: increase_support, reinforce_basics, adjust_quiz, increase_challenge, challenge_with_variation, advance_topic, reduce_support. | Context used: score=1.00, engagement=low, trend=improving, style=balanced, macro_action=guided_progression, scaffold_policy=medium."
+    },
+    "generated_content_history": {
+        "tree": {
+            "balanced_trees": [
+                {
+                    "timestamp": "2026-09-02T06:36:33.528442+00:00",
+                    "fingerprint": "431ab6624f5fec43d9cd3bf34a31f834e1f6968bf0f2ac199f06d201f4b6b5d3",
+                    "preview": "## tree \u2014 balanced_trees\n\n**Overview**\nBalanced trees are specialized search trees that utilize self-restructuring algorithms (like rotations or color-coding) to ensure the tree height remains logarithmic relative to the number of nodes. At",
+                    "metadata": {
+                        "mode": "advanced",
+                        "depth": "advanced",
+                        "score": 1.0
+                    }
+                },
+                {
+                    "timestamp": "2026-09-02T06:36:34.296728+00:00",
+                    "fingerprint": "431ab6624f5fec43d9cd3bf34a31f834e1f6968bf0f2ac199f06d201f4b6b5d3",
+                    "preview": "## tree \u2014 balanced_trees\n\n**Overview**\nBalanced trees are specialized search trees that utilize self-restructuring algorithms (like rotations or color-coding) to ensure the tree height remains logarithmic relative to the number of nodes. At",
+                    "metadata": {}
+                }
+            ]
+        }
+    },
+    "content_fingerprints": {
+        "tree": {
+            "balanced_trees": [
+                "431ab6624f5fec43d9cd3bf34a31f834e1f6968bf0f2ac199f06d201f4b6b5d3"
+            ]
+        }
+    },
+    "quiz_seen_questions": {},
+    "quiz_attempts": {},
+    "weak_areas": {},
+    "strong_areas": {},
+    "completed_topics": [],
+    "_rag_latency_ms": 96.62,
+    "last_assessment_type": "posttest"
+}

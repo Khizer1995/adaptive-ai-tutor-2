@@ -69,6 +69,7 @@ from core.practical_agent import QuizQuestion
 from core.logging_utils import Timer, get_logger
 from core.metrics_collector import log_learning_cycle_metrics
 from core.adaptive_engine import after_quiz_submit, record_content, get_all_topics
+from core.question_bank_service import get_question_bank_service, DEFAULT_QUIZ_LENGTH
 
 app = FastAPI(title="Cognitive Adaptive AI Tutor API", version="2.0.0")
 
@@ -930,6 +931,10 @@ def get_quiz(body: TopicRequest, user: Dict = Depends(require_auth)):
 
     Issue #4 fix: this is the ONLY place quiz questions are generated;
     the /tutor/explain/stream endpoint no longer generates them.
+
+    Question-bank fix: tries the pre-built question bank first (adaptive
+    count = min(DEFAULT_QUIZ_LENGTH, available_unseen)).  Falls back to
+    LLM generation when the bank is empty or not yet ingested.
     """
     student_id = user["student_id"]
     state = get_student_state(student_id)
@@ -941,12 +946,67 @@ def get_quiz(body: TopicRequest, user: Dict = Depends(require_auth)):
     _reset_seen_hashes_for_other_subtopics(state, body.topic, current_subtopic)
     seen_hashes = _get_seen_hashes_for_subtopic(state, body.topic, current_subtopic)
     subject = str(state.get("subject", "dsa"))
-    _ensure_rag_ready()
 
     macro = decision_engine.decide_macro_plan(state)
     state["macro_decision"] = macro
     micro = decision_engine.decide_next_step(state)
 
+    # ── Step 1: try the pre-built question bank ──────────────────────────────
+    difficulty = str(state.get("difficulty_level") or micro.get("difficulty", "medium")).lower()
+    qbs = get_question_bank_service()
+    bank_result = qbs.get_quiz(
+        topic=body.topic,
+        difficulty=difficulty,
+        pool="practice_pool",
+        student_id=student_id,
+        context="practice",
+    )
+
+    if bank_result is not None:
+        # Bank responded (may be 0 questions if pool is totally exhausted)
+        bank_questions = bank_result["questions"]
+        actual = bank_result["actual_count"]
+        widened = bank_result["widened_difficulty"]
+        diffs_used = bank_result["difficulties_used"]
+
+        if actual > 0:
+            logger.info(
+                "quiz/generate bank hit: topic=%r difficulty=%r diffs_used=%r "
+                "pool=practice_pool student=%r actual=%d/%d widened=%s",
+                body.topic, difficulty, diffs_used, student_id,
+                actual, DEFAULT_QUIZ_LENGTH, widened,
+            )
+            pm.save(student_id, state, user_id=user["user_id"])
+            return {
+                "topic": body.topic,
+                "subtopic": current_subtopic,
+                "questions": bank_questions,
+                "rag_grounded": False,
+                "quiz_basis": {"source": "question_bank", "difficulties_used": diffs_used},
+                "retrieval_warning": (
+                    f"Pool thin: only {actual} of {DEFAULT_QUIZ_LENGTH} questions available"
+                    + (f" (widened to {diffs_used})" if widened else "")
+                    if actual < DEFAULT_QUIZ_LENGTH else ""
+                ),
+                "adaptive_mode": macro.get("scaffold_policy", "medium"),
+                "bank_metadata": {
+                    "source": "question_bank",
+                    "actual_count": actual,
+                    "default_count": DEFAULT_QUIZ_LENGTH,
+                    "widened_difficulty": widened,
+                    "difficulties_used": diffs_used,
+                },
+            }
+
+        # Pool completely exhausted — note in log and fall through to LLM
+        logger.warning(
+            "quiz/generate bank pool exhausted: topic=%r difficulty=%r "
+            "pool=practice_pool student=%r — falling back to LLM",
+            body.topic, difficulty, student_id,
+        )
+
+    # ── Step 2: LLM fallback (original path) ────────────────────────────────
+    _ensure_rag_ready()
     engineered_query = crew.tutor.query_engineer.engineer(
         f"Quiz questions for {body.topic} — {current_subtopic}", state
     )
@@ -987,20 +1047,21 @@ def get_quiz(body: TopicRequest, user: Dict = Depends(require_auth)):
     rag_context = "\n\n".join(rag_chunks) if rag_chunks else domain_fallback
 
     quiz_basis = {
+        "source": "llm",
         "topics_covered": [body.topic] if delivered_chunk_ids else [],
         "concepts_covered": delivered_concepts,
         "chunk_ids_used": [str(item.get("chunk_id", "")) for item in rag_chunk_records if str(item.get("chunk_id", ""))],
     }
 
     questions = crew.practical.generate_quiz_batch(
-        micro, state, rag_context, target_count=6, seen_hashes=seen_hashes
+        micro, state, rag_context, target_count=DEFAULT_QUIZ_LENGTH, seen_hashes=seen_hashes
     )
-    if len(questions) < 6:
+    if len(questions) < DEFAULT_QUIZ_LENGTH:
         extra_questions = crew.practical.generate_quiz_batch(
             micro,
             state,
             rag_context,
-            target_count=6 - len(questions),
+            target_count=DEFAULT_QUIZ_LENGTH - len(questions),
             seen_hashes=seen_hashes,
         )
         questions = questions + extra_questions
@@ -1030,22 +1091,97 @@ def get_quiz(body: TopicRequest, user: Dict = Depends(require_auth)):
         "retrieval_warning": retrieval_warning,
         # Tell the UI which adaptive mode was used so it can show context.
         "adaptive_mode": macro.get("scaffold_policy", "medium"),
+        "bank_metadata": {"source": "llm"},
     }
+
 
 
 def _generate_assessment_questions(
     state: Dict[str, Any], topic: str, subtopic: str, assessment_type: str
 ) -> Dict[str, Any]:
+    """
+    Generate pretest or posttest questions.
+
+    Try the pre-built question bank first (adaptive count, difficulty fallback,
+    thin-pool logging).  Falls back to LLM generation when the bank is empty or
+    not yet ingested so the system keeps working before full Supabase migration.
+
+    assessment_type must be "pretest" or "posttest" — maps to the corresponding
+    pool (pretest_pool / posttest_pool) in the question_bank table.
+    """
     state["current_topic"] = topic
     state["current_subtopic"] = subtopic
     state["last_assessment_type"] = assessment_type
     subject = str(state.get("subject", "dsa"))
-    _ensure_rag_ready()
+    student_id: str = state.get("student_id", "")
 
     macro = decision_engine.decide_macro_plan(state)
     state["macro_decision"] = macro
     micro = decision_engine.decide_next_step(state)
 
+    # Map assessment type → pool name and asked_questions context value
+    pool_map = {
+        "pretest":  ("pretest_pool",  "pretest"),
+        "posttest": ("posttest_pool", "posttest"),
+    }
+    pool, context = pool_map.get(assessment_type, ("pretest_pool", "pretest"))
+    difficulty = str(state.get("difficulty_level") or micro.get("difficulty", "medium")).lower()
+
+    # ── Step 1: try the pre-built question bank ──────────────────────────────
+    if student_id:
+        qbs = get_question_bank_service()
+        bank_result = qbs.get_quiz(
+            topic=topic,
+            difficulty=difficulty,
+            pool=pool,
+            student_id=student_id,
+            context=context,
+        )
+    else:
+        bank_result = None  # no student_id → skip bank, go straight to LLM
+
+    if bank_result is not None:
+        bank_questions = bank_result["questions"]
+        actual = bank_result["actual_count"]
+        widened = bank_result["widened_difficulty"]
+        diffs_used = bank_result["difficulties_used"]
+
+        if actual > 0:
+            logger.info(
+                "_generate_assessment_questions bank hit: type=%r topic=%r "
+                "difficulty=%r diffs_used=%r pool=%r student=%r actual=%d/%d widened=%s",
+                assessment_type, topic, difficulty, diffs_used, pool,
+                student_id, actual, DEFAULT_QUIZ_LENGTH, widened,
+            )
+            return {
+                "type": assessment_type,
+                "topic": topic,
+                "subtopic": subtopic,
+                "questions": bank_questions,
+                "rag_grounded": False,
+                "retrieval_warning": (
+                    f"Pool thin: only {actual} of {DEFAULT_QUIZ_LENGTH} questions available"
+                    + (f" (widened to {diffs_used})" if widened else "")
+                    if actual < DEFAULT_QUIZ_LENGTH else ""
+                ),
+                "bank_metadata": {
+                    "source": "question_bank",
+                    "actual_count": actual,
+                    "default_count": DEFAULT_QUIZ_LENGTH,
+                    "widened_difficulty": widened,
+                    "difficulties_used": diffs_used,
+                    "pool": pool,
+                },
+            }
+
+        logger.warning(
+            "_generate_assessment_questions bank pool exhausted: "
+            "type=%r topic=%r difficulty=%r pool=%r student=%r — falling back to LLM",
+            assessment_type, topic, difficulty, pool, student_id,
+        )
+
+    # ── Step 2: LLM fallback (original path) ────────────────────────────────
+    _ensure_rag_ready()
     engineered_query = crew.tutor.query_engineer.engineer(
         f"{assessment_type} diagnostic quiz questions for {topic} {subtopic}", state
     )
@@ -1088,15 +1224,15 @@ def _generate_assessment_questions(
     seen_hashes: set[str] = {str(v) for v in assessment_seen_store.get(assessment_seen_key, [])}
 
     questions = crew.practical.generate_quiz_batch(
-        micro, state, rag_context, target_count=6, seen_hashes=seen_hashes
+        micro, state, rag_context, target_count=DEFAULT_QUIZ_LENGTH, seen_hashes=seen_hashes
     )
-    if len(questions) < 6:
+    if len(questions) < DEFAULT_QUIZ_LENGTH:
         questions.extend(
             crew.practical.generate_quiz_batch(
                 micro,
                 state,
                 rag_context,
-                target_count=6 - len(questions),
+                target_count=DEFAULT_QUIZ_LENGTH - len(questions),
                 seen_hashes=seen_hashes,
             )
         )
@@ -1121,7 +1257,9 @@ def _generate_assessment_questions(
         "questions": validated_questions,
         "rag_grounded": bool(rag_chunks),
         "retrieval_warning": retrieval_warning,
+        "bank_metadata": {"source": "llm"},
     }
+
 
 
 def _handle_assessment(body: AssessmentRequest, assessment_type: str, student_id: str, user_id: str | None = None) -> Dict[str, Any]:
