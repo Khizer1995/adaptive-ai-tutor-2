@@ -8,12 +8,8 @@ from core.layered_kb.schema import KBChunk
 
 DEFAULT_PREREQS = {
     "array": [],
-    "linked_list": ["array"],
-    "stack": ["array"],
     "queue": ["array"],
-    "hash_table": ["array"],
-    "tree": ["stack", "queue"],
-    "graph": ["tree", "queue", "stack"],
+    "graph": ["queue"],
 }
 
 

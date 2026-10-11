@@ -1,0 +1,642 @@
+[
+  {
+    "id": "mcq_gr_medium_001",
+    "topic": "Graph",
+    "subtopic": "Shortest Path",
+    "difficulty": "medium",
+    "prompt": "In a connected graph with V vertices and no cycles with zero or negative weight, what is the maximum number of edges on any shortest simple path?",
+    "options": [
+      "E",
+      "V",
+      "V / 2",
+      "V - 1"
+    ],
+    "correct_index": 3,
+    "explanation": "A simple path never repeats a vertex, so it has at most V vertices and therefore at most V - 1 edges.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_002",
+    "topic": "Graph",
+    "subtopic": "Graph Introduction",
+    "difficulty": "medium",
+    "prompt": "What does this code print (row sums, then column sums of a directed graph's adjacency matrix)?\nm = [[0, 1, 1],\n     [0, 0, 1],\n     [1, 0, 0]]\nprint([sum(r) for r in m], [sum(c) for c in zip(*m)])",
+    "options": [
+      "[2, 1, 1] [2, 1, 1]",
+      "[1, 1, 2] [2, 1, 1]",
+      "[2, 1, 1] [1, 1, 2]",
+      "[3, 3, 3] [3, 3, 3]"
+    ],
+    "correct_index": 2,
+    "explanation": "Row sums are the out-degrees [2,1,1] and column sums are the in-degrees [1,1,2].",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_003",
+    "topic": "Graph",
+    "subtopic": "Topological Sort",
+    "difficulty": "medium",
+    "prompt": "In a DFS-based cycle check for a simple UNDIRECTED graph, which condition signals a cycle?",
+    "options": [
+      "A vertex with degree greater than 2",
+      "An edge to an unvisited vertex",
+      "Any edge to an already visited vertex, including the parent",
+      "An edge to an already visited vertex that is not the parent of the current vertex"
+    ],
+    "correct_index": 3,
+    "explanation": "The edge back to the parent is just the tree edge traversed in reverse; any other visited neighbor closes a cycle.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_004",
+    "topic": "Graph",
+    "subtopic": "Adjacency Matrix and List",
+    "difficulty": "medium",
+    "prompt": "What is the cost of iterating over all neighbors of a single vertex u?",
+    "options": [
+      "O(deg(u)) with both representations",
+      "O(E) with both representations",
+      "O(1) with an adjacency matrix, O(V) with an adjacency list",
+      "O(V) with an adjacency matrix, O(deg(u)) with an adjacency list"
+    ],
+    "correct_index": 3,
+    "explanation": "A matrix row must be scanned in full to find the 1s, while a list stores only the actual neighbors.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_005",
+    "topic": "Graph",
+    "subtopic": "DFS",
+    "difficulty": "medium",
+    "prompt": "In a DFS of a directed graph, u -> v is a tree edge (v is discovered from u). Which statement about finishing times holds?",
+    "options": [
+      "u finishes before v",
+      "v finishes before u",
+      "It depends on the weight of the edge",
+      "u and v finish at the same time"
+    ],
+    "correct_index": 1,
+    "explanation": "The recursive call for v is nested inside the call for u, so it returns first.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_006",
+    "topic": "Graph",
+    "subtopic": "Topological Sort",
+    "difficulty": "medium",
+    "prompt": "After Kahn's algorithm finishes, how do you detect that the graph has a cycle?",
+    "options": [
+      "The queue was never empty",
+      "Some vertex had in-degree 0 at the start",
+      "The number of vertices output is less than V",
+      "The last vertex output has out-degree greater than 0"
+    ],
+    "correct_index": 2,
+    "explanation": "Vertices on a cycle never reach in-degree 0, so they are never output.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_007",
+    "topic": "Graph",
+    "subtopic": "Shortest Path",
+    "difficulty": "medium",
+    "prompt": "Which algorithm computes single-source shortest paths in a graph that may contain negative edge weights (but no negative cycle)?",
+    "options": [
+      "Bellman-Ford",
+      "Dijkstra",
+      "BFS",
+      "Kruskal"
+    ],
+    "correct_index": 0,
+    "explanation": "Bellman-Ford relaxes all edges V-1 times and does not rely on non-negativity.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_008",
+    "topic": "Graph",
+    "subtopic": "DFS",
+    "difficulty": "medium",
+    "prompt": "A recursive DFS on a graph containing a cycle has no visited set. What happens?",
+    "options": [
+      "It can recurse forever (until a RecursionError), because it keeps re-entering vertices on the cycle",
+      "It automatically skips vertices it has visited before",
+      "It finishes but visits vertices in the wrong order",
+      "It finishes normally, because each edge is used once"
+    ],
+    "correct_index": 0,
+    "explanation": "Nothing stops the recursion from going around the cycle again and again.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_009",
+    "topic": "Graph",
+    "subtopic": "Applications",
+    "difficulty": "medium",
+    "prompt": "How can BFS be extended to reconstruct an actual shortest path (not just its length) from s to t?",
+    "options": [
+      "Record parent[v] = u when v is first discovered from u, then follow parents back from t to s",
+      "Run BFS twice and intersect the visited sets",
+      "Sort the visited vertices and read them in order",
+      "Store each vertex's degree and follow the largest degrees"
+    ],
+    "correct_index": 0,
+    "explanation": "The parent pointers form a BFS tree, and the tree path from s to t is a shortest path.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_010",
+    "topic": "Graph",
+    "subtopic": "Adjacency Matrix and List",
+    "difficulty": "medium",
+    "prompt": "A program must answer millions of 'is there an edge between u and v?' queries on a dense graph with 2,000 vertices. Which representation fits best?",
+    "options": [
+      "Adjacency list, because it uses less memory than a matrix on every graph",
+      "Adjacency list stored as plain Python lists, because it always has the fastest edge lookup",
+      "Edge list, because it is sorted by weight",
+      "Adjacency matrix, because each query is an O(1) lookup"
+    ],
+    "correct_index": 3,
+    "explanation": "A matrix gives O(1) edge checks and is not wasteful on dense graphs; plain adjacency lists need O(deg(u)) per check.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_011",
+    "topic": "Graph",
+    "subtopic": "Topological Sort",
+    "difficulty": "medium",
+    "prompt": "During Kahn's algorithm on a DAG, the queue holds two vertices at some step. What does this imply?",
+    "options": [
+      "The graph is disconnected and has no valid order",
+      "The algorithm must be restarted",
+      "The graph contains a cycle",
+      "More than one valid topological order exists"
+    ],
+    "correct_index": 3,
+    "explanation": "Either of the two vertices could come next, so the ordering is not unique.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_012",
+    "topic": "Graph",
+    "subtopic": "Adjacency Matrix and List",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\nfrom collections import defaultdict\ng = defaultdict(list)\nfor u, v in [(1, 2), (2, 3), (1, 3)]:\n    g[u].append(v); g[v].append(u)\nprint(g[3])",
+    "options": [
+      "[3]",
+      "[2, 3, 1]",
+      "[1, 2]",
+      "[2, 1]"
+    ],
+    "correct_index": 3,
+    "explanation": "Edges are processed in order: (2,3) appends 2 to g[3], then (1,3) appends 1, so g[3] is [2, 1].",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_013",
+    "topic": "Graph",
+    "subtopic": "Shortest Path",
+    "difficulty": "medium",
+    "prompt": "Edges: A->B weight 2, A->C weight 5, C->B weight -4. A classic Dijkstra that finalizes a vertex when it is popped from the heap reports what distance to B, and what is the true shortest distance?",
+    "options": [
+      "It reports 1, which is correct",
+      "It reports 5, but the true distance is 2",
+      "It reports 2, which is correct",
+      "It reports 2, but the true shortest distance is 1 (via A -> C -> B)"
+    ],
+    "correct_index": 3,
+    "explanation": "B is finalized with distance 2 before the negative edge C->B is considered, so Dijkstra misses the cheaper path.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_014",
+    "topic": "Graph",
+    "subtopic": "Graph Introduction",
+    "difficulty": "medium",
+    "prompt": "A connected undirected graph has 6 vertices and 5 edges. Which statement is true?",
+    "options": [
+      "It is disconnected",
+      "It is a tree, so it contains no cycle",
+      "It must contain a vertex of degree 5",
+      "It must contain exactly one cycle"
+    ],
+    "correct_index": 1,
+    "explanation": "A connected graph with V vertices and V - 1 edges is a tree; adding any further edge would create a cycle.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_015",
+    "topic": "Graph",
+    "subtopic": "Graph Introduction",
+    "difficulty": "medium",
+    "prompt": "An undirected graph has E edges and is stored as an adjacency list. What is the total number of entries across all the lists?",
+    "options": [
+      "E",
+      "2E",
+      "E / 2",
+      "V + E"
+    ],
+    "correct_index": 1,
+    "explanation": "Each undirected edge (u, v) appears once in u's list and once in v's list.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_016",
+    "topic": "Graph",
+    "subtopic": "BFS",
+    "difficulty": "medium",
+    "prompt": "A graph has two connected components. A single BFS started from vertex 0 finishes. Which statement is correct?",
+    "options": [
+      "Only vertices at even distance from 0 were visited",
+      "Only the vertices in 0's component were visited; to cover the whole graph, BFS must be restarted from unvisited vertices",
+      "All vertices were visited, because BFS follows edges between components",
+      "BFS fails with an error on disconnected graphs"
+    ],
+    "correct_index": 1,
+    "explanation": "BFS reaches only what is reachable from its start vertex.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_017",
+    "topic": "Graph",
+    "subtopic": "Adjacency Matrix and List",
+    "difficulty": "medium",
+    "prompt": "In a weighted adjacency matrix, why should 'no edge' usually be stored as infinity rather than 0?",
+    "options": [
+      "Because 0 may be a legitimate edge weight, so it would be confused with an existing edge",
+      "Because infinity makes the matrix symmetric",
+      "Because 0 cannot be stored in a Python list",
+      "Because infinity reduces the memory used"
+    ],
+    "correct_index": 0,
+    "explanation": "Using a sentinel that cannot be a real weight avoids ambiguity between 'weight 0' and 'no edge'.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_018",
+    "topic": "Graph",
+    "subtopic": "Shortest Path",
+    "difficulty": "medium",
+    "prompt": "Which algorithm computes shortest paths between all pairs of vertices using dynamic programming over intermediate vertices, in O(V³) time?",
+    "options": [
+      "Prim's algorithm",
+      "Floyd-Warshall",
+      "Depth-first search",
+      "Kahn's algorithm"
+    ],
+    "correct_index": 1,
+    "explanation": "Floyd-Warshall updates dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]) for each intermediate vertex k.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_019",
+    "topic": "Graph",
+    "subtopic": "BFS",
+    "difficulty": "medium",
+    "prompt": "A BFS implementation marks a vertex as visited only when it is dequeued, not when it is enqueued. What is the consequence?",
+    "options": [
+      "The same vertex can be enqueued several times before it is processed, which wastes time and memory but still yields correct distances",
+      "BFS can no longer reach vertices in cycles",
+      "Shortest distances become wrong for all vertices",
+      "BFS becomes DFS"
+    ],
+    "correct_index": 0,
+    "explanation": "Duplicates can accumulate in the queue (up to one per incoming edge), so mark on enqueue for the O(V+E) bound.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_020",
+    "topic": "Graph",
+    "subtopic": "DFS",
+    "difficulty": "medium",
+    "prompt": "A graph is a tree with root 1: children of 1 are 2 and 3, and 2 has child 4. In what order are vertices finished (post-order) by a DFS that visits children in increasing order?",
+    "options": [
+      "[4, 3, 2, 1]",
+      "[1, 2, 3, 4]",
+      "[4, 2, 3, 1]",
+      "[1, 2, 4, 3]"
+    ],
+    "correct_index": 2,
+    "explanation": "A vertex finishes after all its descendants: 4, then 2, then 3, and finally the root 1.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_021",
+    "topic": "Graph",
+    "subtopic": "Adjacency Matrix and List",
+    "difficulty": "medium",
+    "prompt": "A directed graph is stored as an adjacency list of out-neighbors. How long does it take to compute the in-degree of every vertex?",
+    "options": [
+      "O(1), because in-degrees are stored in the list",
+      "O(V + E), by scanning all lists once and incrementing a counter for each target",
+      "O(V²), because each vertex must be compared with every other vertex",
+      "O(E log V), because the edges must be sorted first"
+    ],
+    "correct_index": 1,
+    "explanation": "Every edge is seen once, and each time its target's counter is incremented; initializing the counters costs O(V).",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_022",
+    "topic": "Graph",
+    "subtopic": "BFS",
+    "difficulty": "medium",
+    "prompt": "What is the worst-case space used by the BFS queue on a graph with V vertices?",
+    "options": [
+      "O(E²), since each edge is stored twice",
+      "O(1), since only one vertex is processed at a time",
+      "O(log V), since the queue holds one path",
+      "O(V), for example in a star graph where all leaves are enqueued together"
+    ],
+    "correct_index": 3,
+    "explanation": "The queue can hold an entire level, which may contain almost all vertices.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_023",
+    "topic": "Graph",
+    "subtopic": "DFS",
+    "difficulty": "medium",
+    "prompt": "What does this DFS print?\ng = {1: [2, 3], 2: [4], 3: [4], 4: []}\nseen = []\ndef dfs(u):\n    seen.append(u)\n    for v in g[u]:\n        if v not in seen: dfs(v)\ndfs(1); print(seen)",
+    "options": [
+      "[1, 2, 4, 3]",
+      "[1, 3, 4, 2]",
+      "[1, 2, 3, 4]",
+      "[1, 2, 4, 3, 4]"
+    ],
+    "correct_index": 0,
+    "explanation": "DFS goes 1 -> 2 -> 4, backtracks, and then visits 3; vertex 4 is already seen when 3 examines it.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_024",
+    "topic": "Graph",
+    "subtopic": "Shortest Path",
+    "difficulty": "medium",
+    "prompt": "What does this Dijkstra code print?\nimport heapq\ng = {'A': [('B', 4), ('C', 1)], 'C': [('B', 2)], 'B': []}\nd, h = {'A': 0}, [(0, 'A')]\nwhile h:\n    w, u = heapq.heappop(h)\n    for v, c in g[u]:\n        if w + c < d.get(v, 99): d[v] = w + c; heapq.heappush(h, (w + c, v))\nprint(d['B'])",
+    "options": [
+      "3",
+      "4",
+      "1",
+      "2"
+    ],
+    "correct_index": 0,
+    "explanation": "A reaches C with cost 1, then B via C with cost 1 + 2 = 3, which beats the direct edge of cost 4.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_025",
+    "topic": "Graph",
+    "subtopic": "Topological Sort",
+    "difficulty": "medium",
+    "prompt": "A directed graph has a valid topological ordering if and only if it is:",
+    "options": [
+      "A directed acyclic graph (DAG)",
+      "A tree",
+      "Connected",
+      "Undirected"
+    ],
+    "correct_index": 0,
+    "explanation": "A cycle would require some vertex to come both before and after another, so an ordering exists exactly when there is no directed cycle.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_026",
+    "topic": "Graph",
+    "subtopic": "Applications",
+    "difficulty": "medium",
+    "prompt": "During BFS on an undirected graph you find an edge connecting two vertices at the same BFS level. What does this imply?",
+    "options": [
+      "The two vertices are at distance 0 from each other",
+      "The graph is a tree",
+      "The graph is bipartite",
+      "The graph contains an odd-length cycle, so it is not bipartite"
+    ],
+    "correct_index": 3,
+    "explanation": "Two same-level vertices plus their paths to a common ancestor form an odd cycle (2k+1 edges), which rules out a 2-coloring.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_027",
+    "topic": "Graph",
+    "subtopic": "DFS",
+    "difficulty": "medium",
+    "prompt": "DFS is started at vertex s in a directed graph. Which vertices does it visit?",
+    "options": [
+      "Exactly the vertices reachable from s by following edge directions",
+      "Every vertex of the graph",
+      "Only the out-neighbors of s",
+      "Only vertices that can reach s"
+    ],
+    "correct_index": 0,
+    "explanation": "DFS follows edges forward, so it marks precisely the vertices that have a directed path from s.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_028",
+    "topic": "Graph",
+    "subtopic": "Applications",
+    "difficulty": "medium",
+    "prompt": "BFS on an R x C grid moves in 4 directions between open cells. What is its time complexity?",
+    "options": [
+      "O(R + C)",
+      "O(R * C)",
+      "O(R * C * log(R * C))",
+      "O((R * C)²)"
+    ],
+    "correct_index": 1,
+    "explanation": "Each cell is enqueued at most once and has at most 4 neighbors, so the work is proportional to the number of cells.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_029",
+    "topic": "Graph",
+    "subtopic": "Topological Sort",
+    "difficulty": "medium",
+    "prompt": "In a DFS-based cycle check for a DIRECTED graph, which condition signals a cycle?",
+    "options": [
+      "An edge from the current vertex to any previously visited vertex",
+      "A vertex with in-degree greater than 1",
+      "An edge from the current vertex to a vertex that is still on the current recursion stack",
+      "An edge from the current vertex to its parent"
+    ],
+    "correct_index": 2,
+    "explanation": "Edges to already finished vertices (e.g., cross or forward edges) are harmless in a directed graph; only a back edge to an active ancestor closes a cycle.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_030",
+    "topic": "Graph",
+    "subtopic": "Applications",
+    "difficulty": "medium",
+    "prompt": "What does this connected-components code print?\ng = {0: [1], 1: [0], 2: [3], 3: [2], 4: []}\nseen, c = set(), 0\ndef dfs(u):\n    seen.add(u)\n    for v in g[u]:\n        if v not in seen: dfs(v)\nfor u in g:\n    if u not in seen: dfs(u); c += 1\nprint(c)",
+    "options": [
+      "5",
+      "2",
+      "4",
+      "3"
+    ],
+    "correct_index": 3,
+    "explanation": "The components are {0,1}, {2,3} and {4}, so DFS is started three times.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_031",
+    "topic": "Graph",
+    "subtopic": "BFS",
+    "difficulty": "medium",
+    "prompt": "An undirected graph has edges 0-1, 0-2, 1-3, 2-3, 2-4. How many vertices are at distance exactly 2 from vertex 0?",
+    "options": [
+      "1",
+      "4",
+      "3",
+      "2 (vertices 3 and 4)"
+    ],
+    "correct_index": 3,
+    "explanation": "Distance 1: vertices 1 and 2. Distance 2: vertex 3 (via 1 or 2) and vertex 4 (via 2).",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_032",
+    "topic": "Graph",
+    "subtopic": "Shortest Path",
+    "difficulty": "medium",
+    "prompt": "Dijkstra's algorithm requires which condition on the edge weights?",
+    "options": [
+      "All edge weights must be distinct",
+      "All edge weights must be integers",
+      "All edge weights must be non-negative",
+      "All edge weights must be equal"
+    ],
+    "correct_index": 2,
+    "explanation": "Dijkstra's greedy choice assumes that extending a path can never make it shorter, which fails with negative weights.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_033",
+    "topic": "Graph",
+    "subtopic": "Shortest Path",
+    "difficulty": "medium",
+    "prompt": "What is the time complexity of Dijkstra's algorithm using an adjacency list and a binary heap?",
+    "options": [
+      "O(V * E)",
+      "O(V³)",
+      "O(V + E)",
+      "O((V + E) log V)"
+    ],
+    "correct_index": 3,
+    "explanation": "Each edge relaxation can cause one heap push of cost O(log V), and each vertex is popped from the heap, so the bound is (V + E) log V.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_034",
+    "topic": "Graph",
+    "subtopic": "DFS",
+    "difficulty": "medium",
+    "prompt": "What is the worst-case recursion depth of recursive DFS on a connected graph with V vertices?",
+    "options": [
+      "O(V), for example on a path-shaped graph",
+      "O(E²)",
+      "O(log V) always",
+      "O(1), because the call stack is reused"
+    ],
+    "correct_index": 0,
+    "explanation": "On a path, each vertex's call is nested in the previous one, producing V nested calls.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_035",
+    "topic": "Graph",
+    "subtopic": "Graph Introduction",
+    "difficulty": "medium",
+    "prompt": "Which kind of graph cannot be represented correctly by a 0/1 adjacency matrix?",
+    "options": [
+      "A directed graph",
+      "A multigraph with several parallel edges between the same pair of vertices",
+      "An unweighted graph",
+      "A graph with a vertex of degree 0"
+    ],
+    "correct_index": 1,
+    "explanation": "A single 0/1 cell can record only whether an edge exists, not how many parallel edges there are.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_036",
+    "topic": "Graph",
+    "subtopic": "Topological Sort",
+    "difficulty": "medium",
+    "prompt": "How can a topological order be produced using DFS?",
+    "options": [
+      "Output vertices in increasing order of degree",
+      "Output vertices in the order they are first discovered",
+      "Run DFS on all vertices and output them in reverse order of finishing time",
+      "Output vertices in the order of their finishing times, unreversed"
+    ],
+    "correct_index": 2,
+    "explanation": "A vertex finishes only after all vertices reachable from it, so reversing the finishing order puts every vertex before its successors.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_037",
+    "topic": "Graph",
+    "subtopic": "Shortest Path",
+    "difficulty": "medium",
+    "prompt": "A graph has edges A-B (weight 10), A-C (weight 1) and C-B (weight 1). What goes wrong if BFS is used to find the cheapest path from A to B?",
+    "options": [
+      "BFS cannot reach B at all",
+      "BFS returns A-C-B because it has more vertices",
+      "BFS finds the cost 2 path but reports the cost as 1",
+      "BFS returns the direct edge A-B (1 edge, cost 10) instead of A-C-B (2 edges, cost 2)"
+    ],
+    "correct_index": 3,
+    "explanation": "BFS minimizes the number of edges, not the total weight, so it is only correct for unweighted graphs.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_038",
+    "topic": "Graph",
+    "subtopic": "DFS",
+    "difficulty": "medium",
+    "prompt": "What is the time complexity of DFS on a graph stored as an adjacency matrix with V vertices?",
+    "options": [
+      "O(V + E)",
+      "O(V)",
+      "O(V²)",
+      "O(E log V)"
+    ],
+    "correct_index": 2,
+    "explanation": "Finding the neighbors of each vertex requires scanning a full row of length V, so the total is V * V.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_039",
+    "topic": "Graph",
+    "subtopic": "Topological Sort",
+    "difficulty": "medium",
+    "prompt": "What does this Kahn's algorithm code print?\ng = {'a': ['b', 'c'], 'b': ['d'], 'c': ['d'], 'd': []}\nindeg, q, out = {'a': 0, 'b': 1, 'c': 1, 'd': 2}, ['a'], []\nwhile q:\n    u = q.pop(0); out.append(u)\n    for v in g[u]:\n        indeg[v] -= 1\n        if indeg[v] == 0: q.append(v)\nprint(out)",
+    "options": [
+      "['a', 'b', 'c', 'd']",
+      "['a', 'c', 'b', 'd']",
+      "['a', 'b', 'd', 'c']",
+      "['a', 'd', 'b', 'c']"
+    ],
+    "correct_index": 0,
+    "explanation": "After a, both b and c reach in-degree 0 and are queued in adjacency order; d is queued only when both have been processed.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_medium_040",
+    "topic": "Graph",
+    "subtopic": "BFS",
+    "difficulty": "medium",
+    "prompt": "What does this BFS distance code print?\nfrom collections import deque\ng = {'A': ['B', 'C'], 'B': ['D'], 'C': ['D'], 'D': []}\nd, q = {'A': 0}, deque('A')\nwhile q:\n    u = q.popleft()\n    for v in g[u]:\n        if v not in d: d[v] = d[u] + 1; q.append(v)\nprint(d['D'])",
+    "options": [
+      "3",
+      "0",
+      "1",
+      "2"
+    ],
+    "correct_index": 3,
+    "explanation": "D is reached via B or C, both of which are one step from A, so its distance is 2.",
+    "source": "custom_mcq"
+  }
+]

@@ -1,0 +1,642 @@
+[
+  {
+    "id": "mcq_gr_hard_001",
+    "topic": "Graph",
+    "subtopic": "Adjacency Matrix and List",
+    "difficulty": "hard",
+    "prompt": "For a dense graph (E close to V²), which Dijkstra implementation has the best asymptotic running time?",
+    "options": [
+      "Adjacency matrix with a linear scan, O(V³)",
+      "Binary heap with adjacency list, O((V + E) log V), because heaps are always faster",
+      "Adjacency matrix with a linear scan for the minimum, O(V²), which beats the binary-heap version's O(V² log V)",
+      "Both are O(V log V)"
+    ],
+    "correct_index": 2,
+    "explanation": "With E ~ V², the heap version costs O(E log V) = O(V² log V), while the array version costs O(V²) for V minimum-scans plus V² relaxations.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_002",
+    "topic": "Graph",
+    "subtopic": "Shortest Path",
+    "difficulty": "hard",
+    "prompt": "How does Bellman-Ford detect a negative cycle reachable from the source?",
+    "options": [
+      "If any edge can still be relaxed after V - 1 full passes over all edges",
+      "If the priority queue becomes empty",
+      "If some vertex is visited twice during DFS",
+      "If any distance is negative after the first pass"
+    ],
+    "correct_index": 0,
+    "explanation": "Without a negative cycle, shortest paths have at most V - 1 edges and are final after V - 1 passes; a further improvement proves a negative cycle.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_003",
+    "topic": "Graph",
+    "subtopic": "DFS",
+    "difficulty": "hard",
+    "prompt": "This three-color DFS cycle check runs on a directed graph with a cycle 1 -> 2 -> 3 -> 1. What does it print?\ng = {0: [1], 1: [2], 2: [3], 3: [1]}\ncolor = {u: 0 for u in g}\ndef dfs(u):\n    color[u] = 1\n    for v in g[u]:\n        if color[v] == 1 or (color[v] == 0 and dfs(v)): return True\n    color[u] = 2\nprint(dfs(0), color)",
+    "options": [
+      "True {0: 1, 1: 1, 2: 1, 3: 1}",
+      "True {0: 2, 1: 2, 2: 2, 3: 2}",
+      "False {0: 2, 1: 2, 2: 2, 3: 2}",
+      "None {0: 1, 1: 1, 2: 1, 3: 1}"
+    ],
+    "correct_index": 0,
+    "explanation": "When vertex 3 sees vertex 1 in state 1 (on the stack), True is returned immediately and propagates up; no vertex reaches state 2 because the early returns skip color[u] = 2.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_004",
+    "topic": "Graph",
+    "subtopic": "Graph Introduction",
+    "difficulty": "hard",
+    "prompt": "A DAG is given. When does adding a new directed edge u -> v create a cycle?",
+    "options": [
+      "Exactly when there is already a directed path from v to u",
+      "Never; adding an edge to a DAG can never create a cycle",
+      "Exactly when v has in-degree 0",
+      "Exactly when u and v are adjacent"
+    ],
+    "correct_index": 0,
+    "explanation": "The new edge closes the loop v ~> u -> v if and only if v can already reach u.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_005",
+    "topic": "Graph",
+    "subtopic": "Shortest Path",
+    "difficulty": "hard",
+    "prompt": "This lazy Dijkstra counts heap pops. What does it print (distance to vertex 3, number of pops)?\nimport heapq\ng = {0: [(1, 1), (2, 4)], 1: [(2, 2), (3, 6)], 2: [(3, 3)], 3: []}\nd, h, pops = {0: 0}, [(0, 0)], 0\nwhile h:\n    w, u = heapq.heappop(h); pops += 1\n    if w > d[u]: continue\n    for v, c in g[u]:\n        if w + c < d.get(v, 99): d[v] = w + c; heapq.heappush(h, (w + c, v))\nprint(d[3], pops)",
+    "options": [
+      "6 6",
+      "6 5",
+      "6 4",
+      "7 6"
+    ],
+    "correct_index": 0,
+    "explanation": "Pushes: (0,0), (1,1), (4,2), (3,2), (7,3), (6,3) = 6 entries, all popped; the stale entries (4,2) and (7,3) are skipped. Distance to 3 is 1 + 2 + 3 = 6.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_006",
+    "topic": "Graph",
+    "subtopic": "Applications",
+    "difficulty": "hard",
+    "prompt": "What dominates the running time of Kruskal's algorithm on a graph with V vertices and E edges?",
+    "options": [
+      "The union-find operations, O(E²)",
+      "Sorting the edges, which costs O(E log E) = O(E log V)",
+      "Maintaining the heap of vertices, O(V²)",
+      "Running DFS from every vertex, O(V * E)"
+    ],
+    "correct_index": 1,
+    "explanation": "Union-find with path compression and union by rank is nearly constant per operation, so sorting dominates.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_007",
+    "topic": "Graph",
+    "subtopic": "Graph Introduction",
+    "difficulty": "hard",
+    "prompt": "Which undirected simple graph is impossible?",
+    "options": [
+      "5 vertices, each of degree 3",
+      "6 vertices, each of degree 2",
+      "6 vertices, each of degree 3",
+      "4 vertices, each of degree 3"
+    ],
+    "correct_index": 0,
+    "explanation": "The degree sum must be even (it is twice the number of edges); 5 * 3 = 15 is odd. The other three exist (K4, K3,3, and two triangles).",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_008",
+    "topic": "Graph",
+    "subtopic": "DFS",
+    "difficulty": "hard",
+    "prompt": "Which type of non-tree edge can NOT occur in a DFS of an undirected graph?",
+    "options": [
+      "A back edge to an ancestor",
+      "An edge between a vertex and its parent",
+      "A cross edge connecting vertices in different subtrees that are not ancestor and descendant",
+      "A back edge to a descendant (seen from the ancestor's side)"
+    ],
+    "correct_index": 2,
+    "explanation": "In an undirected graph, if a cross edge existed, DFS would have explored it from whichever endpoint was visited first, making it a tree edge, so every non-tree edge joins an ancestor and a descendant.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_009",
+    "topic": "Graph",
+    "subtopic": "Topological Sort",
+    "difficulty": "hard",
+    "prompt": "How do you modify Kahn's algorithm to output the lexicographically smallest topological order?",
+    "options": [
+      "Sort the vertices once at the start and run a normal queue",
+      "Replace the queue with a stack",
+      "Run Kahn's algorithm on the transposed graph",
+      "Replace the FIFO queue with a min-heap of the vertices whose in-degree is 0"
+    ],
+    "correct_index": 3,
+    "explanation": "At each step, taking the smallest available vertex gives the smallest order; a heap supports this in O(log V) per operation.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_010",
+    "topic": "Graph",
+    "subtopic": "Shortest Path",
+    "difficulty": "hard",
+    "prompt": "What is the purpose of the reweighting step w'(u, v) = w(u, v) + h(u) - h(v) in Johnson's algorithm, where h comes from Bellman-Ford?",
+    "options": [
+      "It adds a constant to every edge so all paths get the same length",
+      "It converts the graph into a DAG",
+      "It removes all cycles from the graph",
+      "It makes all edge weights non-negative while preserving which paths are shortest, so Dijkstra can be run from every source"
+    ],
+    "correct_index": 3,
+    "explanation": "The potential terms telescope along any path (adding h(s) - h(t)), so every s-t path shifts by the same amount; h guarantees w' >= 0.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_011",
+    "topic": "Graph",
+    "subtopic": "Adjacency Matrix and List",
+    "difficulty": "hard",
+    "prompt": "A directed graph is stored as an adjacency list of out-neighbors. What is the cost of building its transpose (all edges reversed) as another adjacency list?",
+    "options": [
+      "O(E log E)",
+      "O(V * E)",
+      "O(V²)",
+      "O(V + E)"
+    ],
+    "correct_index": 3,
+    "explanation": "Scan every edge (u, v) once and append u to the new list of v; creating the V empty lists costs O(V).",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_012",
+    "topic": "Graph",
+    "subtopic": "Adjacency Matrix and List",
+    "difficulty": "hard",
+    "prompt": "A graph is stored as a list of Python sets (one set of neighbors per vertex). Which statement is correct?",
+    "options": [
+      "Edge lookup is O(1) on average and neighbor iteration is O(deg(u)), using O(V + E) space",
+      "Edge lookup is O(log V) because sets are balanced trees",
+      "Edge lookup is O(1) but neighbor iteration takes O(V)",
+      "Edge lookup is O(V) and space is O(V²)"
+    ],
+    "correct_index": 0,
+    "explanation": "Hash sets combine adjacency-list space efficiency with average constant-time membership checks.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_013",
+    "topic": "Graph",
+    "subtopic": "Applications",
+    "difficulty": "hard",
+    "prompt": "Which statement about minimum spanning trees (the cut property) is correct?",
+    "options": [
+      "For any cut of the graph, a minimum-weight edge crossing the cut belongs to some MST",
+      "Every MST contains the minimum-weight path between any two vertices",
+      "The heaviest edge of every cycle must be in the MST",
+      "The lightest edge at each vertex must be the only MST edge at that vertex"
+    ],
+    "correct_index": 0,
+    "explanation": "The cut property justifies both Prim's and Kruskal's greedy choices; it is the heaviest edge of a cycle that can be excluded, not included.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_014",
+    "topic": "Graph",
+    "subtopic": "Shortest Path",
+    "difficulty": "hard",
+    "prompt": "This BFS counts shortest paths from vertex 0. What does it print?\nfrom collections import deque\ng = {0: [1, 2], 1: [3], 2: [3], 3: [4], 4: []}\ndist, ways, q = {0: 0}, {0: 1}, deque([0])\nwhile q:\n    u = q.popleft()\n    for v in g[u]:\n        if v not in dist: dist[v] = dist[u] + 1; ways[v] = 0; q.append(v)\n        if dist[v] == dist[u] + 1: ways[v] += ways[u]\nprint(ways[4])",
+    "options": [
+      "2",
+      "3",
+      "1",
+      "4"
+    ],
+    "correct_index": 0,
+    "explanation": "There are 2 shortest paths to vertex 3 (via 1 or via 2), and vertex 4 inherits that count since its only shortest path continues through 3.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_015",
+    "topic": "Graph",
+    "subtopic": "Graph Introduction",
+    "difficulty": "hard",
+    "prompt": "In a functional graph (every vertex has exactly one outgoing edge), Floyd's tortoise-and-hare is run from vertex 0. What does this code print?\nnxt = [1, 2, 3, 4, 2]\ns = f = 0\nwhile True:\n    s, f = nxt[s], nxt[nxt[f]]\n    if s == f: break\nprint(s)",
+    "options": [
+      "3",
+      "1",
+      "2",
+      "4"
+    ],
+    "correct_index": 0,
+    "explanation": "The pointers meet at vertex 3, which is inside the cycle 2 -> 3 -> 4 -> 2 but not the cycle's entry (2); finding the entry needs a second phase.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_016",
+    "topic": "Graph",
+    "subtopic": "Graph Introduction",
+    "difficulty": "hard",
+    "prompt": "In a DFS of an undirected graph with discovery times disc[] and low-link values low[], when is a non-root vertex u an articulation point?",
+    "options": [
+      "When u has the largest discovery time",
+      "When u has a child v with low[v] < disc[u]",
+      "When u has a child v in the DFS tree with low[v] >= disc[u]",
+      "When u has exactly one child"
+    ],
+    "correct_index": 2,
+    "explanation": "low[v] >= disc[u] means v's subtree cannot reach above u without going through u, so removing u disconnects that subtree.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_017",
+    "topic": "Graph",
+    "subtopic": "BFS",
+    "difficulty": "hard",
+    "prompt": "A graph has branching factor b and the shortest s-t path has d edges. How does bidirectional BFS (searching from both s and t) compare with ordinary BFS in vertices explored?",
+    "options": [
+      "O(d), since it always follows a single path",
+      "About O(b^(d/2)) instead of O(b^d), because each search only needs to reach half the depth",
+      "O(b * d), since the two searches share a queue",
+      "Exactly the same, since both searches together cover the same levels"
+    ],
+    "correct_index": 1,
+    "explanation": "Two frontiers of depth d/2 each contain about b^(d/2) vertices, which is much smaller than b^d.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_018",
+    "topic": "Graph",
+    "subtopic": "Applications",
+    "difficulty": "hard",
+    "prompt": "When is the minimum spanning tree of a connected weighted graph guaranteed to be unique?",
+    "options": [
+      "Always, for every connected graph",
+      "Only when the graph is a tree already",
+      "Only when the graph has fewer than 10 vertices",
+      "When all edge weights are distinct"
+    ],
+    "correct_index": 3,
+    "explanation": "Distinct weights remove ties in the greedy choices, so each cut has a single lightest edge; with equal weights several MSTs may exist.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_019",
+    "topic": "Graph",
+    "subtopic": "BFS",
+    "difficulty": "hard",
+    "prompt": "What is the time complexity of finding the length of the shortest cycle (girth) of an undirected unweighted graph by running BFS from every vertex?",
+    "options": [
+      "O(V²) regardless of E",
+      "O(E log V)",
+      "O(V * (V + E))",
+      "O(V + E)"
+    ],
+    "correct_index": 2,
+    "explanation": "One BFS costs O(V + E); running it from each of the V vertices and checking for non-tree edges gives V * (V + E).",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_020",
+    "topic": "Graph",
+    "subtopic": "Adjacency Matrix and List",
+    "difficulty": "hard",
+    "prompt": "BFS is implemented on a graph given only as an unsorted list of E edges (no adjacency structure), scanning the whole list every time a vertex is expanded. What is the total running time?",
+    "options": [
+      "O(V²)",
+      "O(V * E)",
+      "O(V + E)",
+      "O(E log V)"
+    ],
+    "correct_index": 1,
+    "explanation": "Each of the V vertex expansions scans all E edges to find its neighbors, giving V * E operations.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_021",
+    "topic": "Graph",
+    "subtopic": "Graph Introduction",
+    "difficulty": "hard",
+    "prompt": "Kosaraju's algorithm finds strongly connected components of a directed graph. Which description is correct?",
+    "options": [
+      "Run Kruskal's algorithm on G and read off the components",
+      "Run DFS on G to get finishing times, then run DFS on the transpose graph, starting vertices in decreasing finishing time; each DFS tree is one SCC",
+      "Run DFS on G twice, starting from the vertex with the lowest degree each time",
+      "Run BFS twice on G and intersect the results"
+    ],
+    "correct_index": 1,
+    "explanation": "The vertex with the largest finishing time lies in a source SCC of G, which is a sink SCC of the transpose, so the second DFS cannot leak into other components.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_022",
+    "topic": "Graph",
+    "subtopic": "Topological Sort",
+    "difficulty": "hard",
+    "prompt": "A DAG has a UNIQUE topological ordering if and only if:",
+    "options": [
+      "Every vertex has in-degree at most 1",
+      "It is a tree",
+      "It has exactly V - 1 edges",
+      "It has a directed path through all vertices (a Hamiltonian path), i.e., an edge between every pair of consecutive vertices in the order"
+    ],
+    "correct_index": 3,
+    "explanation": "If consecutive vertices in the order are joined by edges, none can swap; if some pair of consecutive vertices has no edge, swapping them gives another valid order.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_023",
+    "topic": "Graph",
+    "subtopic": "BFS",
+    "difficulty": "hard",
+    "prompt": "A bipartiteness check on a possibly DISCONNECTED undirected graph runs one BFS 2-coloring starting from vertex 0 and reports 'bipartite' if no conflict is found. Why can this be wrong?",
+    "options": [
+      "BFS cannot 2-color graphs that contain even cycles",
+      "Components not reachable from vertex 0 are never examined, and one of them may contain an odd cycle",
+      "The check fails only when vertex 0 has degree 0",
+      "A single BFS always colors all vertices, so the check is correct"
+    ],
+    "correct_index": 1,
+    "explanation": "The algorithm must be restarted from every uncolored vertex so each component is tested.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_024",
+    "topic": "Graph",
+    "subtopic": "Graph Introduction",
+    "difficulty": "hard",
+    "prompt": "An undirected graph has c connected components. What is the minimum number of edges that must be added to make it connected?",
+    "options": [
+      "c - 1",
+      "c / 2",
+      "c",
+      "V - c"
+    ],
+    "correct_index": 0,
+    "explanation": "Each added edge can merge at most two components, and c components need c - 1 merges.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_025",
+    "topic": "Graph",
+    "subtopic": "Topological Sort",
+    "difficulty": "hard",
+    "prompt": "Which statement about the longest path problem is correct?",
+    "options": [
+      "It is NP-hard even on DAGs",
+      "It can be solved with Dijkstra by negating all weights in any graph",
+      "In a DAG it can be solved in O(V + E) by dynamic programming over a topological order, but for general graphs with cycles it is NP-hard",
+      "It can be solved in O(V + E) for every directed graph"
+    ],
+    "correct_index": 2,
+    "explanation": "In a DAG, longest[v] = max over predecessors u of longest[u] + w(u, v), computed in topological order.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_026",
+    "topic": "Graph",
+    "subtopic": "Graph Introduction",
+    "difficulty": "hard",
+    "prompt": "What is the maximum number of edges in a directed acyclic graph with V vertices (no self-loops, no parallel edges)?",
+    "options": [
+      "V²",
+      "V - 1",
+      "V(V - 1) / 2",
+      "V(V - 1)"
+    ],
+    "correct_index": 2,
+    "explanation": "Follow a topological order: each vertex can have an edge to every later vertex, giving V-1 + V-2 + ... + 0 = V(V-1)/2; edges in both directions would form a cycle.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_027",
+    "topic": "Graph",
+    "subtopic": "Topological Sort",
+    "difficulty": "hard",
+    "prompt": "A DAG has edges 1->2, 1->3, 2->4, 3->4 and an isolated vertex 5. How many valid topological orders does it have?",
+    "options": [
+      "5",
+      "2",
+      "10",
+      "24"
+    ],
+    "correct_index": 2,
+    "explanation": "The vertices 1, 2, 3, 4 have 2 valid orders (2 and 3 may swap), and the isolated vertex 5 can be inserted into any of the 5 positions: 2 * 5 = 10.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_028",
+    "topic": "Graph",
+    "subtopic": "Shortest Path",
+    "difficulty": "hard",
+    "prompt": "Which approach computes single-source shortest paths in a weighted DAG, even with negative edge weights, in O(V + E)?",
+    "options": [
+      "Process vertices in topological order and relax each vertex's outgoing edges once",
+      "Run Bellman-Ford for V - 1 passes",
+      "Run BFS and multiply distances by the average weight",
+      "Run Dijkstra with a binary heap"
+    ],
+    "correct_index": 0,
+    "explanation": "In topological order, all edges into a vertex have been relaxed before it is processed, so each edge needs only one relaxation and negative weights are harmless.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_029",
+    "topic": "Graph",
+    "subtopic": "Adjacency Matrix and List",
+    "difficulty": "hard",
+    "prompt": "An undirected graph is stored as adjacency lists (Python lists) and vertex v must be deleted along with all its edges. What is the worst-case cost compared with an adjacency matrix where the row and column of v are cleared?",
+    "options": [
+      "O(V + E) for lists, because every other vertex's list may need scanning; O(V) for clearing the matrix row and column",
+      "O(V²) for lists and O(1) for the matrix",
+      "O(deg(v)) for both representations",
+      "O(1) for lists and O(V²) for the matrix"
+    ],
+    "correct_index": 0,
+    "explanation": "Removing v from the list of each neighbor needs a search through that list (scanning all lists in the worst case), while the matrix only needs v's row and column zeroed.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_030",
+    "topic": "Graph",
+    "subtopic": "Applications",
+    "difficulty": "hard",
+    "prompt": "What is the amortized time per operation of union-find with both path compression and union by rank over m operations on n elements?",
+    "options": [
+      "O(n) per operation",
+      "O(1) worst case for every single operation",
+      "O(log n) per operation, in the worst case",
+      "O(α(n)), the inverse Ackermann function, which is at most 4 for any practical input"
+    ],
+    "correct_index": 3,
+    "explanation": "Together the two optimizations yield nearly constant amortized time, a total of O(m α(n)); individual operations can still cost more.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_031",
+    "topic": "Graph",
+    "subtopic": "Shortest Path",
+    "difficulty": "hard",
+    "prompt": "To use Dijkstra on a graph with negative edges, someone adds the same constant c to every edge weight so all weights become non-negative. Why does this NOT work in general?",
+    "options": [
+      "It fails only because the weights stop being integers",
+      "It fails because Dijkstra cannot handle a constant offset",
+      "It works, because every path is shifted by the same amount",
+      "A path's cost increases by c times its number of edges, so paths with different edge counts are penalized unequally and the shortest path can change"
+    ],
+    "correct_index": 3,
+    "explanation": "A 2-edge path gains 2c while a 5-edge path gains 5c, so the ranking of paths can change.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_032",
+    "topic": "Graph",
+    "subtopic": "Applications",
+    "difficulty": "hard",
+    "prompt": "What does this Kruskal code print?\nedges = [(1, 'A', 'B'), (2, 'B', 'C'), (3, 'A', 'C'), (4, 'C', 'D'), (5, 'B', 'D')]\np = {x: x for x in 'ABCD'}\ndef find(x): return x if p[x] == x else find(p[x])\ntot = 0\nfor w, u, v in sorted(edges):\n    if find(u) != find(v): p[find(u)] = find(v); tot += w\nprint(tot)",
+    "options": [
+      "6",
+      "15",
+      "7",
+      "8"
+    ],
+    "correct_index": 2,
+    "explanation": "Kruskal accepts AB (1), BC (2), skips AC (3, same set), accepts CD (4), and skips BD (5), so the total is 1 + 2 + 4 = 7.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_033",
+    "topic": "Graph",
+    "subtopic": "Adjacency Matrix and List",
+    "difficulty": "hard",
+    "prompt": "A directed graph has adjacency matrix A. What does this code print?\nA = [[0, 1, 0, 1], [0, 0, 1, 0], [0, 0, 0, 0], [0, 0, 1, 0]]\nA2 = [[sum(A[i][k] * A[k][j] for k in range(4)) for j in range(4)] for i in range(4)]\nprint(A2[0][2])",
+    "options": [
+      "0",
+      "2",
+      "1",
+      "4"
+    ],
+    "correct_index": 1,
+    "explanation": "A2[i][j] counts walks of length 2 from i to j. From 0 to 2 there are two: 0->1->2 and 0->3->2.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_034",
+    "topic": "Graph",
+    "subtopic": "Shortest Path",
+    "difficulty": "hard",
+    "prompt": "Each edge of a network has a success probability p in (0, 1] and a path's reliability is the product of its edge probabilities. How can you find the most reliable path using Dijkstra?",
+    "options": [
+      "Use edge weights -log(p), which are non-negative and turn products into sums, then find the shortest path",
+      "Use edge weights p directly and find the shortest path",
+      "It cannot be done; the problem is NP-hard",
+      "Use edge weights 1/p and sum them"
+    ],
+    "correct_index": 0,
+    "explanation": "Maximizing a product of probabilities equals minimizing the sum of -log(p), and -log(p) >= 0, so Dijkstra applies.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_035",
+    "topic": "Graph",
+    "subtopic": "BFS",
+    "difficulty": "hard",
+    "prompt": "For any edge (u, v) in an undirected graph, how do the BFS levels of u and v relate when BFS starts at s?",
+    "options": [
+      "They differ by exactly 1",
+      "They are always equal",
+      "They can differ arbitrarily",
+      "They differ by at most 1"
+    ],
+    "correct_index": 3,
+    "explanation": "If level(v) were more than level(u) + 1, v would have been discovered from u at level(u) + 1, a contradiction.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_036",
+    "topic": "Graph",
+    "subtopic": "DFS",
+    "difficulty": "hard",
+    "prompt": "What does this DFS with timestamps print (discovery time of c, finish time of a)?\ng = {'a': ['b', 'c'], 'b': ['c'], 'c': []}\nt, d, f = 0, {}, {}\ndef dfs(u):\n    global t\n    t += 1; d[u] = t\n    for v in g[u]:\n        if v not in d: dfs(v)\n    t += 1; f[u] = t\ndfs('a'); print(d['c'], f['a'])",
+    "options": [
+      "2 6",
+      "3 5",
+      "4 6",
+      "3 6"
+    ],
+    "correct_index": 3,
+    "explanation": "Times: a discovered at 1, b at 2, c at 3; c finishes at 4, b at 5; back in a the edge to c is skipped (already discovered), and a finishes at 6.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_037",
+    "topic": "Graph",
+    "subtopic": "Shortest Path",
+    "difficulty": "hard",
+    "prompt": "In the Floyd-Warshall triple loop, which loop variable must be the OUTERMOST for the algorithm to be correct?",
+    "options": [
+      "The order of the loops does not matter",
+      "j, the destination vertex",
+      "i, the source vertex",
+      "k, the intermediate vertex allowed on the paths"
+    ],
+    "correct_index": 3,
+    "explanation": "The DP stage k means 'paths may use only intermediate vertices 0..k'; stage k must be fully computed from stage k-1 before moving on.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_038",
+    "topic": "Graph",
+    "subtopic": "DFS",
+    "difficulty": "hard",
+    "prompt": "In an undirected multigraph, two parallel edges join u and v. A DFS cycle check skips the neighbor equal to the parent vertex. What goes wrong, and what is the fix?",
+    "options": [
+      "Nothing goes wrong; parallel edges never form cycles",
+      "The DFS loops forever; fix it by limiting recursion depth",
+      "The check reports a cycle for every edge; fix it by deleting all parallel edges first",
+      "The 2-cycle formed by the parallel edges is missed; fix it by skipping only the specific edge (by id) used to arrive, not every edge to the parent"
+    ],
+    "correct_index": 3,
+    "explanation": "Two parallel edges form a cycle of length 2, but skipping by parent vertex ignores both; tracking the parent edge id skips only the one just traversed.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_039",
+    "topic": "Graph",
+    "subtopic": "DFS",
+    "difficulty": "hard",
+    "prompt": "An iterative DFS pushes each unvisited neighbor onto a stack and marks it visited at push time. What does this code print?\ng = {1: [2, 3], 2: [4], 3: [4], 4: []}\nst, seen, out = [1], {1}, []\nwhile st:\n    u = st.pop(); out.append(u)\n    for v in g[u]:\n        if v not in seen: seen.add(v); st.append(v)\nprint(out)",
+    "options": [
+      "[1, 2, 3, 4]",
+      "[1, 3, 4, 2]",
+      "[1, 3, 2, 4]",
+      "[1, 2, 4, 3]"
+    ],
+    "correct_index": 1,
+    "explanation": "Neighbors 2 and 3 are pushed in that order, so 3 is popped first; 4 is then pushed and marked before 2 is popped. The result differs from recursive DFS ([1, 2, 4, 3]).",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_hard_040",
+    "topic": "Graph",
+    "subtopic": "BFS",
+    "difficulty": "hard",
+    "prompt": "BFS and recursive DFS both start at the center of a star graph (one center connected to V - 1 leaves). Which statement is correct?",
+    "options": [
+      "Both use O(1) extra space",
+      "BFS's queue reaches size V - 1, while DFS's recursion depth never exceeds 2",
+      "BFS's queue size stays 1, while DFS's recursion depth reaches V - 1",
+      "Both reach a depth or size of V - 1"
+    ],
+    "correct_index": 1,
+    "explanation": "BFS enqueues all leaves at once; DFS goes center -> leaf -> back, so its stack depth is at most 2.",
+    "source": "custom_mcq"
+  }
+]

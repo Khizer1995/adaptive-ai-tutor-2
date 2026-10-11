@@ -144,13 +144,8 @@ class ValidationAgent:
     def _is_dsa_topic(subject: str, topic: str) -> bool:
         dsa_topics = {
             "array",
-            "linked_list",
-            "linked list",
-            "stack",
             "queue",
-            "hash_table",
-            "hash table",
-            "tree",
+            "graph",
             "graph",
             "sorting",
             "binary_search",

@@ -34,8 +34,7 @@ class TutorAgent:
         "Error handling", "File I/O"
     ]
     dsa_curriculum = [
-        "array", "linked_list", "stack", "queue",
-        "hash_table", "tree", "graph",
+        "array", "queue", "graph",
     ]
 
     def __init__(self):

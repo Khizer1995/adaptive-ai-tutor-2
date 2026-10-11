@@ -1,0 +1,363 @@
+{
+    "student_id": "USER-8212c094",
+    "name": "Student",
+    "level": "beginner",
+    "subject": "dsa",
+    "current_topic": "queue",
+    "progress": [],
+    "engagement": "low",
+    "last_score": 0.0,
+    "learning_history": [
+        {
+            "type": "pretest",
+            "topic": "queue",
+            "subtopic": "queue_introduction",
+            "score": 0.4,
+            "question_count": 10
+        },
+        {
+            "type": "pretest",
+            "topic": "array",
+            "subtopic": "array_multidimensional",
+            "score": 0.5,
+            "question_count": 10
+        },
+        {
+            "timestamp": "2026-10-11T20:12:35.615241+00:00",
+            "topic": "array",
+            "subtopic": "array_multidimensional",
+            "score": 0.0,
+            "question_count": 0
+        },
+        {
+            "type": "pretest",
+            "topic": "array",
+            "subtopic": "array_operations",
+            "score": 0.6666666666666666,
+            "question_count": 6
+        },
+        {
+            "timestamp": "2026-10-11T21:16:10.124094+00:00",
+            "topic": "array",
+            "subtopic": "array_sorting",
+            "score": 0.0,
+            "question_count": 0
+        }
+    ],
+    "frustration_level": 0,
+    "engagement_score": 5,
+    "learning_style": "balanced",
+    "last_active": "2026-10-11T21:17:36.687446+00:00",
+    "accuracy_history": [],
+    "learning_gain_history": [],
+    "learning_gain": 0.0,
+    "normalized_learning_gain": 0.0,
+    "pretest_score": 0.6667,
+    "posttest_score": null,
+    "assessment_scores": {
+        "queue": {
+            "queue_introduction": {
+                "pretest_score": 0.4
+            }
+        },
+        "array": {
+            "array_multidimensional": {
+                "pretest_score": 0.5
+            },
+            "array_operations": {
+                "pretest_score": 0.6667
+            }
+        }
+    },
+    "assessment_history": [
+        {
+            "type": "pretest",
+            "topic": "queue",
+            "subtopic": "queue_introduction",
+            "score": 0.4
+        },
+        {
+            "type": "pretest",
+            "topic": "array",
+            "subtopic": "array_multidimensional",
+            "score": 0.5
+        },
+        {
+            "type": "pretest",
+            "topic": "array",
+            "subtopic": "array_operations",
+            "score": 0.6667
+        }
+    ],
+    "knowledge_state": {
+        "version": 2,
+        "concepts": {
+            "queue": {
+                "mastery": 0.0,
+                "confidence": 0.35,
+                "attempts": 1,
+                "scaffold_level": "high",
+                "weak_areas": [],
+                "strong_areas": [],
+                "completed": false
+            }
+        }
+    },
+    "knowledge_events": [
+        {
+            "topic": "queue",
+            "mastery": 0.4,
+            "confidence": 0.4,
+            "scaffold_level": "high",
+            "observed_score": 0.4
+        },
+        {
+            "topic": "array",
+            "mastery": 0.5,
+            "confidence": 0.4,
+            "scaffold_level": "high",
+            "observed_score": 0.5
+        },
+        {
+            "topic": "array",
+            "mastery": 0.227,
+            "confidence": 0.4,
+            "scaffold_level": "high",
+            "observed_score": 0.0
+        },
+        {
+            "topic": "array",
+            "mastery": 0.0,
+            "confidence": 0.35,
+            "scaffold_level": "high",
+            "observed_score": 0.0
+        },
+        {
+            "topic": "queue",
+            "mastery": 0.0,
+            "confidence": 0.35,
+            "scaffold_level": "high",
+            "observed_score": 0.0
+        },
+        {
+            "topic": "array",
+            "mastery": 0.668,
+            "confidence": 0.4,
+            "scaffold_level": "high",
+            "observed_score": 0.67
+        },
+        {
+            "topic": "array",
+            "mastery": 0.668,
+            "confidence": 0.4,
+            "scaffold_level": "high",
+            "observed_score": 0.67
+        },
+        {
+            "topic": "array",
+            "mastery": 0.668,
+            "confidence": 0.4,
+            "scaffold_level": "high",
+            "observed_score": 0.67
+        },
+        {
+            "topic": "array",
+            "mastery": 0.668,
+            "confidence": 0.4,
+            "scaffold_level": "high",
+            "observed_score": 0.67
+        },
+        {
+            "topic": "array",
+            "mastery": 0.668,
+            "confidence": 0.4,
+            "scaffold_level": "high",
+            "observed_score": 0.67
+        },
+        {
+            "topic": "array",
+            "mastery": 0.668,
+            "confidence": 0.4,
+            "scaffold_level": "high",
+            "observed_score": 0.67
+        },
+        {
+            "topic": "array",
+            "mastery": 0.668,
+            "confidence": 0.4,
+            "scaffold_level": "high",
+            "observed_score": 0.67
+        },
+        {
+            "topic": "array",
+            "mastery": 0.668,
+            "confidence": 0.4,
+            "scaffold_level": "high",
+            "observed_score": 0.67
+        },
+        {
+            "topic": "array",
+            "mastery": 0.668,
+            "confidence": 0.4,
+            "scaffold_level": "high",
+            "observed_score": 0.67
+        },
+        {
+            "topic": "array",
+            "mastery": 0.668,
+            "confidence": 0.4,
+            "scaffold_level": "high",
+            "observed_score": 0.67
+        },
+        {
+            "topic": "array",
+            "mastery": 0.668,
+            "confidence": 0.4,
+            "scaffold_level": "high",
+            "observed_score": 0.67
+        },
+        {
+            "topic": "array",
+            "mastery": 0.668,
+            "confidence": 0.4,
+            "scaffold_level": "high",
+            "observed_score": 0.67
+        },
+        {
+            "topic": "array",
+            "mastery": 0.668,
+            "confidence": 0.4,
+            "scaffold_level": "high",
+            "observed_score": 0.67
+        },
+        {
+            "topic": "array",
+            "mastery": 0.668,
+            "confidence": 0.4,
+            "scaffold_level": "high",
+            "observed_score": 0.67
+        },
+        {
+            "topic": "array",
+            "mastery": 0.668,
+            "confidence": 0.4,
+            "scaffold_level": "high",
+            "observed_score": 0.67
+        },
+        {
+            "topic": "array",
+            "mastery": 0.303,
+            "confidence": 0.4,
+            "scaffold_level": "high",
+            "observed_score": 0.0
+        },
+        {
+            "topic": "array",
+            "mastery": 0.0,
+            "confidence": 0.35,
+            "scaffold_level": "high",
+            "observed_score": 0.0
+        },
+        {
+            "topic": "queue",
+            "mastery": 0.0,
+            "confidence": 0.35,
+            "scaffold_level": "high",
+            "observed_score": 0.0
+        }
+    ],
+    "delivered_chunks": {
+        "queue": {
+            "chunk_ids": [],
+            "concepts": []
+        },
+        "array": {
+            "chunk_ids": [],
+            "concepts": []
+        },
+        "graph": {
+            "chunk_ids": [],
+            "concepts": []
+        }
+    },
+    "current_subtopic": "queue_introduction",
+    "macro_decision": {
+        "macro_action": "stabilize_foundations",
+        "target_concepts": [
+            "queue"
+        ],
+        "scaffold_policy": "high",
+        "reason": "IF last_score (0.00) < 0.45 THEN stabilize foundations with high scaffolding. | Target weakest concept 'queue' based on mastery snapshot (avg_mastery=0.00, avg_confidence=0.00, trend=fluctuating).",
+        "decision_rationale": "IF last_score (0.00) < 0.45 THEN stabilize foundations with high scaffolding. | Target weakest concept 'queue' based on mastery snapshot (avg_mastery=0.00, avg_confidence=0.00, trend=fluctuating)."
+    },
+    "decision": {
+        "next_node": "education_crew",
+        "action": "increase_support",
+        "weights": {
+            "increase_support": 8,
+            "reinforce_basics": 5,
+            "adjust_quiz": 0,
+            "increase_challenge": 0,
+            "challenge_with_variation": 0,
+            "advance_topic": 0,
+            "reduce_support": 0
+        },
+        "fired_weights": [
+            {
+                "action": "increase_support",
+                "total_weight": 8,
+                "reasons": [
+                    "+3: engagement is low",
+                    "+3: last_score 0.00 is below 0.40",
+                    "+2: macro scaffold policy is high"
+                ]
+            },
+            {
+                "action": "reinforce_basics",
+                "total_weight": 5,
+                "reasons": [
+                    "+2: engagement is low",
+                    "+2: last_score 0.00 is below 0.40",
+                    "+1: macro scaffold policy is high"
+                ]
+            }
+        ],
+        "reason": "Deterministic weighted decision with no randomness. | increase_support=8 from +3: engagement is low, +3: last_score 0.00 is below 0.40, +2: macro scaffold policy is high | reinforce_basics=5 from +2: engagement is low, +2: last_score 0.00 is below 0.40, +1: macro scaffold policy is high | Selected 'increase_support' because it had the highest total weight (8). Ties resolve by fixed action order: increase_support, reinforce_basics, adjust_quiz, increase_challenge, challenge_with_variation, advance_topic, reduce_support. | Context used: score=0.00, engagement=low, trend=fluctuating, style=balanced, macro_action=stabilize_foundations, scaffold_policy=high.",
+        "decision_rationale": "Deterministic weighted decision with no randomness. | increase_support=8 from +3: engagement is low, +3: last_score 0.00 is below 0.40, +2: macro scaffold policy is high | reinforce_basics=5 from +2: engagement is low, +2: last_score 0.00 is below 0.40, +1: macro scaffold policy is high | Selected 'increase_support' because it had the highest total weight (8). Ties resolve by fixed action order: increase_support, reinforce_basics, adjust_quiz, increase_challenge, challenge_with_variation, advance_topic, reduce_support. | Context used: score=0.00, engagement=low, trend=fluctuating, style=balanced, macro_action=stabilize_foundations, scaffold_policy=high."
+    },
+    "generated_content_history": {
+        "queue": {
+            "queue_introduction": [
+                {
+                    "timestamp": "2026-10-11T21:17:36.251756+00:00",
+                    "fingerprint": "65fd847d5a74d39e66433a28b8f0e72d8ef0254f0306dbdf7b4f83005fb40128",
+                    "preview": "## queue \u2014 queue_introduction\n\n**Overview**\nA queue is a simple way to organize data where the first item you put in is the first one you take out. It works exactly like a real-life waiting line at a grocery store.\n\n**Key Points**\n*   **Pre",
+                    "metadata": {
+                        "mode": "remedial",
+                        "depth": "beginner",
+                        "score": 0.4
+                    }
+                },
+                {
+                    "timestamp": "2026-10-11T21:17:36.687446+00:00",
+                    "fingerprint": "65fd847d5a74d39e66433a28b8f0e72d8ef0254f0306dbdf7b4f83005fb40128",
+                    "preview": "## queue \u2014 queue_introduction\n\n**Overview**\nA queue is a simple way to organize data where the first item you put in is the first one you take out. It works exactly like a real-life waiting line at a grocery store.\n\n**Key Points**\n*   **Pre",
+                    "metadata": {}
+                }
+            ]
+        }
+    },
+    "content_fingerprints": {
+        "queue": {
+            "queue_introduction": [
+                "65fd847d5a74d39e66433a28b8f0e72d8ef0254f0306dbdf7b4f83005fb40128"
+            ]
+        }
+    },
+    "quiz_seen_questions": {},
+    "quiz_attempts": {},
+    "weak_areas": {},
+    "strong_areas": {},
+    "completed_topics": [],
+    "_rag_latency_ms": 1964.08
+}

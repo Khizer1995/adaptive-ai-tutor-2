@@ -1,0 +1,125 @@
+{
+    "student_id": "USER-0927b796",
+    "name": "Student",
+    "level": "beginner",
+    "subject": "dsa",
+    "current_topic": "queue",
+    "progress": [],
+    "engagement": "medium",
+    "last_score": 0.5,
+    "learning_history": [
+        {
+            "type": "pretest",
+            "topic": "array",
+            "subtopic": "array_sorting",
+            "score": 0.5,
+            "question_count": 8
+        }
+    ],
+    "frustration_level": 0,
+    "engagement_score": 5,
+    "learning_style": "balanced",
+    "last_active": "2026-10-10T10:39:09.106540+00:00",
+    "accuracy_history": [],
+    "learning_gain_history": [],
+    "learning_gain": 0.0,
+    "normalized_learning_gain": 0.0,
+    "pretest_score": 0.5,
+    "posttest_score": null,
+    "assessment_scores": {
+        "array": {
+            "array_sorting": {
+                "pretest_score": 0.5
+            }
+        }
+    },
+    "assessment_history": [
+        {
+            "type": "pretest",
+            "topic": "array",
+            "subtopic": "array_sorting",
+            "score": 0.5
+        }
+    ],
+    "knowledge_state": {
+        "concepts": {
+            "array": {
+                "mastery": 0.29,
+                "confidence": 0.32,
+                "attempts": 1,
+                "scaffold_level": "high",
+                "weak_areas": [],
+                "strong_areas": [],
+                "completed": false
+            },
+            "stack": {
+                "mastery": 0.5,
+                "confidence": 0.35,
+                "attempts": 0,
+                "scaffold_level": "high",
+                "weak_areas": [],
+                "strong_areas": [],
+                "completed": false
+            },
+            "queue": {
+                "mastery": 0.5,
+                "confidence": 0.35,
+                "attempts": 0,
+                "scaffold_level": "high",
+                "weak_areas": [],
+                "strong_areas": [],
+                "completed": false
+            }
+        },
+        "version": 2
+    },
+    "knowledge_events": [
+        {
+            "topic": "array",
+            "mastery": 0.29,
+            "confidence": 0.32,
+            "scaffold_level": "high",
+            "observed_score": 0.5
+        }
+    ],
+    "delivered_chunks": {
+        "array": {
+            "chunk_ids": [
+                "hybrid_0",
+                "hybrid_1",
+                "hybrid_2",
+                "hybrid_3",
+                "hybrid_4",
+                "hybrid_5"
+            ],
+            "concepts": []
+        }
+    },
+    "current_subtopic": "queue_circular",
+    "last_assessment_type": "pretest",
+    "macro_decision": {
+        "macro_action": "guided_progression",
+        "target_concepts": [
+            "array"
+        ],
+        "scaffold_policy": "medium",
+        "reason": "IF the learner is neither at-risk nor clearly ready to accelerate THEN use guided progression with medium scaffolding. | Target weakest concept 'array' based on mastery snapshot (avg_mastery=0.40, avg_confidence=0.33, trend=stable).",
+        "decision_rationale": "IF the learner is neither at-risk nor clearly ready to accelerate THEN use guided progression with medium scaffolding. | Target weakest concept 'array' based on mastery snapshot (avg_mastery=0.40, avg_confidence=0.33, trend=stable)."
+    },
+    "_rag_latency_ms": 69.95,
+    "assessment_seen_questions": {
+        "pretest:queue:queue_circular": [
+            "74da3e3246304d328a0c0cc57d9028f4",
+            "8af5095a6337f29389dfa9acdc694b71",
+            "9e27eb215110bdb10155c4ca2e024316",
+            "a0b2da3bf8ee5c6bdea93af1a8ea6c76"
+        ]
+    },
+    "generated_content_history": {},
+    "content_fingerprints": {},
+    "quiz_seen_questions": {},
+    "quiz_attempts": {},
+    "weak_areas": {},
+    "strong_areas": {},
+    "completed_topics": []
+}

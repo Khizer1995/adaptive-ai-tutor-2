@@ -126,48 +126,121 @@ Persists state to JSON with learning history, assessment scores, knowledge state
 
 ---
 
-## Installation
+## Installation & Setup
+
+### 1. Clone and Navigate
+```bash
+git clone <repository-url>
+cd Capstone_project
+```
+
+### 2. Backend Setup
 
 ```bash
+# Create and activate virtual environment
+# Windows:
+python -m venv venv
+venv\Scripts\activate
 
+# Mac/Linux:
+# python3 -m venv venv
+# source venv/bin/activate
 
-# Install dependencies
+# Install Python dependencies
 pip install -r requirements.txt
 
-# Configure environment (.env)
-GOOGLE_API_KEY=your-gemini-key
-GROQ_API_KEY=your-groq-key
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_KEY=your-anon-key
+# Configure environment variables
+# Copy .env.example to .env and fill in your keys:
+# - GOOGLE_API_KEY (Gemini API)
+# - GROQ_API_KEY (Groq API)
+# - SUPABASE_URL (Your Supabase project URL)
+# - SUPABASE_SERVICE_KEY (Supabase service key)
+# - JWT_SECRET_KEY (Secret key for JWT tokens)
 
-# Initialize knowledge base
+# Initialize knowledge base (optional - for RAG system)
 python scripts/ingest_pdf.py
 python scripts/build_layered_kb.py
 ```
 
+### 3. Frontend Setup
+
+```bash
+# Navigate to UI directory
+cd ui
+
+# Install Node.js dependencies
+npm install
+
+# Configure frontend environment
+# Copy ui/.env.example to ui/.env and set:
+# - VITE_API_BASE_URL=http://127.0.0.1:8765
+# - VITE_SUPABASE_URL (same as backend)
+# - VITE_SUPABASE_ANON_KEY (Supabase anon key)
+```
+
 ---
 
-## Usage
+## Running the Application
 
-### CLI Mode
+### Development Mode (Local)
+
+You'll need two terminal windows running simultaneously.
+
+#### Terminal 1: Backend Server (Port 8765)
 ```bash
+# From project root directory
+# Make sure virtual environment is activated
+uvicorn api_server:app --host 127.0.0.1 --port 8765 --reload
+```
+
+**Backend will run on:**
+- API: http://localhost:8765
+- Interactive Docs: http://localhost:8765/docs
+- ReDoc: http://localhost:8765/redoc
+
+#### Terminal 2: Frontend Server (Port 5173)
+```bash
+# From project root directory
+cd ui
+npm run dev
+```
+
+**Frontend will run on:**
+- App: http://localhost:5173
+- (Check terminal output for exact port if different)
+
+### Testing the Setup
+
+1. Open http://localhost:5173 in your browser
+2. Click "Sign Up" to create a test account
+3. Log in and start learning!
+
+### CLI Mode (Backend Only)
+```bash
+# Run the LangGraph pipeline without the web UI
 python run_langgraph.py
 ```
 
-### API Mode
-```bash
-uvicorn api_server:app --reload --port 8000
+---
 
-# Interactive docs: http://localhost:8000/docs
-```
+## Key API Endpoints
 
-### Key Endpoints
-- `POST /auth/signup` - Create account
-- `POST /auth/login` - Authenticate
-- `GET /student/state` - Get profile + knowledge state
-- `POST /tutor/explain` - Request learning content
-- `POST /quiz/generate` - Generate 3 MCQ questions
-- `POST /quiz/submit` - Submit answers, update mastery
+### Authentication
+- `POST /auth/signup` - Create new account
+- `POST /auth/login` - Login and get JWT token
+- `POST /auth/logout` - Logout
+- `GET /auth/me` - Get current user info
+
+### Learning
+- `GET /student/state` - Get student profile and progress
+- `GET /student/topics` - Get all topics with mastery levels
+- `POST /tutor/explain` - Request adaptive learning content
+- `POST /quiz/generate` - Generate practice quiz questions
+- `POST /quiz/submit` - Submit quiz answers and update mastery
+
+### Assessments
+- `POST /quiz/pretest` - Take pretest for a topic
+- `POST /quiz/posttest` - Take posttest after learning
 
 ---
 

@@ -1,0 +1,642 @@
+[
+  {
+    "id": "mcq_qu_easy_001",
+    "topic": "Queue",
+    "subtopic": "Dequeue",
+    "difficulty": "easy",
+    "prompt": "Which call removes the front element of a collections.deque in O(1) time?",
+    "options": [
+      "pop()",
+      "remove()",
+      "popleft()",
+      "popright()"
+    ],
+    "correct_index": 2,
+    "explanation": "popleft() removes from the left (front); pop() removes from the right end.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_002",
+    "topic": "Queue",
+    "subtopic": "Enqueue",
+    "difficulty": "easy",
+    "prompt": "What does this code print?\nfrom collections import deque\nq = deque()\nfor i in range(4):\n    q.append(i * i)\nprint(len(q), q[-1])",
+    "options": [
+      "4 16",
+      "3 9",
+      "4 0",
+      "4 9"
+    ],
+    "correct_index": 3,
+    "explanation": "Four items are enqueued (0, 1, 4, 9); q[-1] is the rear, the last item enqueued.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_003",
+    "topic": "Queue",
+    "subtopic": "Circular Queue",
+    "difficulty": "easy",
+    "prompt": "What is the time complexity of enqueue and dequeue in a circular array queue?",
+    "options": [
+      "O(log n) for both",
+      "O(n) for both",
+      "O(1) for both",
+      "O(1) for enqueue and O(n) for dequeue"
+    ],
+    "correct_index": 2,
+    "explanation": "Only index arithmetic is needed, and no elements are shifted.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_004",
+    "topic": "Queue",
+    "subtopic": "Enqueue",
+    "difficulty": "easy",
+    "prompt": "What does the enqueue operation do?",
+    "options": [
+      "Adds an element at the rear of the queue",
+      "Removes the element at the front",
+      "Returns the front element without removing it",
+      "Adds an element at the front of the queue"
+    ],
+    "correct_index": 0,
+    "explanation": "Enqueue inserts a new element at the rear so it is served last.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_005",
+    "topic": "Queue",
+    "subtopic": "Deque",
+    "difficulty": "easy",
+    "prompt": "Why is deque.appendleft(x) preferred over list.insert(0, x) for adding at the front?",
+    "options": [
+      "appendleft is O(1), while insert(0, x) is O(n) because it shifts every element",
+      "appendleft keeps the elements sorted",
+      "They have identical performance",
+      "insert(0, x) is not allowed on lists"
+    ],
+    "correct_index": 0,
+    "explanation": "A list must move all existing elements, whereas a deque links blocks at its ends.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_006",
+    "topic": "Queue",
+    "subtopic": "Circular Queue",
+    "difficulty": "easy",
+    "prompt": "A circular queue of capacity 4 tracks its element count and currently holds 4 elements. What is its state?",
+    "options": [
+      "Empty",
+      "Cannot tell without the front index",
+      "Half full",
+      "Full"
+    ],
+    "correct_index": 3,
+    "explanation": "The queue is full when count equals capacity.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_007",
+    "topic": "Queue",
+    "subtopic": "Deque",
+    "difficulty": "easy",
+    "prompt": "What is a deque?",
+    "options": [
+      "A double-ended queue that allows insertion and removal at both ends",
+      "A stack with an undo operation",
+      "A queue that sorts elements automatically",
+      "A queue limited to a fixed size"
+    ],
+    "correct_index": 0,
+    "explanation": "Deque stands for double-ended queue.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_008",
+    "topic": "Queue",
+    "subtopic": "Priority Queue",
+    "difficulty": "easy",
+    "prompt": "Which Python standard-library module provides priority-queue functions?",
+    "options": [
+      "bisect",
+      "itertools",
+      "functools",
+      "heapq"
+    ],
+    "correct_index": 3,
+    "explanation": "heapq implements a binary min-heap with heappush and heappop.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_009",
+    "topic": "Queue",
+    "subtopic": "Priority Queue",
+    "difficulty": "easy",
+    "prompt": "A hospital emergency room treats the most critical patient first, no matter who arrived earlier. Which structure models this?",
+    "options": [
+      "Plain array with direct indexing",
+      "Stack",
+      "Priority queue",
+      "Ordinary FIFO queue"
+    ],
+    "correct_index": 2,
+    "explanation": "Service order depends on urgency (priority), not on arrival order.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_010",
+    "topic": "Queue",
+    "subtopic": "Priority Queue",
+    "difficulty": "easy",
+    "prompt": "What is the time complexity of inserting an element into a binary-heap priority queue with n elements?",
+    "options": [
+      "O(n)",
+      "O(n²)",
+      "O(log n)",
+      "O(1)"
+    ],
+    "correct_index": 2,
+    "explanation": "The new element may move up along one root-to-leaf path, which has O(log n) length.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_011",
+    "topic": "Queue",
+    "subtopic": "Applications",
+    "difficulty": "easy",
+    "prompt": "An operating system gives each process a short time slice in turn, moving the process that just ran to the back of a line. Which structure does this round-robin scheduling use?",
+    "options": [
+      "A stack",
+      "A binary search tree",
+      "A queue",
+      "A hash table"
+    ],
+    "correct_index": 2,
+    "explanation": "Processes cycle through the line in FIFO order.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_012",
+    "topic": "Queue",
+    "subtopic": "Queue Introduction",
+    "difficulty": "easy",
+    "prompt": "In a queue, where are elements inserted and where are they removed?",
+    "options": [
+      "Inserted at the rear, removed from the front",
+      "Both inserted and removed at the front",
+      "Inserted in the middle, removed from the front",
+      "Inserted at the front, removed from the rear"
+    ],
+    "correct_index": 0,
+    "explanation": "New items join at the rear and the oldest item leaves from the front.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_013",
+    "topic": "Queue",
+    "subtopic": "Applications",
+    "difficulty": "easy",
+    "prompt": "Which structure helps print a binary tree level by level (level-order traversal)?",
+    "options": [
+      "A stack",
+      "A 2D array only",
+      "A set",
+      "A queue"
+    ],
+    "correct_index": 3,
+    "explanation": "Children are enqueued as a node is visited, so each level is processed before the next.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_014",
+    "topic": "Queue",
+    "subtopic": "Queue Introduction",
+    "difficulty": "easy",
+    "prompt": "What does this code print?\nfrom collections import deque\nq = deque()\nprint(len(q))",
+    "options": [
+      "0",
+      "1",
+      "None",
+      "An error"
+    ],
+    "correct_index": 0,
+    "explanation": "A newly created queue holds no elements, so its length is 0.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_015",
+    "topic": "Queue",
+    "subtopic": "Circular Queue",
+    "difficulty": "easy",
+    "prompt": "A circular queue of capacity 5 has its rear at index 4, and index 0 is free. At which index does the next enqueue go?",
+    "options": [
+      "Index 5",
+      "Index 4",
+      "Index 0",
+      "It overflows"
+    ],
+    "correct_index": 2,
+    "explanation": "The index wraps around: (4 + 1) % 5 = 0.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_016",
+    "topic": "Queue",
+    "subtopic": "Deque",
+    "difficulty": "easy",
+    "prompt": "What does this code print?\nfrom collections import deque\nd = deque([1, 2])\nd.appendleft(0)\nd.append(3)\nprint(list(d))",
+    "options": [
+      "[0, 1, 2]",
+      "[1, 2, 3, 0]",
+      "[3, 0, 1, 2]",
+      "[0, 1, 2, 3]"
+    ],
+    "correct_index": 3,
+    "explanation": "appendleft puts 0 in front of the existing elements and append puts 3 at the end.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_017",
+    "topic": "Queue",
+    "subtopic": "Dequeue",
+    "difficulty": "easy",
+    "prompt": "What is it called when you try to dequeue from an empty queue?",
+    "options": [
+      "Hashing",
+      "Underflow",
+      "Rotation",
+      "Overflow"
+    ],
+    "correct_index": 1,
+    "explanation": "Underflow means there is no element left to remove.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_018",
+    "topic": "Queue",
+    "subtopic": "Enqueue",
+    "difficulty": "easy",
+    "prompt": "What is the time complexity of enqueue in a linked-list queue that keeps a tail pointer?",
+    "options": [
+      "O(n²)",
+      "O(log n)",
+      "O(n)",
+      "O(1)"
+    ],
+    "correct_index": 3,
+    "explanation": "The new node is attached directly after the tail, with no traversal.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_019",
+    "topic": "Queue",
+    "subtopic": "Enqueue",
+    "difficulty": "easy",
+    "prompt": "What does this code print?\nfrom collections import deque\nq = deque()\nq.append(5)\nq.append(7)\nprint(list(q))",
+    "options": [
+      "[5]",
+      "[5, 7]",
+      "[7, 5]",
+      "[7]"
+    ],
+    "correct_index": 1,
+    "explanation": "append adds each item at the rear, so 5 stays in front of 7.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_020",
+    "topic": "Queue",
+    "subtopic": "Deque",
+    "difficulty": "easy",
+    "prompt": "Which statement about a deque is true?",
+    "options": [
+      "It can only behave as a stack",
+      "It can behave as a stack, as a queue, or as both",
+      "It can only behave as a queue",
+      "It cannot remove elements"
+    ],
+    "correct_index": 1,
+    "explanation": "Using one end gives stack behaviour; adding at one end and removing at the other gives queue behaviour.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_021",
+    "topic": "Queue",
+    "subtopic": "Circular Queue",
+    "difficulty": "easy",
+    "prompt": "What does this code print?\nprint((4 + 1) % 5)",
+    "options": [
+      "4",
+      "0",
+      "5",
+      "1"
+    ],
+    "correct_index": 1,
+    "explanation": "With capacity 5, the index after 4 wraps around to (4 + 1) % 5 = 0.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_022",
+    "topic": "Queue",
+    "subtopic": "Enqueue",
+    "difficulty": "easy",
+    "prompt": "What is it called when you try to enqueue into a full fixed-size queue?",
+    "options": [
+      "Index shift",
+      "Underflow",
+      "Overflow",
+      "Deadlock"
+    ],
+    "correct_index": 2,
+    "explanation": "Overflow means there is no free slot left for the new element.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_023",
+    "topic": "Queue",
+    "subtopic": "Queue Introduction",
+    "difficulty": "easy",
+    "prompt": "What does this code print?\nfrom collections import deque\nq = deque([1, 2, 3])\nprint(q[0], len(q))",
+    "options": [
+      "1 2",
+      "1 3",
+      "3 3",
+      "2 3"
+    ],
+    "correct_index": 1,
+    "explanation": "q[0] reads the front element without removing it, and the length stays 3.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_024",
+    "topic": "Queue",
+    "subtopic": "Circular Queue",
+    "difficulty": "easy",
+    "prompt": "What is another common name for a circular queue?",
+    "options": [
+      "Binary heap",
+      "Hash table",
+      "Ring buffer",
+      "Skip list"
+    ],
+    "correct_index": 2,
+    "explanation": "The array is treated as a ring whose end connects back to its beginning.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_025",
+    "topic": "Queue",
+    "subtopic": "Queue Introduction",
+    "difficulty": "easy",
+    "prompt": "Which class from Python's collections module is designed for efficient queue operations?",
+    "options": [
+      "deque",
+      "Counter",
+      "OrderedDict",
+      "namedtuple"
+    ],
+    "correct_index": 0,
+    "explanation": "deque supports O(1) appends and pops at both ends.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_026",
+    "topic": "Queue",
+    "subtopic": "Applications",
+    "difficulty": "easy",
+    "prompt": "Which graph traversal algorithm uses a queue?",
+    "options": [
+      "Breadth-first search",
+      "Merge sort",
+      "Binary search",
+      "Depth-first search with recursion"
+    ],
+    "correct_index": 0,
+    "explanation": "BFS processes vertices in the order they were discovered, which a queue provides.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_027",
+    "topic": "Queue",
+    "subtopic": "Dequeue",
+    "difficulty": "easy",
+    "prompt": "Elements 1, 2, 3 are enqueued in that order and then one dequeue is performed. Which element is now at the front?",
+    "options": [
+      "1",
+      "2",
+      "3",
+      "The queue is empty"
+    ],
+    "correct_index": 1,
+    "explanation": "Dequeue removed 1, so 2 is the next oldest element.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_028",
+    "topic": "Queue",
+    "subtopic": "Applications",
+    "difficulty": "easy",
+    "prompt": "A fast producer sends data to a slower consumer. What role does a queue play between them?",
+    "options": [
+      "It buffers the data so the consumer can process items in arrival order at its own pace",
+      "It deletes data when the consumer is slow",
+      "It sorts the data before the consumer reads it",
+      "It lets the consumer read the newest item first"
+    ],
+    "correct_index": 0,
+    "explanation": "A queue decouples the two speeds while preserving FIFO order.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_029",
+    "topic": "Queue",
+    "subtopic": "Dequeue",
+    "difficulty": "easy",
+    "prompt": "From which end does dequeue remove an element?",
+    "options": [
+      "The rear",
+      "The middle",
+      "Either end, chosen at random",
+      "The front"
+    ],
+    "correct_index": 3,
+    "explanation": "Dequeue removes the oldest element, which sits at the front.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_030",
+    "topic": "Queue",
+    "subtopic": "Priority Queue",
+    "difficulty": "easy",
+    "prompt": "What does this code print?\nimport heapq\nh = [3, 1, 2]\nheapq.heapify(h)\nprint(heapq.heappop(h))",
+    "options": [
+      "2",
+      "3",
+      "1",
+      "IndexError"
+    ],
+    "correct_index": 2,
+    "explanation": "heapq is a min-heap, so heappop returns the smallest element.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_031",
+    "topic": "Queue",
+    "subtopic": "Dequeue",
+    "difficulty": "easy",
+    "prompt": "What does this code print?\nfrom collections import deque\nq = deque([1, 2, 3])\nprint(q.popleft(), list(q))",
+    "options": [
+      "2 [1, 3]",
+      "1 [1, 2, 3]",
+      "3 [1, 2]",
+      "1 [2, 3]"
+    ],
+    "correct_index": 3,
+    "explanation": "popleft removes and returns the front element (1), leaving [2, 3].",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_032",
+    "topic": "Queue",
+    "subtopic": "Priority Queue",
+    "difficulty": "easy",
+    "prompt": "Which data structure is most commonly used to implement a priority queue efficiently?",
+    "options": [
+      "Stack",
+      "Plain array scanned from left to right",
+      "Circular queue",
+      "Binary heap"
+    ],
+    "correct_index": 3,
+    "explanation": "A heap provides insertion and removal of the top priority in O(log n).",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_033",
+    "topic": "Queue",
+    "subtopic": "Enqueue",
+    "difficulty": "easy",
+    "prompt": "After enqueuing 4, then 8, then 15 into an empty queue, which element is at the front?",
+    "options": [
+      "4",
+      "15",
+      "It depends on the values",
+      "8"
+    ],
+    "correct_index": 0,
+    "explanation": "The first element enqueued stays at the front until it is dequeued.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_034",
+    "topic": "Queue",
+    "subtopic": "Priority Queue",
+    "difficulty": "easy",
+    "prompt": "In a priority queue, which element is removed first?",
+    "options": [
+      "A random element",
+      "The element with the highest priority, regardless of arrival order",
+      "The element that arrived first",
+      "The element that arrived last"
+    ],
+    "correct_index": 1,
+    "explanation": "A priority queue serves by priority rather than by arrival time.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_035",
+    "topic": "Queue",
+    "subtopic": "Applications",
+    "difficulty": "easy",
+    "prompt": "Which scenario is naturally modeled by a queue?",
+    "options": [
+      "Print jobs waiting for a shared printer",
+      "Undoing the last edit in a text editor",
+      "Checking whether parentheses are balanced",
+      "Backtracking through a maze one step at a time"
+    ],
+    "correct_index": 0,
+    "explanation": "Print jobs are served in arrival order (FIFO); the other tasks need LIFO behaviour.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_036",
+    "topic": "Queue",
+    "subtopic": "Circular Queue",
+    "difficulty": "easy",
+    "prompt": "What problem of a simple array-based queue does a circular queue solve?",
+    "options": [
+      "It lets the queue grow without limit",
+      "Freed slots at the front are reused instead of being wasted after dequeues",
+      "It makes dequeue run in O(n)",
+      "It sorts the elements automatically"
+    ],
+    "correct_index": 1,
+    "explanation": "Indexes wrap around to the start of the array, so slots freed by dequeues can be reused.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_037",
+    "topic": "Queue",
+    "subtopic": "Queue Introduction",
+    "difficulty": "easy",
+    "prompt": "Which principle does a queue follow?",
+    "options": [
+      "Last In, First Out (LIFO)",
+      "First In, First Out (FIFO)",
+      "Random access by index",
+      "Highest value first"
+    ],
+    "correct_index": 1,
+    "explanation": "The element that has waited longest is the first one to be removed.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_038",
+    "topic": "Queue",
+    "subtopic": "Queue Introduction",
+    "difficulty": "easy",
+    "prompt": "Which real-life situation best resembles a queue?",
+    "options": [
+      "A stack of plates in a cupboard",
+      "People waiting in line at a ticket counter",
+      "A pile of books where you always take the top one",
+      "Looking up a word in a dictionary"
+    ],
+    "correct_index": 1,
+    "explanation": "People are served in the order they arrived, which is FIFO.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_039",
+    "topic": "Queue",
+    "subtopic": "Dequeue",
+    "difficulty": "easy",
+    "prompt": "A queue is empty. After 5 enqueue operations and 2 dequeue operations, how many elements does it hold?",
+    "options": [
+      "2",
+      "5",
+      "7",
+      "3"
+    ],
+    "correct_index": 3,
+    "explanation": "The size is 5 - 2 = 3.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_easy_040",
+    "topic": "Queue",
+    "subtopic": "Deque",
+    "difficulty": "easy",
+    "prompt": "What does this code print?\nfrom collections import deque\nd = deque([1, 2, 3])\nprint(d.pop())",
+    "options": [
+      "[1, 2]",
+      "2",
+      "3",
+      "1"
+    ],
+    "correct_index": 2,
+    "explanation": "pop() removes and returns the right-hand (last) element.",
+    "source": "custom_mcq"
+  }
+]

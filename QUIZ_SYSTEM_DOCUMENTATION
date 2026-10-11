@@ -1,0 +1,254 @@
+# Practice Quiz System Documentation
+
+## Overview
+
+The practice quiz system provides adaptive, repeatable quizzes for students learning Data Structures and Algorithms (DSA). The system uses an intelligent question bank with adaptive repetition logic to maximize learning outcomes.
+
+## System Architecture
+
+### Question Bank Structure
+
+- **Total Questions**: 360 MCQs across 3 topics (Array, Queue, Graph).
+- **Difficulty Levels**: Easy, Medium, Hard (40 questions per topic × difficulty).
+- **Pool Distribution** (per topic × difficulty):
+  - **Pretest Pool**: 16 questions (40%)
+  - **Posttest Pool**: 16 questions (40%)
+  - **Practice Pool**: 8 questions (20%)
+
+### Topics and Subtopics
+
+**Array (6 subtopics):**
+- `array_introduction`: Introduction & Concept
+- `array_operations`: Array Operations
+- `array_searching`: Searching (Linear & Binary)
+- `array_sorting`: Sorting Algorithms
+- `array_multidimensional`: Multi-dimensional Arrays
+- `array_applications`: Applications & Use-cases
+
+**Queue (7 subtopics):**
+- `queue_introduction`: Introduction & Concept
+- `queue_enqueue`: Enqueue Operation
+- `queue_dequeue`: Dequeue Operation
+- `queue_circular`: Circular Queue
+- `queue_priority`: Priority Queue
+- `queue_deque`: Deque (Double-ended Queue)
+- `queue_applications`: Applications
+
+**Graph (7 subtopics):**
+- `graph_introduction`: Introduction & Terminology
+- `graph_representation`: Adjacency Matrix / List
+- `graph_bfs`: Breadth-First Search (BFS)
+- `graph_dfs`: Depth-First Search (DFS)
+- `graph_shortest_path`: Shortest Path (Dijkstra / BFS)
+- `graph_topological`: Topological Sort
+- `graph_applications`: Applications
+
+## Key Features
+
+### 1. Adaptive Practice Quiz System
+
+When the initial practice pool (8 questions) is exhausted, the system intelligently generates adaptive repeat quizzes by combining the following question categories.
+
+**Composition** (randomized):
+- **1–2 questions** previously answered correctly (reinforcement learning)
+- **4–5 questions** answered incorrectly in previous practice quizzes (remediation)
+- **3–4 questions** answered incorrectly in pretest (addressing fundamental gaps)
+
+This ensures:
+- Students can practice indefinitely
+- Focus on weak areas
+- Spaced repetition for mastery
+- Cross-pool learning from pretest mistakes
+
+### 2. Subtopic-Aware Filtering
+
+Practice quizzes can be filtered by specific subtopics, allowing focused practice on individual concepts within a topic.
+
+### 3. Non-Repetition for Assessments
+
+- **Pretest** and **Posttest** maintain strict non-repetition.
+- Questions are marked as "asked" at fetch time (not submit time).
+- Students who abandon a quiz cannot see those questions again.
+
+### 4. Adaptive Difficulty Selection
+
+Quiz difficulty is automatically determined based on student mastery.
+
+- **Mastery ≥ 0.70 → Hard questions**
+
+*The remaining mastery thresholds were not visible in the supplied screenshots.*
+
+## Technical Implementation
+
+### Database Schema
+
+**`question_bank` table:**
+- `id`: Unique question identifier (e.g., `"mcq_ar_easy_001"`)
+- `topic`: `"Array"` | `"Queue"` | `"Graph"`
+- `subtopic`: e.g., `"Array Operations"`
+- `difficulty`: `"easy"` | `"medium"` | `"hard"`
+- `test_form`: `"practice_pool"` | `"pretest_pool"` | `"posttest_pool"`
+- `question_type`: `"mcq"` | `"code"`
+- `prompt`: Question text
+- `options`: Array of 4 answer choices (for MCQ)
+- `correct_index`: Index of correct answer (0–3)
+- `explanation`: Explanation shown after submission
+- `source`: `"custom_mcq"`
+
+**`asked_questions` table:**
+- `student_id`: Student identifier
+- `question_id`: Foreign key to `question_bank`
+- `context`: `"practice"` | `"pretest"` | `"posttest"`
+- `correct`: Boolean or `NULL` (`NULL` = shown but not graded yet)
+- `asked_at`: Timestamp
+
+### API Endpoints
+
+**`GET /quiz/generate`**
+
+Returns 10 practice questions (or adaptive repeat if the pool is exhausted).
+
+**`POST /quiz/mcq/submit`**
+
+Example JSON request:
+
+```json
+{
+  "question_id": "mcq_ar_easy_001",
+  "chosen_index": 2,
+  "student_id": "USER-xxx"
+}
+```
+
+Returns grading result with explanation.
+
+**`POST /quiz/submit`**
+
+For full quiz submission with score calculation.
+
+### Key Code Components
+
+**`core/question_bank_service.py`:**
+- `get_quiz()`: Main quiz fetch logic
+- `_fetch_adaptive_repeat_questions()`: Adaptive repeat when pool exhausted
+- `grade()`: Server-side grading with explanation disclosure
+- Handles subtopic normalization: `array_operations` → `Array Operations`
+
+**`core/curriculum_config.py`:**
+- Single source of truth for all topics/subtopics.
+- Defines progression order and unlock thresholds.
+
+**`api_server.py`:**
+- `/quiz/generate`: Practice quiz endpoint
+- `/quiz/pretest`: Pretest endpoint (MCQ only)
+- `/quiz/posttest`: Posttest endpoint (MCQ only)
+
+## Question Ingestion
+
+Questions are stored in `data/mcq/`:
+- 9 JSON files (3 topics × 3 difficulties)
+- 40 questions per file
+
+**Ingestion command:**
+
+```bash
+python scripts/ingest_mcq_bank.py --stage write
+```
+
+This:
+1. Validates all 360 questions
+2. Splits into pools (16/16/8)
+3. Upserts to Supabase `question_bank` table
+
+**Reset Student History** (for testing):
+
+```bash
+python scripts/reset_student_questions.py USER-{student_id}
+```
+
+## Security Features
+
+## Logging and Monitoring
+
+**Logs** (in the `logs/` directory):
+- `question_bank_service.log`: Quiz fetch, `THIN_POOL` warnings, `EMPTY_POOL`
+- `thin_pool.jsonl`: Structured logs for thin pool incidents
+- `api_server.log`: HTTP request logs
+
+**`THIN_POOL` Warning**: Triggered when available questions < 10.
+
+**`EMPTY_POOL` Warning**: Triggered when no questions are available (before adaptive repeat kicks in).
+
+## Common Operations
+
+### Check Available Questions
+
+```python
+from core.question_bank_service import get_question_bank_service
+
+qbs = get_question_bank_service()
+result = qbs.get_quiz(
+    topic="array",
+    difficulty="easy",
+    pool="practice_pool",
+    student_id="USER-test",
+    context="practice"
+)
+print(f"Available: {result['available_count']}")
+```
+
+### Manually Query Database
+
+```python
+from core.supabase_client import get_supabase
+
+sb = get_supabase()
+
+# Count practice questions for Array/easy
+resp = (
+    sb.table("question_bank")
+    .select("*", count="exact")
+    .eq("topic", "Array")
+    .eq("difficulty", "easy")
+    .eq("test_form", "practice_pool")
+    .execute()
+)
+print(f"Count: {resp.count}")
+```
+
+## Troubleshooting
+
+### Issue: "No questions available"
+
+- **Cause**: Practice pool exhausted for that student.
+- **Solution**: Adaptive repeat should auto-trigger. If not, check logs for errors.
+
+### Issue: Questions repeating in pretest
+
+- **Cause**: `asked_questions` table not being updated.
+- **Check**: Database connection and RLS policies.
+
+### Issue: Subtopic filtering returns no questions
+
+- **Cause**: Subtopic name mismatch (curriculum uses underscores, DB uses spaces).
+- **Solution**: Already handled by normalization in `question_bank_service.py`.
+
+### Issue: Student can't retake quiz
+
+- **Cause**: All questions marked as asked.
+- **Solution**:
+  - For practice: Adaptive repeat will provide questions.
+  - For testing: Use reset script or create more questions.
+
+## Future Enhancements
+
+1. **LLM-Generated Questions**: Dynamically generate new questions when pool is exhausted.
+2. **Difficulty Adaptation**: Adjust question difficulty based on real-time performance.
+3. **Spaced Repetition**: Time-based cooldown before showing same questions.
+4. **Multi-language Support**: Add questions in multiple languages.
+5. **Code Questions**: Expand beyond MCQ to include coding challenges.
+
+---
+
+**Last Updated**: October 2026  
+**Maintained By**: Capstone Team

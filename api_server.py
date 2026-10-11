@@ -25,8 +25,7 @@ Issue #4  Quiz rendered below content:
 
 Issue #5  Only one topic shown:
   /student/topics now uses get_all_curriculum_topics() from curriculum_config
-  so all 7 DSA topics (array, linked_list, stack, queue, hash_table, tree,
-  graph) are returned with their subtopic lists.
+  so all 3 DSA topics (array, queue, graph) are returned with their subtopic lists.
 
 Issue #6  Source material not utilised:
   No change to RAG plumbing needed — the adaptive prompts in tutor_agent and
@@ -69,7 +68,10 @@ from core.practical_agent import QuizQuestion
 from core.logging_utils import Timer, get_logger
 from core.metrics_collector import log_learning_cycle_metrics
 from core.adaptive_engine import after_quiz_submit, record_content, get_all_topics
-from core.question_bank_service import get_question_bank_service, DEFAULT_QUIZ_LENGTH
+from core.question_bank_service import get_question_bank_service
+# DEFAULT_QUIZ_LENGTH: maximum questions per quiz session.
+DEFAULT_QUIZ_LENGTH: int = 10
+
 
 app = FastAPI(title="Cognitive Adaptive AI Tutor API", version="2.0.0")
 
@@ -392,6 +394,11 @@ class AssessmentRequest(BaseModel):
     topic: str
     subtopic: str | None = None
     answers: List[QuizBatchAnswer] | None = None
+    # MCQ bank grading path: pass pre-computed score + question count directly.
+    # Set when the UI grades each question via POST /quiz/mcq/submit and then
+    # POSTs the aggregated result here for mastery update.
+    mcq_score: float | None = None
+    mcq_total: int | None = None
 
 
 class QuizBatchSubmitRequest(BaseModel):
@@ -404,6 +411,14 @@ class QuizBatchSubmitRequest(BaseModel):
 class CurriculumNextRequest(BaseModel):
     current_topic: str
     current_subtopic: str
+
+
+class MCQSubmitRequest(BaseModel):
+    """Request body for POST /quiz/mcq/submit (server-side grading)."""
+    question_id: str
+    chosen_index: int    # 0-3; the option index the student selected
+    context: str         # "pretest" | "posttest" | "practice"
+
 
 
 class StudySurveyRequest(BaseModel):
@@ -687,7 +702,7 @@ def get_topics(user: Dict = Depends(require_auth)):
     subtopic_progress = state.get("subtopic_progress", {})
     subtopic_mastery = state.get("subtopic_mastery", {})
 
-    # Full curriculum from curriculum_config (all 7 DSA topics).
+    # Full curriculum from curriculum_config (3 DSA topics: array, queue, graph).
     curriculum = get_all_curriculum_topics()
 
     topics = []
@@ -925,16 +940,13 @@ async def stream_explanation(
 @app.post("/quiz/generate")
 def get_quiz(body: TopicRequest, user: Dict = Depends(require_auth)):
     """
-    Issue #3 fix: seen question hashes are loaded, passed to the quiz
-    generator, and stored back after generation so repeated calls produce
-    different questions.
+    Practice quiz generation from the MCQ question bank.
 
-    Issue #4 fix: this is the ONLY place quiz questions are generated;
-    the /tutor/explain/stream endpoint no longer generates them.
+    Uses QuestionBankService.get_quiz() with pool='practice_pool' and
+    question_type=None (practice can be MCQ or code questions).
 
-    Question-bank fix: tries the pre-built question bank first (adaptive
-    count = min(DEFAULT_QUIZ_LENGTH, available_unseen)).  Falls back to
-    LLM generation when the bank is empty or not yet ingested.
+    Non-repetition is enforced at fetch time by asked_questions table.
+    Difficulty is derived adaptively from current mastery level.
     """
     student_id = user["student_id"]
     state = get_student_state(student_id)
@@ -943,155 +955,85 @@ def get_quiz(body: TopicRequest, user: Dict = Depends(require_auth)):
         state["current_subtopic"] = body.subtopic
     current_subtopic = str(state.get("current_subtopic") or f"{body.topic}_introduction")
     state["current_subtopic"] = current_subtopic
-    _reset_seen_hashes_for_other_subtopics(state, body.topic, current_subtopic)
-    seen_hashes = _get_seen_hashes_for_subtopic(state, body.topic, current_subtopic)
-    subject = str(state.get("subject", "dsa"))
 
-    macro = decision_engine.decide_macro_plan(state)
-    state["macro_decision"] = macro
-    micro = decision_engine.decide_next_step(state)
+    # Derive difficulty from current mastery (adaptive selection)
+    concepts = state.get("knowledge_state", {}).get("concepts", {})
+    mastery = float(
+        concepts.get(body.topic.lower(), {}).get("mastery", 0.0)
+        or concepts.get(body.topic, {}).get("mastery", 0.0)
+        or 0.0
+    )
+    if mastery >= 0.70:
+        difficulty = "hard"
+    elif mastery >= 0.40:
+        difficulty = "medium"
+    else:
+        difficulty = "easy"
 
-    # ── Step 1: try the pre-built question bank ──────────────────────────────
-    difficulty = str(state.get("difficulty_level") or micro.get("difficulty", "medium")).lower()
+    # Fetch from question bank
     qbs = get_question_bank_service()
-    bank_result = qbs.get_quiz(
-        topic=body.topic,
+    result = qbs.get_quiz(
+        topic=body.topic,       # service normalizes to title-case internally
         difficulty=difficulty,
         pool="practice_pool",
         student_id=student_id,
         context="practice",
+        question_type=None,     # practice pool can contain both MCQ and code
+        subtopic=current_subtopic,  # filter by current subtopic for focused practice
     )
 
-    if bank_result is not None:
-        # Bank responded (may be 0 questions if pool is totally exhausted)
-        bank_questions = bank_result["questions"]
-        actual = bank_result["actual_count"]
-        widened = bank_result["widened_difficulty"]
-        diffs_used = bank_result["difficulties_used"]
-
-        if actual > 0:
-            logger.info(
-                "quiz/generate bank hit: topic=%r difficulty=%r diffs_used=%r "
-                "pool=practice_pool student=%r actual=%d/%d widened=%s",
-                body.topic, difficulty, diffs_used, student_id,
-                actual, DEFAULT_QUIZ_LENGTH, widened,
-            )
-            pm.save(student_id, state, user_id=user["user_id"])
-            return {
-                "topic": body.topic,
-                "subtopic": current_subtopic,
-                "questions": bank_questions,
-                "rag_grounded": False,
-                "quiz_basis": {"source": "question_bank", "difficulties_used": diffs_used},
-                "retrieval_warning": (
-                    f"Pool thin: only {actual} of {DEFAULT_QUIZ_LENGTH} questions available"
-                    + (f" (widened to {diffs_used})" if widened else "")
-                    if actual < DEFAULT_QUIZ_LENGTH else ""
-                ),
-                "adaptive_mode": macro.get("scaffold_policy", "medium"),
-                "bank_metadata": {
-                    "source": "question_bank",
-                    "actual_count": actual,
-                    "default_count": DEFAULT_QUIZ_LENGTH,
-                    "widened_difficulty": widened,
-                    "difficulties_used": diffs_used,
-                },
-            }
-
-        # Pool completely exhausted — note in log and fall through to LLM
+    if result is None:
+        # Supabase unavailable — return graceful empty
         logger.warning(
-            "quiz/generate bank pool exhausted: topic=%r difficulty=%r "
-            "pool=practice_pool student=%r — falling back to LLM",
+            "/quiz/generate: question_bank_service returned None "
+            "(topic=%r student=%r)",
+            body.topic, student_id,
+        )
+        return {
+            "topic": body.topic,
+            "subtopic": current_subtopic,
+            "questions": [],
+            "reason": "question_bank_unavailable",
+            "bank_metadata": {"source": "question_bank", "note": "Service unavailable."},
+        }
+
+    questions = result.get("questions", [])
+    actual_count = result.get("actual_count", len(questions))
+    available_count = result.get("available_count", 0)
+    widened = result.get("widened_difficulty", False)
+    difficulties_used = result.get("difficulties_used", [difficulty])
+
+    # Log thin/empty pool for content team
+    if actual_count == 0:
+        logger.warning(
+            "PRACTICE_POOL_EMPTY topic=%r difficulty=%r student=%r available=%d",
+            body.topic, difficulty, student_id, available_count,
+        )
+    elif actual_count < DEFAULT_QUIZ_LENGTH:
+        logger.info(
+            "PRACTICE_POOL_THIN topic=%r difficulty=%r student=%r "
+            "actual=%d requested=%d available=%d widened=%s",
             body.topic, difficulty, student_id,
+            actual_count, DEFAULT_QUIZ_LENGTH, available_count, widened,
         )
 
-    # ── Step 2: LLM fallback (original path) ────────────────────────────────
-    _ensure_rag_ready()
-    engineered_query = crew.tutor.query_engineer.engineer(
-        f"Quiz questions for {body.topic} — {current_subtopic}", state
-    )
-    delivered_summary = get_delivered_topic_summary(state, body.topic)
-    delivered_chunk_ids = delivered_summary.get("chunk_ids", [])
-    delivered_concepts = delivered_summary.get("concepts", [])
-
-    rag_chunk_records: List[Dict[str, Any]] = []
-    retrieval_warning = ""
-    try:
-        # Use k=4 to pull more OpenDSA/textbook chunks — richer context → more unique questions.
-        if "dsa" in subject.lower():
-            if delivered_chunk_ids:
-                rag_chunk_records = crew.tutor.retrieve_context_chunk_records(
-                    engineered_query, state, k=4, allowed_chunk_ids=delivered_chunk_ids
-                )
-                # Top-up with unrestricted chunks if not enough
-                if len(rag_chunk_records) < 3:
-                    rag_chunk_records = crew.tutor.retrieve_context_chunk_records(
-                        engineered_query, state, k=4
-                    )
-            else:
-                rag_chunk_records = crew.tutor.retrieve_context_chunk_records(
-                    engineered_query, state, k=4
-                )
-        else:
-            rag_chunk_records = crew.tutor.retrieve_context_chunk_records(engineered_query, state, k=4)
-    except Exception as exc:
-        retrieval_warning = f"RAG retrieval fallback used: {exc}"
-        rag_chunk_records = []
-
-    rag_chunks = [
-        str(item.get("content", "")).strip()
-        for item in rag_chunk_records
-        if str(item.get("content", "")).strip()
-    ]
-    domain_fallback = "DSA fundamentals" if "dsa" in subject.lower() else "Python programming fundamentals"
-    rag_context = "\n\n".join(rag_chunks) if rag_chunks else domain_fallback
-
-    quiz_basis = {
-        "source": "llm",
-        "topics_covered": [body.topic] if delivered_chunk_ids else [],
-        "concepts_covered": delivered_concepts,
-        "chunk_ids_used": [str(item.get("chunk_id", "")) for item in rag_chunk_records if str(item.get("chunk_id", ""))],
-    }
-
-    questions = crew.practical.generate_quiz_batch(
-        micro, state, rag_context, target_count=DEFAULT_QUIZ_LENGTH, seen_hashes=seen_hashes
-    )
-    if len(questions) < DEFAULT_QUIZ_LENGTH:
-        extra_questions = crew.practical.generate_quiz_batch(
-            micro,
-            state,
-            rag_context,
-            target_count=DEFAULT_QUIZ_LENGTH - len(questions),
-            seen_hashes=seen_hashes,
-        )
-        questions = questions + extra_questions
-
-    # Issue #3: persist updated seen hashes.
-    _store_seen_hashes_for_subtopic(
-        state,
-        body.topic,
-        current_subtopic,
-        seen_hashes.union({_question_hash(q.get("question", "")) for q in questions if isinstance(q, dict)}),
-    )
     pm.save(student_id, state, user_id=user["user_id"])
-
-    validated_questions: List[Dict[str, Any]] = []
-    for q in questions:
-        try:
-            validated_questions.append(QuizQuestion.model_validate(q).model_dump())
-        except Exception:
-            continue
 
     return {
         "topic": body.topic,
-        "subtopic": state.get("current_subtopic"),
-        "questions": validated_questions,
-        "rag_grounded": bool(rag_chunks),
-        "quiz_basis": quiz_basis,
-        "retrieval_warning": retrieval_warning,
-        # Tell the UI which adaptive mode was used so it can show context.
-        "adaptive_mode": macro.get("scaffold_policy", "medium"),
-        "bank_metadata": {"source": "llm"},
+        "subtopic": current_subtopic,
+        "questions": questions,
+        "actual_count": actual_count,
+        "requested_count": min(DEFAULT_QUIZ_LENGTH, available_count) if available_count > 0 else 0,
+        "available_count": available_count,
+        "widened_difficulty": widened,
+        "difficulties_used": difficulties_used,
+        "bank_metadata": {
+            "source": "question_bank",
+            "pool": "practice_pool",
+            "difficulty": difficulty,
+            "mastery": mastery,
+        },
     }
 
 
@@ -1100,173 +1042,93 @@ def _generate_assessment_questions(
     state: Dict[str, Any], topic: str, subtopic: str, assessment_type: str
 ) -> Dict[str, Any]:
     """
-    Generate pretest or posttest questions.
+    Fetch pretest or posttest questions from the MCQ question bank.
 
-    Try the pre-built question bank first (adaptive count, difficulty fallback,
-    thin-pool logging).  Falls back to LLM generation when the bank is empty or
-    not yet ingested so the system keeps working before full Supabase migration.
+    Uses QuestionBankService.get_quiz() with question_type='mcq' and the
+    appropriate pool (pretest_pool / posttest_pool).  The returned questions
+    are sanitised — correct_index and explanation are NOT included; grading
+    happens server-side via POST /quiz/mcq/submit.
 
-    assessment_type must be "pretest" or "posttest" — maps to the corresponding
-    pool (pretest_pool / posttest_pool) in the question_bank table.
+    assessment_type must be "pretest" or "posttest".
     """
     state["current_topic"] = topic
     state["current_subtopic"] = subtopic
     state["last_assessment_type"] = assessment_type
-    subject = str(state.get("subject", "dsa"))
     student_id: str = state.get("student_id", "")
 
-    macro = decision_engine.decide_macro_plan(state)
-    state["macro_decision"] = macro
-    micro = decision_engine.decide_next_step(state)
+    pool = "pretest_pool" if assessment_type == "pretest" else "posttest_pool"
 
-    # Map assessment type → pool name and asked_questions context value
-    pool_map = {
-        "pretest":  ("pretest_pool",  "pretest"),
-        "posttest": ("posttest_pool", "posttest"),
-    }
-    pool, context = pool_map.get(assessment_type, ("pretest_pool", "pretest"))
-    difficulty = str(state.get("difficulty_level") or micro.get("difficulty", "medium")).lower()
-
-    # ── Step 1: try the pre-built question bank ──────────────────────────────
-    if student_id:
-        qbs = get_question_bank_service()
-        bank_result = qbs.get_quiz(
-            topic=topic,
-            difficulty=difficulty,
-            pool=pool,
-            student_id=student_id,
-            context=context,
-        )
+    # Derive difficulty band from current mastery for adaptive selection.
+    # Pretest: always start with 'easy' to establish baseline.
+    # Posttest: use the difficulty that matches current mastery level.
+    if assessment_type == "pretest":
+        difficulty = "easy"
     else:
-        bank_result = None  # no student_id → skip bank, go straight to LLM
-
-    if bank_result is not None:
-        bank_questions = bank_result["questions"]
-        actual = bank_result["actual_count"]
-        widened = bank_result["widened_difficulty"]
-        diffs_used = bank_result["difficulties_used"]
-
-        if actual > 0:
-            logger.info(
-                "_generate_assessment_questions bank hit: type=%r topic=%r "
-                "difficulty=%r diffs_used=%r pool=%r student=%r actual=%d/%d widened=%s",
-                assessment_type, topic, difficulty, diffs_used, pool,
-                student_id, actual, DEFAULT_QUIZ_LENGTH, widened,
-            )
-            return {
-                "type": assessment_type,
-                "topic": topic,
-                "subtopic": subtopic,
-                "questions": bank_questions,
-                "rag_grounded": False,
-                "retrieval_warning": (
-                    f"Pool thin: only {actual} of {DEFAULT_QUIZ_LENGTH} questions available"
-                    + (f" (widened to {diffs_used})" if widened else "")
-                    if actual < DEFAULT_QUIZ_LENGTH else ""
-                ),
-                "bank_metadata": {
-                    "source": "question_bank",
-                    "actual_count": actual,
-                    "default_count": DEFAULT_QUIZ_LENGTH,
-                    "widened_difficulty": widened,
-                    "difficulties_used": diffs_used,
-                    "pool": pool,
-                },
-            }
-
-        logger.warning(
-            "_generate_assessment_questions bank pool exhausted: "
-            "type=%r topic=%r difficulty=%r pool=%r student=%r — falling back to LLM",
-            assessment_type, topic, difficulty, pool, student_id,
+        concepts = state.get("knowledge_state", {}).get("concepts", {})
+        mastery = float(
+            concepts.get(topic.lower(), {}).get("mastery", 0.0)
+            or concepts.get(topic, {}).get("mastery", 0.0)
+            or 0.0
         )
-
-    # ── Step 2: LLM fallback (original path) ────────────────────────────────
-    _ensure_rag_ready()
-    engineered_query = crew.tutor.query_engineer.engineer(
-        f"{assessment_type} diagnostic quiz questions for {topic} {subtopic}", state
-    )
-    delivered_summary = get_delivered_topic_summary(state, topic)
-    delivered_chunk_ids = delivered_summary.get("chunk_ids", [])
-
-    rag_chunk_records: List[Dict[str, Any]] = []
-    retrieval_warning = ""
-    try:
-        # Use k=4 to pull more OpenDSA/textbook chunks — richer source material = more unique questions.
-        if "dsa" in subject.lower() and delivered_chunk_ids:
-            rag_chunk_records = crew.tutor.retrieve_context_chunk_records(
-                engineered_query, state, k=4, allowed_chunk_ids=delivered_chunk_ids
-            )
-            # Top-up with unrestricted retrieval if delivered chunks are sparse
-            if len(rag_chunk_records) < 3:
-                rag_chunk_records = crew.tutor.retrieve_context_chunk_records(
-                    engineered_query, state, k=4
-                )
-        elif "dsa" not in subject.lower():
-            rag_chunk_records = crew.tutor.retrieve_context_chunk_records(engineered_query, state, k=4)
+        if mastery >= 0.70:
+            difficulty = "hard"
+        elif mastery >= 0.40:
+            difficulty = "medium"
         else:
-            rag_chunk_records = crew.tutor.retrieve_context_chunk_records(engineered_query, state, k=4)
-    except Exception as exc:
-        retrieval_warning = f"RAG retrieval fallback used: {exc}"
-        rag_chunk_records = []
+            difficulty = "easy"
 
-    rag_chunks = [
-        str(item.get("content", "")).strip()
-        for item in rag_chunk_records
-        if str(item.get("content", "")).strip()
-    ]
-    domain_fallback = "DSA fundamentals" if "dsa" in subject.lower() else "Python programming fundamentals"
-    rag_context = "\n\n".join(rag_chunks) if rag_chunks else domain_fallback
-
-    # Load persistent seen-hashes for this assessment type + topic + subtopic
-    # so repeated pretest/posttest calls never re-ask the same questions.
-    assessment_seen_key = f"{assessment_type}:{topic}:{subtopic}"
-    assessment_seen_store = state.setdefault("assessment_seen_questions", {})
-    seen_hashes: set[str] = {str(v) for v in assessment_seen_store.get(assessment_seen_key, [])}
-
-    questions = crew.practical.generate_quiz_batch(
-        micro, state, rag_context, target_count=DEFAULT_QUIZ_LENGTH, seen_hashes=seen_hashes
+    qbs = get_question_bank_service()
+    result = qbs.get_quiz(
+        topic=topic,
+        difficulty=difficulty,
+        pool=pool,
+        student_id=student_id,
+        context=assessment_type,
+        question_type="mcq",
     )
-    if len(questions) < DEFAULT_QUIZ_LENGTH:
-        questions.extend(
-            crew.practical.generate_quiz_batch(
-                micro,
-                state,
-                rag_context,
-                target_count=DEFAULT_QUIZ_LENGTH - len(questions),
-                seen_hashes=seen_hashes,
-            )
+
+    if result is None:
+        # Supabase unavailable — return graceful empty
+        logger.warning(
+            "_generate_assessment_questions: question_bank_service returned None "
+            "(type=%r topic=%r student=%r)",
+            assessment_type, topic, student_id,
         )
+        return {
+            "type": assessment_type,
+            "topic": topic,
+            "subtopic": subtopic,
+            "questions": [],
+            "reason": "question_bank_unavailable",
+            "bank_metadata": {"source": "question_bank", "note": "Service unavailable."},
+        }
 
-    # Persist the newly seen hashes so future calls get fresh questions.
-    seen_hashes.update(
-        _question_hash(q.get("question", "")) for q in questions if isinstance(q, dict)
-    )
-    assessment_seen_store[assessment_seen_key] = sorted(seen_hashes)
-
-    validated_questions: List[Dict[str, Any]] = []
-    for question in questions:
-        try:
-            validated_questions.append(QuizQuestion.model_validate(question).model_dump())
-        except Exception:
-            continue
-
+    questions = result.get("questions", [])
     return {
-        "type": assessment_type,
-        "topic": topic,
-        "subtopic": subtopic,
-        "questions": validated_questions,
-        "rag_grounded": bool(rag_chunks),
-        "retrieval_warning": retrieval_warning,
-        "bank_metadata": {"source": "llm"},
+        "type":       assessment_type,
+        "topic":      topic,
+        "subtopic":   subtopic,
+        "questions":  questions,
+        "actual_count":       result.get("actual_count", len(questions)),
+        "requested_count":    result.get("requested_count", DEFAULT_QUIZ_LENGTH),
+        "available_count":    result.get("available_count", 0),
+        "widened_difficulty": result.get("widened_difficulty", False),
+        "difficulties_used":  result.get("difficulties_used", [difficulty]),
+        "pool":               pool,
+        "bank_metadata": {
+            "source":     "question_bank",
+            "pool":       pool,
+            "difficulty": difficulty,
+        },
     }
-
 
 
 def _handle_assessment(body: AssessmentRequest, assessment_type: str, student_id: str, user_id: str | None = None) -> Dict[str, Any]:
     state = get_student_state(student_id)
     subtopic = body.subtopic or state.get("current_subtopic") or f"{body.topic}_assessment"
 
-    if body.answers is None:
+    # Fetch path: no answers AND no pre-computed MCQ score → generate questions.
+    if body.answers is None and body.mcq_score is None:
         state["current_topic"] = body.topic
         state["current_subtopic"] = subtopic
         state["last_assessment_type"] = assessment_type
@@ -1275,10 +1137,23 @@ def _handle_assessment(body: AssessmentRequest, assessment_type: str, student_id
         pm.save(student_id, state, user_id=user_id)
         return result
 
-    correct_count, total, score = _score_answer_batch(body.answers)
+    # ── Scoring path: client sends completed answers for mastery update ─────
+    # MCQ bank path: UI already graded each question via /quiz/mcq/submit;
+    # sends pre-computed mcq_score + mcq_total instead of raw answer text.
+    if body.mcq_score is not None:
+        score = max(0.0, min(1.0, float(body.mcq_score)))
+        total = int(body.mcq_total or 0)
+        correct_count = round(score * total)
+    elif body.answers is not None:
+        # Legacy LLM-quiz path: text answer comparison
+        correct_count, total, score = _score_answer_batch(body.answers)
+    else:
+        score, total, correct_count = 0.0, 0, 0
+
     state["current_topic"] = body.topic
     state["current_subtopic"] = subtopic
     state["last_score"] = score
+
     state.setdefault("learning_history", []).append({
         "type": assessment_type,
         "topic": body.topic,
@@ -1316,6 +1191,52 @@ def pretest_quiz(body: AssessmentRequest, user: Dict = Depends(require_auth)):
 @app.post("/quiz/posttest")
 def posttest_quiz(body: AssessmentRequest, user: Dict = Depends(require_auth)):
     return _handle_assessment(body, "posttest", user["student_id"], user_id=user["user_id"])
+
+
+@app.post("/quiz/mcq/submit")
+def submit_mcq_answer(body: MCQSubmitRequest, user: Dict = Depends(require_auth)):
+    """
+    Server-side grading for MCQ bank questions.
+
+    Security contract:
+      • The frontend sends only {question_id, chosen_index, context}.
+      • This endpoint reads correct_index and explanation from question_bank
+        (never exposed to the frontend at fetch time).
+      • Returns {correct: bool, explanation: str}.
+
+    Recording semantics:
+      • asked_questions row was already written at fetch time (correct=NULL).
+      • This endpoint UPDATEs that row with the correct bool so analytics
+        capture actual student performance.
+
+    Mastery update:
+      • All contexts (pretest, posttest, practice) call after_quiz_submit()
+        which feeds record_quiz_attempt() → mastery = 0.65*old + 0.35*score.
+      • For pretest/posttest the score is the fraction correct across the
+        submitted question (1.0 if correct, 0.0 otherwise) — the batch-level
+        mastery update happens when the UI submits the final batch via
+        /quiz/pretest or /quiz/posttest with answers filled in.
+      • Single-question grading here does NOT update mastery — that would
+        create a race condition with batch submission.  Only the batch
+        endpoint triggers after_quiz_submit.
+    """
+    student_id = user["student_id"]
+    qbs = get_question_bank_service()
+
+    # Validate chosen_index range
+    if body.chosen_index not in (0, 1, 2, 3):
+        raise HTTPException(
+            status_code=422,
+            detail=f"chosen_index must be 0-3, got {body.chosen_index}",
+        )
+
+    result = qbs.grade(
+        question_id=body.question_id,
+        chosen_index=body.chosen_index,
+        student_id=student_id,
+        context=body.context,
+    )
+    return result
 
 
 @app.post("/quiz/submit")

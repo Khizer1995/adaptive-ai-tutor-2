@@ -6,9 +6,10 @@ from core.layered_kb.builder import LayeredKnowledgeBuilder
 
 
 DEFAULT_OPEN_DSA_URLS = [
-    "https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/Stack.html",
+    "https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/ListArray.html",
+    "https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/BinarySearch.html",
     "https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/Queue.html",
-    "https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/HashIntro.html",
+    "https://opendsa-server.cs.vt.edu/ODSA/Books/Everything/html/QueueLinked.html",
 ]
 
 

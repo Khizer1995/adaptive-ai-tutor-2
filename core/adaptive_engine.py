@@ -260,13 +260,9 @@ def record_content(
 # ──────────────────────────────────────────────────────────────────────────────
 
 _DSA_TOPICS_DEFAULT = [
-    {"name": "array",       "order_index": 0,  "subtopics": ["array_introduction", "array_operations", "array_searching", "array_sorting"]},
-    {"name": "linked_list", "order_index": 1,  "subtopics": ["linked_list_introduction", "linked_list_insertion", "linked_list_deletion", "linked_list_traversal"]},
-    {"name": "stack",       "order_index": 2,  "subtopics": ["stack_introduction", "stack_push", "stack_pop", "stack_peek", "stack_isempty_isfull", "stack_array", "stack_linked_list", "stack_applications"]},
-    {"name": "queue",       "order_index": 3,  "subtopics": ["queue_introduction", "queue_enqueue", "queue_dequeue", "queue_circular", "queue_priority"]},
-    {"name": "hash_table",  "order_index": 4,  "subtopics": ["hash_table_introduction", "hash_functions", "collision_resolution", "hash_table_operations"]},
-    {"name": "tree",        "order_index": 5,  "subtopics": ["tree_introduction", "binary_tree", "bst_operations", "tree_traversal", "balanced_trees"]},
-    {"name": "graph",       "order_index": 6,  "subtopics": ["graph_introduction", "graph_representation", "bfs", "dfs", "shortest_path"]},
+    {"name": "array", "order_index": 0, "subtopics": ["array_introduction", "array_operations", "array_searching", "array_sorting", "array_multidimensional", "array_applications"]},
+    {"name": "queue", "order_index": 1, "subtopics": ["queue_introduction", "queue_enqueue", "queue_dequeue", "queue_circular", "queue_priority", "queue_deque", "queue_applications"]},
+    {"name": "graph", "order_index": 2, "subtopics": ["graph_introduction", "graph_representation", "graph_bfs", "graph_dfs", "graph_shortest_path", "graph_topological", "graph_applications"]},
 ]
 
 _PYTHON_TOPICS_DEFAULT = [

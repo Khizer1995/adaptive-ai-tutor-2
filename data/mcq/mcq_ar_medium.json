@@ -1,0 +1,642 @@
+[
+  {
+    "id": "mcq_ar_medium_001",
+    "topic": "Array",
+    "subtopic": "Array Introduction",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\na = [1, 2]\nb = a\nc = a[:]\nb.append(3)\nprint(a, c)",
+    "options": [
+      "[1, 2, 3] [1, 2, 3]",
+      "[1, 2] [1, 2]",
+      "[1, 2, 3] [1, 2]",
+      "[1, 2] [1, 2, 3]"
+    ],
+    "correct_index": 2,
+    "explanation": "b = a makes both names refer to the same list, so b.append changes a; c = a[:] is an independent copy.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_002",
+    "topic": "Array",
+    "subtopic": "Array Operations",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\na = [1, 1, 2, 2, 3]\nk = 1\nfor i in range(1, len(a)):\n    if a[i] != a[k-1]: a[k] = a[i]; k += 1\nprint(k, a[:k])",
+    "options": [
+      "3 [1, 2, 3]",
+      "5 [1, 2, 3]",
+      "2 [1, 2]",
+      "3 [1, 1, 2]"
+    ],
+    "correct_index": 0,
+    "explanation": "k counts unique values written back to the front: 1, 2 and 3, so k = 3.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_003",
+    "topic": "Array",
+    "subtopic": "Array Sorting",
+    "difficulty": "medium",
+    "prompt": "What is the best-case time complexity of insertion sort, and when does it occur?",
+    "options": [
+      "O(n), when the array is already sorted",
+      "O(n log n), when the array is already sorted",
+      "O(1), when the array has one distinct value",
+      "O(n²), when the array is already sorted"
+    ],
+    "correct_index": 0,
+    "explanation": "On sorted input every element is compared once with its predecessor and no shifting occurs.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_004",
+    "topic": "Array",
+    "subtopic": "Array Introduction",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\na = [0, 1, 2, 3, 4, 5]\nprint(a[::2])",
+    "options": [
+      "[0, 2]",
+      "[0, 5]",
+      "[1, 3, 5]",
+      "[0, 2, 4]"
+    ],
+    "correct_index": 3,
+    "explanation": "The step of 2 takes every second element starting from index 0.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_005",
+    "topic": "Array",
+    "subtopic": "Multi-dimensional Arrays",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\nm = [[0] * 3] * 2\nm[0][0] = 1\nprint(m)",
+    "options": [
+      "[[1, 1, 1], [1, 1, 1]]",
+      "[[1, 0, 0], [0, 0, 0]]",
+      "[[1, 0, 0], [1, 0, 0]]",
+      "[[0, 0, 0], [1, 0, 0]]"
+    ],
+    "correct_index": 2,
+    "explanation": "[[0] * 3] * 2 repeats a reference to the same row, so changing one row changes both.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_006",
+    "topic": "Array",
+    "subtopic": "Array Sorting",
+    "difficulty": "medium",
+    "prompt": "Selection sort is chosen over bubble sort when writes are expensive. Why?",
+    "options": [
+      "It performs fewer comparisons than bubble sort",
+      "It performs no swaps at all",
+      "It performs at most n - 1 swaps, while bubble sort can perform O(n²) swaps",
+      "It is stable while bubble sort is not"
+    ],
+    "correct_index": 2,
+    "explanation": "Selection sort does one swap per pass to place the minimum; bubble sort swaps adjacent pairs repeatedly.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_007",
+    "topic": "Array",
+    "subtopic": "Multi-dimensional Arrays",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\nj = [[1], [2, 3], [4, 5, 6]]\nprint(len(j[2]), sum(len(r) for r in j))",
+    "options": [
+      "6 6",
+      "3 6",
+      "6 3",
+      "3 3"
+    ],
+    "correct_index": 1,
+    "explanation": "Rows may have different lengths; the last row has 3 elements and the rows hold 1 + 2 + 3 = 6 elements in total.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_008",
+    "topic": "Array",
+    "subtopic": "Array Sorting",
+    "difficulty": "medium",
+    "prompt": "Quicksort that always picks the first element as the pivot runs in O(n²) on which input?",
+    "options": [
+      "An array of all different random values",
+      "An already sorted array",
+      "An array stored in a 2D layout",
+      "An array with exactly two elements"
+    ],
+    "correct_index": 1,
+    "explanation": "On sorted input every partition splits off just one element, so the recursion depth becomes n.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_009",
+    "topic": "Array",
+    "subtopic": "Multi-dimensional Arrays",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\nm = [[1, 2], [3, 4], [5, 6]]\nprint(list(zip(*m)))",
+    "options": [
+      "[(1, 4), (2, 5), (3, 6)]",
+      "[(1, 2), (3, 4), (5, 6)]",
+      "[(1, 3, 5), (2, 4, 6)]",
+      "[[1, 3, 5], [2, 4, 6]]"
+    ],
+    "correct_index": 2,
+    "explanation": "zip(*rows) pairs the first elements of every row, then the second elements, producing tuples (the transpose).",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_010",
+    "topic": "Array",
+    "subtopic": "Array Operations",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\na = [1, 2, 3]\na.insert(1, 5)\na.insert(0, 9)\nprint(a)",
+    "options": [
+      "[1, 9, 5, 2, 3]",
+      "[9, 1, 5, 2, 3]",
+      "[1, 5, 2, 3, 9]",
+      "[9, 5, 1, 2, 3]"
+    ],
+    "correct_index": 1,
+    "explanation": "insert(1, 5) gives [1, 5, 2, 3]; insert(0, 9) then puts 9 in front of everything.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_011",
+    "topic": "Array",
+    "subtopic": "Array Operations",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\na = [1, 2, 3, 4, 5]\ni, j = 0, len(a) - 1\nwhile i < j:\n    a[i], a[j] = a[j], a[i]; i += 1; j -= 1\nprint(a)",
+    "options": [
+      "[2, 1, 4, 3, 5]",
+      "[1, 2, 3, 4, 5]",
+      "[5, 4, 3, 2, 1]",
+      "[5, 2, 3, 4, 1]"
+    ],
+    "correct_index": 2,
+    "explanation": "Two pointers swap the outermost pair and move inward until they meet, reversing the array in place.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_012",
+    "topic": "Array",
+    "subtopic": "Array Introduction",
+    "difficulty": "medium",
+    "prompt": "An array starts at address 1000 and each element takes 4 bytes. What is the address of a[5] (zero-based)?",
+    "options": [
+      "1024",
+      "1016",
+      "1020",
+      "1005"
+    ],
+    "correct_index": 2,
+    "explanation": "address = base + index × element size = 1000 + 5 × 4.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_013",
+    "topic": "Array",
+    "subtopic": "Array Applications",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\ncnt = [0] * 26\nfor ch in 'hello':\n    cnt[ord(ch) - 97] += 1\nprint(cnt[ord('l') - 97])",
+    "options": [
+      "26",
+      "2",
+      "1",
+      "3"
+    ],
+    "correct_index": 1,
+    "explanation": "The array cnt is used as 26 letter counters; the letter 'l' appears twice in 'hello'.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_014",
+    "topic": "Array",
+    "subtopic": "Array Operations",
+    "difficulty": "medium",
+    "prompt": "n items are inserted one at a time at the front of a Python list. What is the total running time?",
+    "options": [
+      "O(n²), because the i-th insertion shifts about i elements",
+      "O(1) amortized per insertion",
+      "O(n)",
+      "O(n log n)"
+    ],
+    "correct_index": 0,
+    "explanation": "Each front insertion shifts every existing element, so the total is 1 + 2 + ... + n = O(n²).",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_015",
+    "topic": "Array",
+    "subtopic": "Array Applications",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\na = [0, 1, 0, 3, 12]\nk = 0\nfor x in a:\n    if x != 0: a[k] = x; k += 1\na[k:] = [0] * (len(a) - k)\nprint(a)",
+    "options": [
+      "[1, 3, 12, 0, 0]",
+      "[0, 1, 0, 3, 12]",
+      "[0, 0, 1, 3, 12]",
+      "[1, 3, 12]"
+    ],
+    "correct_index": 0,
+    "explanation": "The write pointer k packs non-zero values to the front in their original order, then the remaining slots are filled with zeros.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_016",
+    "topic": "Array",
+    "subtopic": "Multi-dimensional Arrays",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\nm = [[1, 2, 3], [4, 5, 6], [7, 8, 10]]\nprint(sum(m[i][i] for i in range(3)))",
+    "options": [
+      "12",
+      "45",
+      "16",
+      "15"
+    ],
+    "correct_index": 2,
+    "explanation": "The main diagonal is 1 + 5 + 10 = 16; the anti-diagonal sum would be 15.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_017",
+    "topic": "Array",
+    "subtopic": "Array Searching",
+    "difficulty": "medium",
+    "prompt": "Many implementations compute the binary-search midpoint as lo + (hi - lo) // 2 instead of (lo + hi) // 2. Why?",
+    "options": [
+      "To round the midpoint up instead of down",
+      "To make the search work on unsorted arrays",
+      "To make binary search O(1)",
+      "To avoid integer overflow of lo + hi in languages with fixed-width integers"
+    ],
+    "correct_index": 3,
+    "explanation": "lo + hi can exceed the maximum integer for very large arrays; lo + (hi - lo) // 2 yields the same value without overflow.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_018",
+    "topic": "Array",
+    "subtopic": "Array Searching",
+    "difficulty": "medium",
+    "prompt": "About how many comparisons does binary search need, at most, on a sorted array of 1,000 elements?",
+    "options": [
+      "1000",
+      "500",
+      "100",
+      "10"
+    ],
+    "correct_index": 3,
+    "explanation": "The range halves each time, and 2¹⁰ = 1024 ≥ 1000, so at most about 10 comparisons are needed.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_019",
+    "topic": "Array",
+    "subtopic": "Array Searching",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\na = [1, 2, 2, 2, 3]\nprint(a.index(2), a.count(2))",
+    "options": [
+      "3 3",
+      "0 3",
+      "1 1",
+      "1 3"
+    ],
+    "correct_index": 3,
+    "explanation": "index returns the first position of 2 (index 1) and count returns how many times it occurs (3).",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_020",
+    "topic": "Array",
+    "subtopic": "Array Operations",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\na = [1, 2, 4, 5]\nfor x in a:\n    if x % 2 == 0: a.remove(x)\nprint(a)",
+    "options": [
+      "[1, 2, 4, 5]",
+      "[1, 4, 5]",
+      "[1, 5]",
+      "[1, 4]"
+    ],
+    "correct_index": 1,
+    "explanation": "Removing 2 shifts the list left, so the loop's next index skips 4; it is never checked and stays in the list.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_021",
+    "topic": "Array",
+    "subtopic": "Array Searching",
+    "difficulty": "medium",
+    "prompt": "A successful linear search on n distinct elements, with every position equally likely, makes how many comparisons on average?",
+    "options": [
+      "(n + 1) / 2",
+      "n",
+      "2n",
+      "log₂ n"
+    ],
+    "correct_index": 0,
+    "explanation": "The target is equally likely to be at positions 1..n, so the average number of comparisons is (1 + 2 + ... + n) / n = (n + 1) / 2.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_022",
+    "topic": "Array",
+    "subtopic": "Array Applications",
+    "difficulty": "medium",
+    "prompt": "Why is an array the underlying storage of most hash tables?",
+    "options": [
+      "Arrays automatically remove collisions",
+      "A hash value can be turned into an index, giving O(1) direct access to the bucket",
+      "Arrays are the only structure that can store strings",
+      "Arrays keep their elements sorted, which makes hashing unnecessary"
+    ],
+    "correct_index": 1,
+    "explanation": "The hash function maps a key to an index, and array indexing reaches that bucket in constant time.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_023",
+    "topic": "Array",
+    "subtopic": "Array Introduction",
+    "difficulty": "medium",
+    "prompt": "Why is iterating over an array often faster in practice than iterating over a linked list of the same length?",
+    "options": [
+      "Arrays contain fewer elements",
+      "Linked-list traversal is O(n²)",
+      "Array elements are kept in CPU registers",
+      "Contiguous storage gives good cache locality, so neighbouring elements are loaded together"
+    ],
+    "correct_index": 3,
+    "explanation": "Both traversals are O(n), but sequential memory access makes better use of CPU caches.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_024",
+    "topic": "Array",
+    "subtopic": "Array Searching",
+    "difficulty": "medium",
+    "prompt": "A standard binary search for 2 on [5, 1, 4, 2, 3] reports 'not found', although 2 is in the array. Why?",
+    "options": [
+      "The array is unsorted, so discarding half of it based on the middle element is invalid",
+      "Binary search only works on arrays of at most 4 elements",
+      "Binary search cannot find values smaller than the middle value",
+      "The array has an odd number of elements"
+    ],
+    "correct_index": 0,
+    "explanation": "Comparing with the middle value 4 wrongly discards the right half that contains 2; binary search needs sorted input.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_025",
+    "topic": "Array",
+    "subtopic": "Multi-dimensional Arrays",
+    "difficulty": "medium",
+    "prompt": "What is the time complexity of the standard triple-loop multiplication of two n × n matrices?",
+    "options": [
+      "O(n³)",
+      "O(n log n)",
+      "O(2ⁿ)",
+      "O(n²)"
+    ],
+    "correct_index": 0,
+    "explanation": "Each of the n² result entries needs a sum of n products.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_026",
+    "topic": "Array",
+    "subtopic": "Array Sorting",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\np = [('b', 2), ('a', 2), ('c', 1)]\nprint(sorted(p, key=lambda x: x[1]))",
+    "options": [
+      "[('a', 2), ('b', 2), ('c', 1)]",
+      "[('b', 2), ('a', 2), ('c', 1)]",
+      "[('c', 1), ('b', 2), ('a', 2)]",
+      "[('c', 1), ('a', 2), ('b', 2)]"
+    ],
+    "correct_index": 2,
+    "explanation": "Python's sort is stable: equal keys keep their original relative order, so ('b', 2) stays before ('a', 2).",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_027",
+    "topic": "Array",
+    "subtopic": "Array Applications",
+    "difficulty": "medium",
+    "prompt": "Given a SORTED array, you must decide whether two elements add up to a target. Which approach is O(n) time and O(1) extra space?",
+    "options": [
+      "Two pointers, one at each end, moving inward based on whether the current sum is too small or too large",
+      "Copy the array into a second array and sort it again",
+      "Linear search from the middle outward without comparing sums",
+      "Binary search for every pair, using O(n²) time"
+    ],
+    "correct_index": 0,
+    "explanation": "If the sum is too small, the left pointer moves right; if too large, the right pointer moves left, so each element is visited once.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_028",
+    "topic": "Array",
+    "subtopic": "Array Searching",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\na, t = [2, 4, 6, 8, 10, 12], 10\nlo, hi, steps = 0, len(a) - 1, 0\nwhile lo <= hi:\n    mid = (lo + hi) // 2; steps += 1\n    if a[mid] == t: break\n    lo, hi = (mid + 1, hi) if a[mid] < t else (lo, mid - 1)\nprint(mid, steps)",
+    "options": [
+      "4 2",
+      "2 4",
+      "5 3",
+      "3 2"
+    ],
+    "correct_index": 0,
+    "explanation": "First mid = 2 (value 6 < 10), then mid = 4 (value 10) is found after 2 comparisons.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_029",
+    "topic": "Array",
+    "subtopic": "Array Sorting",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\na = [4, 3, 2, 1]\nfor i in range(1, 3):\n    k, j = a[i], i - 1\n    while j >= 0 and a[j] > k: a[j+1] = a[j]; j -= 1\n    a[j+1] = k\nprint(a)",
+    "options": [
+      "[4, 3, 2, 1]",
+      "[3, 4, 2, 1]",
+      "[2, 3, 4, 1]",
+      "[1, 2, 3, 4]"
+    ],
+    "correct_index": 2,
+    "explanation": "The loop inserts a[1] and a[2] into the sorted prefix, so the first three elements become sorted while 1 is untouched.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_030",
+    "topic": "Array",
+    "subtopic": "Array Sorting",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\na = [5, 1, 4, 2, 8]\nfor _ in range(2):\n    for i in range(len(a) - 1):\n        if a[i] > a[i+1]: a[i], a[i+1] = a[i+1], a[i]\nprint(a)",
+    "options": [
+      "[5, 1, 4, 2, 8]",
+      "[1, 2, 4, 5, 8]",
+      "[1, 2, 4, 8, 5]",
+      "[1, 4, 2, 5, 8]"
+    ],
+    "correct_index": 1,
+    "explanation": "Pass 1 gives [1, 4, 2, 5, 8] and pass 2 swaps 4 and 2, giving [1, 2, 4, 5, 8].",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_031",
+    "topic": "Array",
+    "subtopic": "Array Searching",
+    "difficulty": "medium",
+    "prompt": "An unsorted array of n elements must answer n membership queries. Which approach is asymptotically best?",
+    "options": [
+      "Run a linear search for every query: O(n) total",
+      "Sort once with an O(n log n) sort, then answer each query with binary search: O(n log n) total",
+      "Run binary search directly on the unsorted array: O(n log n) total",
+      "Run a linear search for every query: O(n log n) total"
+    ],
+    "correct_index": 1,
+    "explanation": "Repeated linear searches cost O(n) each, O(n²) in total; sorting once amortizes the cost over all queries.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_032",
+    "topic": "Array",
+    "subtopic": "Multi-dimensional Arrays",
+    "difficulty": "medium",
+    "prompt": "A 3 × 4 array is stored in row-major order starting at address 100, with 4 bytes per element. What is the address of element [1][2]?",
+    "options": [
+      "128",
+      "124",
+      "120",
+      "108"
+    ],
+    "correct_index": 1,
+    "explanation": "Offset = (row × columns + column) × size = (1 × 4 + 2) × 4 = 24, so the address is 100 + 24.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_033",
+    "topic": "Array",
+    "subtopic": "Array Applications",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\na, k = [2, 1, 5, 1, 3, 2], 3\ns = sum(a[:k]); best = s\nfor i in range(k, len(a)):\n    s += a[i] - a[i-k]; best = max(best, s)\nprint(best)",
+    "options": [
+      "8",
+      "6",
+      "9",
+      "14"
+    ],
+    "correct_index": 2,
+    "explanation": "The window sums for size 3 are 8, 7, 9 and 6, so the best is 9.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_034",
+    "topic": "Array",
+    "subtopic": "Array Operations",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\na = [1, 2, 1]\na.remove(1)\nprint(a)",
+    "options": [
+      "[2]",
+      "[2, 1]",
+      "[1, 2]",
+      "[1, 1]"
+    ],
+    "correct_index": 1,
+    "explanation": "remove(1) deletes only the first occurrence of the value 1.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_035",
+    "topic": "Array",
+    "subtopic": "Array Operations",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\na = [1, 2, 3, 4, 5]\na = a[2:] + a[:2]\nprint(a)",
+    "options": [
+      "[5, 1, 2, 3, 4]",
+      "[2, 3, 4, 5, 1]",
+      "[4, 5, 1, 2, 3]",
+      "[3, 4, 5, 1, 2]"
+    ],
+    "correct_index": 3,
+    "explanation": "a[2:] is [3, 4, 5] and a[:2] is [1, 2]; joining them rotates the list left by 2.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_036",
+    "topic": "Array",
+    "subtopic": "Array Introduction",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\na = [1, 2, 3, 4, 5]\nprint(a[1:4])",
+    "options": [
+      "[1, 2, 3]",
+      "[2, 3, 4, 5]",
+      "[1, 2, 3, 4]",
+      "[2, 3, 4]"
+    ],
+    "correct_index": 3,
+    "explanation": "A slice a[1:4] includes indexes 1, 2 and 3 and excludes the end index 4.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_037",
+    "topic": "Array",
+    "subtopic": "Array Introduction",
+    "difficulty": "medium",
+    "prompt": "Python's list.append is described as amortized O(1). Why?",
+    "options": [
+      "Append always runs in O(1) even in the worst case, with no resizing at all",
+      "The new element is stored in a separate hash table",
+      "Appends are queued and executed once when the program exits",
+      "The list over-allocates spare capacity, so the expensive resize-and-copy happens only occasionally"
+    ],
+    "correct_index": 3,
+    "explanation": "Occasional O(n) copies are spread over many cheap appends, giving a constant average cost.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_038",
+    "topic": "Array",
+    "subtopic": "Array Introduction",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\na = [1, 2, 3]\nprint(a[1:10])",
+    "options": [
+      "[2, 3]",
+      "[]",
+      "[1, 2, 3]",
+      "IndexError"
+    ],
+    "correct_index": 0,
+    "explanation": "Unlike indexing, slicing silently clips an out-of-range end index to the length of the list.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_039",
+    "topic": "Array",
+    "subtopic": "Array Applications",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\na = [3, 1, 4, 1, 5]\np = [0]\nfor x in a: p.append(p[-1] + x)\nprint(p[4] - p[1])",
+    "options": [
+      "5",
+      "9",
+      "14",
+      "6"
+    ],
+    "correct_index": 3,
+    "explanation": "p holds prefix sums, so p[4] - p[1] is the sum of a[1..3] = 1 + 4 + 1.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_ar_medium_040",
+    "topic": "Array",
+    "subtopic": "Array Sorting",
+    "difficulty": "medium",
+    "prompt": "What is the extra (auxiliary) space complexity of the standard array merge sort?",
+    "options": [
+      "O(log n)",
+      "O(1)",
+      "O(n²)",
+      "O(n)"
+    ],
+    "correct_index": 3,
+    "explanation": "Merging two halves needs a temporary array of up to n elements.",
+    "source": "custom_mcq"
+  }
+]

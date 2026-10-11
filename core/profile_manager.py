@@ -52,7 +52,15 @@ class ProfileManager:
         Load a student profile by ID.
         Returns a plain dict suitable for use with all agents.
         Raises FileNotFoundError if profile doesn't exist.
+        
+        Filters out removed topics (linked_list, stack, hash_table, tree) from:
+        - knowledge_state
+        - subtopic_mastery
+        - subtopic_progress
+        - seen_question_hashes
         """
+        from core.curriculum_config import TOPIC_ORDER  # Import current curriculum
+        
         path = self._path(student_id)
         if not os.path.exists(path):
             raise FileNotFoundError(
@@ -64,7 +72,40 @@ class ProfileManager:
 
         # Normalise via schema so field names are consistent
         profile = StudentProfile.from_dict(raw)
-        return cast(Dict[str, Any], profile.to_dict())
+        state = cast(Dict[str, Any], profile.to_dict())
+        
+        # Filter out removed topics from state
+        valid_topics = set(TOPIC_ORDER)
+        
+        # Filter knowledge_state
+        if "knowledge_state" in state and isinstance(state["knowledge_state"], dict):
+            state["knowledge_state"] = {
+                k: v for k, v in state["knowledge_state"].items()
+                if k in valid_topics
+            }
+        
+        # Filter subtopic_mastery
+        if "subtopic_mastery" in state and isinstance(state["subtopic_mastery"], dict):
+            state["subtopic_mastery"] = {
+                k: v for k, v in state["subtopic_mastery"].items()
+                if any(k.startswith(topic + "_") for topic in valid_topics)
+            }
+        
+        # Filter subtopic_progress
+        if "subtopic_progress" in state and isinstance(state["subtopic_progress"], dict):
+            state["subtopic_progress"] = {
+                k: v for k, v in state["subtopic_progress"].items()
+                if any(k.startswith(topic + "_") for topic in valid_topics)
+            }
+        
+        # Filter seen_question_hashes
+        if "seen_question_hashes" in state and isinstance(state["seen_question_hashes"], dict):
+            state["seen_question_hashes"] = {
+                k: v for k, v in state["seen_question_hashes"].items()
+                if k in valid_topics or any(k.startswith(topic + "_") for topic in valid_topics)
+            }
+        
+        return state
 
     def save(self, student_id: str, state: dict, user_id: Optional[str] = None) -> None:
         """

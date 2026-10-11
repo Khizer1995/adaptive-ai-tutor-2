@@ -1,0 +1,642 @@
+[
+  {
+    "id": "mcq_gr_easy_001",
+    "topic": "Graph",
+    "subtopic": "Shortest Path",
+    "difficulty": "easy",
+    "prompt": "In an unweighted graph, which traversal finds the path with the fewest edges from a source to every reachable vertex?",
+    "options": [
+      "Depth-first search",
+      "Topological sort",
+      "Inorder traversal",
+      "Breadth-first search"
+    ],
+    "correct_index": 3,
+    "explanation": "BFS explores vertices in order of their edge distance from the source, so the first path it finds to each vertex has the fewest edges.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_002",
+    "topic": "Graph",
+    "subtopic": "DFS",
+    "difficulty": "easy",
+    "prompt": "Which data structure does depth-first search use, explicitly or via recursion?",
+    "options": [
+      "A queue",
+      "A stack",
+      "A priority queue",
+      "A hash set only"
+    ],
+    "correct_index": 1,
+    "explanation": "DFS follows last-in, first-out order: the call stack (or an explicit stack) remembers where to backtrack.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_003",
+    "topic": "Graph",
+    "subtopic": "Adjacency Matrix and List",
+    "difficulty": "easy",
+    "prompt": "What is the space complexity of an adjacency list for a graph with V vertices and E edges?",
+    "options": [
+      "O(V * V)",
+      "O(V * E)",
+      "O(E * E)",
+      "O(V + E)"
+    ],
+    "correct_index": 3,
+    "explanation": "The list stores one entry per vertex plus one entry per edge (two per edge if undirected).",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_004",
+    "topic": "Graph",
+    "subtopic": "Shortest Path",
+    "difficulty": "easy",
+    "prompt": "In a weighted graph, what is the length (cost) of a path?",
+    "options": [
+      "The largest edge weight on the path",
+      "The sum of the weights of the edges on the path",
+      "The number of cycles the path contains",
+      "The number of vertices on the path"
+    ],
+    "correct_index": 1,
+    "explanation": "Shortest-path algorithms minimize the total of the edge weights along the path.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_005",
+    "topic": "Graph",
+    "subtopic": "Topological Sort",
+    "difficulty": "easy",
+    "prompt": "A graph has directed edges A -> B, A -> C, B -> D and C -> D. Which vertex must come first in every topological ordering?",
+    "options": [
+      "D",
+      "A",
+      "C",
+      "B"
+    ],
+    "correct_index": 1,
+    "explanation": "A has no incoming edges and must precede B and C, which in turn must precede D.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_006",
+    "topic": "Graph",
+    "subtopic": "DFS",
+    "difficulty": "easy",
+    "prompt": "In DFS, when does the algorithm backtrack from a vertex?",
+    "options": [
+      "When the vertex has an even degree",
+      "When the vertex has no unvisited neighbors left",
+      "After visiting exactly two neighbors",
+      "As soon as it finds the first neighbor"
+    ],
+    "correct_index": 1,
+    "explanation": "A vertex is finished when all its neighbors are visited; DFS then returns to the previous vertex.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_007",
+    "topic": "Graph",
+    "subtopic": "Applications",
+    "difficulty": "easy",
+    "prompt": "A web crawler starts from one page and must find every page reachable by following links. Which technique does this?",
+    "options": [
+      "Sorting the pages by URL",
+      "Graph traversal with BFS or DFS, keeping a visited set",
+      "Hashing each page's title",
+      "Binary search on the page list"
+    ],
+    "correct_index": 1,
+    "explanation": "Following links from a start page is exactly a traversal of the link graph; the visited set prevents loops.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_008",
+    "topic": "Graph",
+    "subtopic": "BFS",
+    "difficulty": "easy",
+    "prompt": "What does this BFS print?\nfrom collections import deque\ng = {1: [2, 3], 2: [4], 3: [], 4: []}\nq, order = deque([1]), []\nwhile q:\n    u = q.popleft(); order.append(u)\n    q.extend(g[u])\nprint(order)",
+    "options": [
+      "[4, 3, 2, 1]",
+      "[1, 2, 3, 4]",
+      "[1, 3, 2, 4]",
+      "[1, 2, 4, 3]"
+    ],
+    "correct_index": 1,
+    "explanation": "BFS visits 1, then its neighbors 2 and 3, then the neighbor of 2, which is 4. (The second option is a DFS order.)",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_009",
+    "topic": "Graph",
+    "subtopic": "DFS",
+    "difficulty": "easy",
+    "prompt": "How does DFS explore a graph?",
+    "options": [
+      "It only follows edges with the smallest weight",
+      "It visits all neighbors of a vertex before going deeper",
+      "It visits vertices in sorted order",
+      "It goes as deep as possible along a path and backtracks only when it hits a dead end"
+    ],
+    "correct_index": 3,
+    "explanation": "DFS keeps moving to an unvisited neighbor and returns to earlier vertices only when none remain.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_010",
+    "topic": "Graph",
+    "subtopic": "Graph Introduction",
+    "difficulty": "easy",
+    "prompt": "In an undirected graph, what is the degree of a vertex?",
+    "options": [
+      "The number of vertices in the whole graph",
+      "The number of edges incident to that vertex",
+      "The length of the longest path starting at that vertex",
+      "The number of cycles passing through that vertex"
+    ],
+    "correct_index": 1,
+    "explanation": "Degree counts the edges touching a vertex, which equals its number of neighbors in a simple graph.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_011",
+    "topic": "Graph",
+    "subtopic": "BFS",
+    "difficulty": "easy",
+    "prompt": "Why does BFS keep a 'visited' set?",
+    "options": [
+      "To count the number of edges",
+      "To store the edge weights",
+      "To avoid visiting the same vertex repeatedly and looping forever in graphs with cycles",
+      "To sort the vertices by degree"
+    ],
+    "correct_index": 2,
+    "explanation": "Without marking visited vertices, a cycle would cause the same vertices to be enqueued again and again.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_012",
+    "topic": "Graph",
+    "subtopic": "Graph Introduction",
+    "difficulty": "easy",
+    "prompt": "When is an undirected graph called connected?",
+    "options": [
+      "When it has exactly V - 1 edges",
+      "When it contains no cycles",
+      "When there is a path between every pair of vertices",
+      "When every vertex has at least one self-loop"
+    ],
+    "correct_index": 2,
+    "explanation": "Connectivity means any vertex can reach any other; a connected graph may or may not contain cycles.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_013",
+    "topic": "Graph",
+    "subtopic": "Graph Introduction",
+    "difficulty": "easy",
+    "prompt": "What is a weighted graph?",
+    "options": [
+      "A graph in which each edge has an associated numeric value such as cost or distance",
+      "A graph that contains at least one cycle",
+      "A graph in which every vertex has the same degree",
+      "A graph with more edges than vertices"
+    ],
+    "correct_index": 0,
+    "explanation": "Edge weights model quantities like distance, time, or cost, and are used by shortest-path algorithms.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_014",
+    "topic": "Graph",
+    "subtopic": "Graph Introduction",
+    "difficulty": "easy",
+    "prompt": "What is the maximum number of edges in a simple undirected graph (no self-loops, no parallel edges) with 4 vertices?",
+    "options": [
+      "4",
+      "6",
+      "8",
+      "12"
+    ],
+    "correct_index": 1,
+    "explanation": "Each pair of vertices can have at most one edge, so the maximum is C(4,2) = 4*3/2 = 6.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_015",
+    "topic": "Graph",
+    "subtopic": "Applications",
+    "difficulty": "easy",
+    "prompt": "In a social network where friendship is mutual, how are people and friendships best modeled?",
+    "options": [
+      "People as directed edges and friendships as weights",
+      "People as edges and friendships as vertices",
+      "People as stack frames and friendships as queues",
+      "People as vertices and friendships as undirected edges"
+    ],
+    "correct_index": 3,
+    "explanation": "Mutual relationships are symmetric, so undirected edges between person-vertices model them naturally.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_016",
+    "topic": "Graph",
+    "subtopic": "Applications",
+    "difficulty": "easy",
+    "prompt": "How can the number of connected components of an undirected graph be counted?",
+    "options": [
+      "Sort the vertices and count the distinct labels",
+      "Run BFS or DFS from every unvisited vertex and count how many times a new search is started",
+      "Count the number of edges and divide by 2",
+      "Count the vertices with degree 1"
+    ],
+    "correct_index": 1,
+    "explanation": "Each new traversal start discovers one entire component not seen before.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_017",
+    "topic": "Graph",
+    "subtopic": "BFS",
+    "difficulty": "easy",
+    "prompt": "Which data structure does breadth-first search use to keep track of vertices to visit?",
+    "options": [
+      "A queue",
+      "A stack",
+      "A binary search tree",
+      "A heap ordered by vertex id"
+    ],
+    "correct_index": 0,
+    "explanation": "BFS needs first-in, first-out order so that vertices closer to the start are processed first.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_018",
+    "topic": "Graph",
+    "subtopic": "Adjacency Matrix and List",
+    "difficulty": "easy",
+    "prompt": "What property does the adjacency matrix of an undirected graph always have?",
+    "options": [
+      "All its diagonal entries are 1",
+      "Every row has the same sum",
+      "It is symmetric: matrix[i][j] equals matrix[j][i]",
+      "Its rows are sorted in increasing order"
+    ],
+    "correct_index": 2,
+    "explanation": "An undirected edge between i and j is recorded in both directions.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_019",
+    "topic": "Graph",
+    "subtopic": "Graph Introduction",
+    "difficulty": "easy",
+    "prompt": "A graph is made up of which two components?",
+    "options": [
+      "A set of keys and a set of values",
+      "A set of vertices (nodes) and a set of edges connecting them",
+      "A set of rows and a set of columns",
+      "A set of roots and a set of leaves"
+    ],
+    "correct_index": 1,
+    "explanation": "A graph G = (V, E) consists of vertices V and edges E, each edge joining two vertices.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_020",
+    "topic": "Graph",
+    "subtopic": "Topological Sort",
+    "difficulty": "easy",
+    "prompt": "Kahn's algorithm for topological sorting starts by placing which vertices in its queue?",
+    "options": [
+      "Only the vertex with the highest degree",
+      "All vertices with out-degree 0",
+      "All vertices with in-degree 0",
+      "All vertices of the graph"
+    ],
+    "correct_index": 2,
+    "explanation": "Vertices with no incoming edges have no prerequisites, so they can safely come first.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_021",
+    "topic": "Graph",
+    "subtopic": "BFS",
+    "difficulty": "easy",
+    "prompt": "In what order does BFS visit vertices?",
+    "options": [
+      "As deep as possible along one path before backtracking",
+      "In increasing order of vertex label",
+      "Level by level: all vertices at distance 1 from the start, then distance 2, and so on",
+      "In random order"
+    ],
+    "correct_index": 2,
+    "explanation": "BFS explores all neighbors of the current level before moving on to the next level.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_022",
+    "topic": "Graph",
+    "subtopic": "Applications",
+    "difficulty": "easy",
+    "prompt": "A computer network connects routers by cables. If you want to know whether any two routers can communicate, which graph property do you check?",
+    "options": [
+      "Whether the graph is a complete binary tree",
+      "Whether the graph is connected (a path exists between them)",
+      "Whether the number of routers is prime",
+      "Whether every router has exactly two cables"
+    ],
+    "correct_index": 1,
+    "explanation": "Two routers can communicate exactly when there is a path between them, i.e. they lie in the same connected component.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_023",
+    "topic": "Graph",
+    "subtopic": "Applications",
+    "difficulty": "easy",
+    "prompt": "Web pages link to other web pages through hyperlinks. What kind of graph models this?",
+    "options": [
+      "A matrix with only diagonal entries",
+      "An undirected graph, because a link always goes both ways",
+      "A complete binary tree",
+      "A directed graph, where pages are vertices and links are directed edges"
+    ],
+    "correct_index": 3,
+    "explanation": "A page A linking to page B does not mean B links back to A, so edges are directed.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_024",
+    "topic": "Graph",
+    "subtopic": "Adjacency Matrix and List",
+    "difficulty": "easy",
+    "prompt": "What does this code print?\ng = {0: [1, 2], 1: [0], 2: [0]}\nprint(g[0])",
+    "options": [
+      "[0]",
+      "[1]",
+      "[0, 1, 2]",
+      "[1, 2]"
+    ],
+    "correct_index": 3,
+    "explanation": "g[0] is the adjacency list of vertex 0, which holds its neighbors 1 and 2.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_025",
+    "topic": "Graph",
+    "subtopic": "BFS",
+    "difficulty": "easy",
+    "prompt": "What is the time complexity of BFS on a graph stored as an adjacency list with V vertices and E edges?",
+    "options": [
+      "O(V * E)",
+      "O(V log V)",
+      "O(E²)",
+      "O(V + E)"
+    ],
+    "correct_index": 3,
+    "explanation": "Each vertex is enqueued once and each edge is examined a constant number of times.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_026",
+    "topic": "Graph",
+    "subtopic": "DFS",
+    "difficulty": "easy",
+    "prompt": "A recursive DFS in Python is run on a path-shaped graph with 100,000 vertices. What is the most likely problem?",
+    "options": [
+      "The output is sorted incorrectly",
+      "DFS silently switches to BFS",
+      "A RecursionError, because the recursion depth exceeds Python's default limit",
+      "The graph is rejected because it has no cycles"
+    ],
+    "correct_index": 2,
+    "explanation": "Recursive DFS uses one stack frame per vertex on the path; Python's default limit is about 1000 frames. An explicit stack avoids this.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_027",
+    "topic": "Graph",
+    "subtopic": "Shortest Path",
+    "difficulty": "easy",
+    "prompt": "Which algorithm finds the shortest paths from one source vertex in a weighted graph whose edge weights are all non-negative?",
+    "options": [
+      "Dijkstra's algorithm",
+      "Kahn's algorithm",
+      "Binary search",
+      "Breadth-first search, because it always minimizes total weight"
+    ],
+    "correct_index": 0,
+    "explanation": "Dijkstra's algorithm repeatedly settles the closest unsettled vertex and works when no edge weight is negative; BFS only minimizes the number of edges.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_028",
+    "topic": "Graph",
+    "subtopic": "Adjacency Matrix and List",
+    "difficulty": "easy",
+    "prompt": "Which representation is usually preferred for a sparse graph (far fewer edges than V*V)?",
+    "options": [
+      "Adjacency matrix",
+      "A 3-dimensional array",
+      "Adjacency list",
+      "Both use the same space"
+    ],
+    "correct_index": 2,
+    "explanation": "An adjacency list uses O(V+E) space, whereas a matrix wastes O(V*V) space on missing edges.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_029",
+    "topic": "Graph",
+    "subtopic": "Graph Introduction",
+    "difficulty": "easy",
+    "prompt": "What distinguishes a directed edge (u, v) from an undirected edge between u and v?",
+    "options": [
+      "A directed edge connects three or more vertices",
+      "A directed edge can be followed only from u to v",
+      "A directed edge always has a weight",
+      "A directed edge can only be used once in a path"
+    ],
+    "correct_index": 1,
+    "explanation": "Direction means the edge allows travel from u to v but not automatically from v to u.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_030",
+    "topic": "Graph",
+    "subtopic": "Adjacency Matrix and List",
+    "difficulty": "easy",
+    "prompt": "A graph has V vertices. What is the size of its adjacency matrix?",
+    "options": [
+      "V x V",
+      "E x E",
+      "V x E",
+      "V x log V"
+    ],
+    "correct_index": 0,
+    "explanation": "The matrix has one row and one column per vertex, so V * V cells.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_031",
+    "topic": "Graph",
+    "subtopic": "BFS",
+    "difficulty": "easy",
+    "prompt": "An undirected graph has edges 0-1, 0-2, and 1-3. Running BFS from vertex 0, at which level (distance from 0) is vertex 3 discovered?",
+    "options": [
+      "Level 0",
+      "Level 2",
+      "Level 3",
+      "Level 1"
+    ],
+    "correct_index": 1,
+    "explanation": "Vertex 3 is reached via 0 -> 1 -> 3, which uses two edges.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_032",
+    "topic": "Graph",
+    "subtopic": "Graph Introduction",
+    "difficulty": "easy",
+    "prompt": "An undirected graph has 5 edges. What is the sum of the degrees of all its vertices?",
+    "options": [
+      "5",
+      "25",
+      "10",
+      "It depends on the number of vertices"
+    ],
+    "correct_index": 2,
+    "explanation": "Each edge contributes 1 to the degree of each of its two endpoints, so the degree sum is 2 * 5 = 10.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_033",
+    "topic": "Graph",
+    "subtopic": "Adjacency Matrix and List",
+    "difficulty": "easy",
+    "prompt": "With an adjacency matrix, how long does it take to check whether an edge between u and v exists?",
+    "options": [
+      "O(V)",
+      "O(E)",
+      "O(log V)",
+      "O(1)"
+    ],
+    "correct_index": 3,
+    "explanation": "The answer is just matrix[u][v], a direct array lookup.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_034",
+    "topic": "Graph",
+    "subtopic": "Topological Sort",
+    "difficulty": "easy",
+    "prompt": "A graph has directed edges A -> B, B -> C and A -> C. Which sequence is a valid topological ordering?",
+    "options": [
+      "A, B, C",
+      "A, C, B",
+      "C, B, A",
+      "B, A, C"
+    ],
+    "correct_index": 0,
+    "explanation": "A, B, C is the only order where A precedes B, B precedes C, and A precedes C; the others each break one edge.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_035",
+    "topic": "Graph",
+    "subtopic": "Graph Introduction",
+    "difficulty": "easy",
+    "prompt": "What is a cycle in a graph?",
+    "options": [
+      "A path that starts and ends at the same vertex",
+      "A path that visits every vertex exactly once",
+      "A vertex that has no edges",
+      "An edge that connects two different components"
+    ],
+    "correct_index": 0,
+    "explanation": "A cycle returns to its starting vertex, e.g. A -> B -> C -> A.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_036",
+    "topic": "Graph",
+    "subtopic": "Topological Sort",
+    "difficulty": "easy",
+    "prompt": "What is a topological ordering of a directed graph?",
+    "options": [
+      "An ordering of the vertices from smallest to largest label",
+      "An ordering of the vertices from smallest to largest degree",
+      "A linear ordering of the vertices in which, for every edge u -> v, u appears before v",
+      "The order in which BFS first visits the vertices"
+    ],
+    "correct_index": 2,
+    "explanation": "A topological order respects every edge direction, so each vertex comes after all the vertices that point to it.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_037",
+    "topic": "Graph",
+    "subtopic": "Shortest Path",
+    "difficulty": "easy",
+    "prompt": "A graph has edges A-B with weight 2, B-D with weight 3, and A-D with weight 10. What is the cost of the cheapest path from A to D?",
+    "options": [
+      "15",
+      "2",
+      "10",
+      "5"
+    ],
+    "correct_index": 3,
+    "explanation": "The route A -> B -> D costs 2 + 3 = 5, which is cheaper than the direct edge of weight 10.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_038",
+    "topic": "Graph",
+    "subtopic": "DFS",
+    "difficulty": "easy",
+    "prompt": "What is the time complexity of DFS on a graph stored as an adjacency list with V vertices and E edges?",
+    "options": [
+      "O(V * E)",
+      "O(V + E)",
+      "O(log V)",
+      "O(V²)"
+    ],
+    "correct_index": 1,
+    "explanation": "Every vertex is visited once and every edge is examined a constant number of times.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_039",
+    "topic": "Graph",
+    "subtopic": "Adjacency Matrix and List",
+    "difficulty": "easy",
+    "prompt": "What does this code print?\ng = {1: [], 2: []}\ng[1].append(2)\ng[2].append(1)\nprint(g)",
+    "options": [
+      "{1: [2], 2: [1]}",
+      "{1: [2], 2: []}",
+      "{1: [2, 1], 2: [1, 2]}",
+      "{1: [], 2: [1]}"
+    ],
+    "correct_index": 0,
+    "explanation": "For an undirected edge the code adds 2 to 1's list and 1 to 2's list.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_gr_easy_040",
+    "topic": "Graph",
+    "subtopic": "DFS",
+    "difficulty": "easy",
+    "prompt": "What does this recursive DFS print?\ng = {1: [2, 3], 2: [4], 3: [], 4: []}\ndef dfs(u):\n    print(u, end=' ')\n    for v in g[u]: dfs(v)\ndfs(1)",
+    "options": [
+      "1 2 3 4",
+      "1 3 2 4",
+      "1 2 4 3",
+      "4 3 2 1"
+    ],
+    "correct_index": 2,
+    "explanation": "DFS from 1 goes to 2, then deeper to 4, backtracks to 1 and then visits 3.",
+    "source": "custom_mcq"
+  }
+]

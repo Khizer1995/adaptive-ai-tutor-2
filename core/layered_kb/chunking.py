@@ -5,13 +5,9 @@ from typing import Dict, List, Tuple
 
 
 TOPIC_KEYWORDS: Dict[str, List[str]] = {
-    "array": ["array", "list indexing", "dynamic array"],
-    "linked_list": ["linked list", "node", "pointer"],
-    "stack": ["stack", "push", "pop", "lifo"],
-    "queue": ["queue", "enqueue", "dequeue", "fifo"],
-    "hash_table": ["hash", "hash table", "collision", "bucket", "rehash"],
-    "tree": ["tree", "binary tree", "traversal"],
-    "graph": ["graph", "bfs", "dfs", "adjacency"],
+    "array": ["array", "list indexing", "dynamic array", "searching", "sorting"],
+    "queue": ["queue", "enqueue", "dequeue", "fifo", "circular", "priority", "deque"],
+    "graph": ["graph", "bfs", "dfs", "adjacency", "shortest path", "topological"],
 }
 
 CONCEPT_PATTERNS: List[Tuple[str, List[str]]] = [

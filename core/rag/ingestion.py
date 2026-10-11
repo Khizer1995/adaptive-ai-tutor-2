@@ -6,14 +6,9 @@ from core.rag.vector_store import VectorStore
 
 class PDFIngestionService:
     TOPIC_KEYWORD_MAP = {
-        "stack": ["stack", "push", "pop", "peek", "lifo"],
-        "queue": ["queue", "enqueue", "dequeue", "fifo", "front", "rear"],
-        "linked_list": ["linked list", "node", "next pointer", "head", "tail"],
-        "array": ["array", "index", "element", "contiguous"],
-        "hash_table": ["hash", "bucket", "collision", "key-value", "key value"],
-        "tree": ["binary tree", "root", "leaf", "traversal", "bst"],
-        "sorting": ["bubble sort", "merge sort", "quick sort", "insertion sort"],
-        "binary_search": ["binary search", "mid", "low", "high"],
+        "array": ["array", "index", "element", "contiguous", "searching", "sorting"],
+        "queue": ["queue", "enqueue", "dequeue", "fifo", "front", "rear", "circular", "priority"],
+        "graph": ["graph", "vertex", "edge", "adjacency", "bfs", "dfs", "path", "topological"],
     }
     def __init__(
         self,

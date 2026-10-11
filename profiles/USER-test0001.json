@@ -1,0 +1,41 @@
+{
+    "student_id": "USER-test0001",
+    "name": "Student",
+    "level": "beginner",
+    "subject": "dsa",
+    "current_topic": "Queue",
+    "progress": [],
+    "engagement": "medium",
+    "last_score": 0.3,
+    "learning_history": [],
+    "frustration_level": 0,
+    "engagement_score": 5,
+    "learning_style": "balanced",
+    "last_active": "2026-10-10T17:33:36.282417+00:00",
+    "accuracy_history": [],
+    "learning_gain_history": [],
+    "learning_gain": 0.0,
+    "normalized_learning_gain": 0.0,
+    "pretest_score": null,
+    "posttest_score": null,
+    "assessment_scores": {},
+    "assessment_history": [],
+    "knowledge_state": {
+        "concepts": {
+            "array": {
+                "mastery": 0.2,
+                "confidence": 0.25,
+                "attempts": 0,
+                "scaffold_level": "high",
+                "weak_areas": [],
+                "strong_areas": [],
+                "completed": false
+            }
+        },
+        "version": 2
+    },
+    "knowledge_events": [],
+    "delivered_chunks": {},
+    "current_subtopic": "Introduction",
+    "last_assessment_type": "posttest"
+}

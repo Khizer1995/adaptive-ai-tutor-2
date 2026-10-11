@@ -1,0 +1,642 @@
+[
+  {
+    "id": "mcq_qu_hard_001",
+    "topic": "Queue",
+    "subtopic": "Deque",
+    "difficulty": "hard",
+    "prompt": "In 0-1 BFS (shortest paths where every edge weight is 0 or 1), a deque replaces the priority queue. When a neighbor v is relaxed through a weight-0 edge, where is it inserted?",
+    "options": [
+      "In the middle, ordered by its distance",
+      "At the front for weight 1 and at the back for weight 0",
+      "At the front, so it is processed at the same distance as the current vertex",
+      "At the back, exactly like a weight-1 edge"
+    ],
+    "correct_index": 2,
+    "explanation": "Weight-0 neighbors have the same distance as the current vertex and must be processed before weight-1 neighbors, so they go to the front; this keeps the deque sorted by distance and gives O(V+E).",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_002",
+    "topic": "Queue",
+    "subtopic": "Deque",
+    "difficulty": "hard",
+    "prompt": "In the monotonic-deque algorithm for sliding window maximum over n elements, each iteration has a while loop that pops from the back. Why is the total time still O(n) rather than O(nk)?",
+    "options": [
+      "Each index is appended once and removed at most once, so the total number of pops across all iterations is at most n",
+      "The while loop only runs for the first window; later windows reuse earlier results",
+      "The while loop runs at most k times and k is treated as a constant",
+      "Popping from a deque takes O(1/k) time amortized"
+    ],
+    "correct_index": 0,
+    "explanation": "Amortized analysis: every element enters and leaves the deque at most once, so the inner loops sum to O(n).",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_003",
+    "topic": "Queue",
+    "subtopic": "Applications",
+    "difficulty": "hard",
+    "prompt": "In the 'rotting oranges' problem, all initially rotten cells are put into the BFS queue before the search starts, and the answer is the number of BFS levels. Why is this correct?",
+    "options": [
+      "Putting all sources in the queue makes the traversal depth-first, which finds the minimum time",
+      "Running a separate BFS from each rotten cell and taking the maximum gives the same result in the same time",
+      "All rotten cells are at distance 0, so level-by-level expansion gives every fresh cell its minimum time to rot from its nearest rotten cell in one pass",
+      "A queue is only needed because DFS cannot visit grid cells"
+    ],
+    "correct_index": 2,
+    "explanation": "Multi-source BFS treats the sources as a single level-0 frontier, so each cell is reached at its shortest distance from any source in O(rows*cols).",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_004",
+    "topic": "Queue",
+    "subtopic": "Enqueue",
+    "difficulty": "hard",
+    "prompt": "A circular queue of N = 5 slots uses only front and rear indices and declares itself full when (rear + 1) % N == front. Starting empty, the operations are: 5 enqueue attempts, then 2 dequeues, then 3 more enqueue attempts. How many of the 8 enqueue attempts succeed?",
+    "options": [
+      "5",
+      "6",
+      "7",
+      "8"
+    ],
+    "correct_index": 1,
+    "explanation": "This design stores at most N - 1 = 4 items. The first 5 attempts give 4 successes; after 2 dequeues, 2 of the next 3 succeed (back to 4 items). Total successes = 6 (a size-counter design would allow 7).",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_005",
+    "topic": "Queue",
+    "subtopic": "Circular Queue",
+    "difficulty": "hard",
+    "prompt": "A full circular queue of capacity 4 stores w, x, y, z at array indices 2, 3, 0, 1 with front = 2. It is 'resized' to capacity 8 by copying the old array into the first 4 slots of a new array, keeping front = 2 and size = 4. What goes wrong?",
+    "options": [
+      "The queue now returns items in LIFO order",
+      "Nothing; the same front and size stay valid under modulo 8",
+      "Enqueue raises an error because the new capacity is not a multiple of the old size",
+      "Dequeues return w, x, then empty slots, because y and z remain at indices 0 and 1 behind the front"
+    ],
+    "correct_index": 3,
+    "explanation": "Wrapped items must be re-laid out starting from front (unrolled) when resizing; otherwise the logical sequence front..front+size-1 no longer matches the stored items.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_006",
+    "topic": "Queue",
+    "subtopic": "Priority Queue",
+    "difficulty": "hard",
+    "prompt": "Building a binary heap from n arbitrary items with heapify (sift-down from the last parent up to the root) is O(n), while n separate insertions are O(n log n). Why is heapify faster?",
+    "options": [
+      "Most nodes are near the bottom and sift down only a few levels; the sum of node heights is O(n)",
+      "Heapify first sorts the array with an O(n) counting sort",
+      "Heapify never compares siblings, so each step costs O(1)",
+      "Every sift-down moves a node exactly one level, so the total is n steps"
+    ],
+    "correct_index": 0,
+    "explanation": "Half of the nodes are leaves (height 0), a quarter have height 1, and so on; the sum of heights n/2*0 + n/4*1 + n/8*2 + ... is O(n).",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_007",
+    "topic": "Queue",
+    "subtopic": "Deque",
+    "difficulty": "hard",
+    "prompt": "Which implementation CANNOT support all four deque operations (push and pop at both ends) in O(1) time, amortized or worst-case?",
+    "options": [
+      "A linked list of fixed-size blocks, as in CPython's deque",
+      "A singly linked list with head and tail pointers",
+      "A circular array that doubles when full",
+      "A doubly linked list with sentinel nodes"
+    ],
+    "correct_index": 1,
+    "explanation": "Removing the tail of a singly linked list requires finding the previous node, which takes O(n) even with a tail pointer.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_008",
+    "topic": "Queue",
+    "subtopic": "Queue Introduction",
+    "difficulty": "hard",
+    "prompt": "A stack is implemented with one FIFO queue. push(x) enqueues x and then dequeues and re-enqueues the previous n items so x ends up at the front; pop() just dequeues. For a stack holding n items, what are the costs?",
+    "options": [
+      "push O(n), pop O(1)",
+      "push O(n), pop O(n)",
+      "push O(1), pop O(1)",
+      "push O(1), pop O(n)"
+    ],
+    "correct_index": 0,
+    "explanation": "The rotation in push touches all n older items, while pop is a single dequeue.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_009",
+    "topic": "Queue",
+    "subtopic": "Circular Queue",
+    "difficulty": "hard",
+    "prompt": "A circular array queue tracks only front and rear indices, and front == rear means 'empty'. What must the design do to distinguish 'full' from 'empty'?",
+    "options": [
+      "Compare rear and front only after enqueues, never after dequeues",
+      "Keep one slot unused, so at most capacity - 1 items are stored",
+      "Nothing; modular arithmetic already makes front and rear differ when the queue is full",
+      "Store capacity items; a full queue then has rear = front + 1"
+    ],
+    "correct_index": 1,
+    "explanation": "If all slots were filled, rear would wrap around to equal front, which is indistinguishable from empty. Wasting one slot (or keeping a size counter) resolves this.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_010",
+    "topic": "Queue",
+    "subtopic": "Priority Queue",
+    "difficulty": "hard",
+    "prompt": "heapq has no decrease-key. A common Dijkstra implementation pushes a new (distance, vertex) entry whenever a shorter path is found and skips stale entries when popped. Why is the running time still O(E log V)?",
+    "options": [
+      "The stale entries make it O(E²), but heapq's constant factors hide this",
+      "The heap never holds more than V entries, because newer entries overwrite older ones",
+      "The heap holds at most O(E) entries, and each push or pop costs O(log E) = O(log V)",
+      "heapq automatically removes older entries for the same vertex"
+    ],
+    "correct_index": 2,
+    "explanation": "Each edge relaxation causes at most one push, so the heap has at most E entries; log E <= 2 log V, so each operation is O(log V).",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_011",
+    "topic": "Queue",
+    "subtopic": "Enqueue",
+    "difficulty": "hard",
+    "prompt": "What does this bounded circular-queue enqueue code print?\ncap, f, n = 4, 0, 0\nbuf = [None] * cap\ndef enq(x):\n    global n\n    if n == cap: return False\n    buf[(f + n) % cap] = x; n += 1; return True\nprint([enq(i) for i in range(6)], buf)",
+    "options": [
+      "[True, True, True, True, False, False] [4, 5, 2, 3]",
+      "[True, True, True, False, False, False] [0, 1, 2, None]",
+      "[True, True, True, True, False, False] [0, 1, 2, 3]",
+      "[True, True, True, True, True, True] [4, 5, 2, 3]"
+    ],
+    "correct_index": 2,
+    "explanation": "With a size counter all 4 slots are usable. The 5th and 6th enqueues see n == cap and are rejected, so nothing is overwritten and the buffer stays [0, 1, 2, 3].",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_012",
+    "topic": "Queue",
+    "subtopic": "Queue Introduction",
+    "difficulty": "hard",
+    "prompt": "What does this code print?\nfrom collections import deque\nq = deque(maxlen=3)\nfor x in range(5): q.append(x)\nprint(list(q))",
+    "options": [
+      "IndexError on the 4th append",
+      "[2, 3, 4]",
+      "[0, 1, 2]",
+      "[0, 1, 2, 3, 4]"
+    ],
+    "correct_index": 1,
+    "explanation": "A deque with maxlen discards items from the opposite end when full, so appending 3 and 4 evicts 0 and 1.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_013",
+    "topic": "Queue",
+    "subtopic": "Applications",
+    "difficulty": "hard",
+    "prompt": "What does this BFS print?\nfrom collections import deque\ng = {1: [3, 2], 2: [5], 3: [4, 5], 4: [6], 5: [6], 6: []}\nq, seen, order = deque([1]), {1}, []\nwhile q:\n    u = q.popleft(); order.append(u)\n    for v in g[u]:\n        if v not in seen: seen.add(v); q.append(v)\nprint(order)",
+    "options": [
+      "[1, 3, 2, 5, 4, 6]",
+      "[1, 3, 2, 4, 5, 6]",
+      "[1, 3, 4, 6, 5, 2]",
+      "[1, 2, 3, 5, 4, 6]"
+    ],
+    "correct_index": 1,
+    "explanation": "BFS expands level by level following adjacency order: level 1 is 3 then 2, level 2 is 4 then 5 (via 3), then 6. The first distractor is a DFS order.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_014",
+    "topic": "Queue",
+    "subtopic": "Deque",
+    "difficulty": "hard",
+    "prompt": "What does this code print?\nfrom collections import deque\nd = deque([1, 2, 3, 4, 5])\nd.rotate(2)\nd.appendleft(d.pop())\nprint(d)",
+    "options": [
+      "deque([3, 4, 5, 1, 2])",
+      "deque([5, 1, 2, 3, 4])",
+      "deque([4, 5, 1, 2, 3])",
+      "deque([2, 3, 4, 5, 1])"
+    ],
+    "correct_index": 0,
+    "explanation": "rotate(2) gives [4,5,1,2,3]; moving the last element (3) to the front then gives [3,4,5,1,2].",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_015",
+    "topic": "Queue",
+    "subtopic": "Dequeue",
+    "difficulty": "hard",
+    "prompt": "A circular queue has capacity 5, front = 2 and size n = 0 (it is empty). A buggy dequeue does NOT check for emptiness: it reads buf[front], sets front = (front + 1) % 5 and does n -= 1. Then enqueue('x') runs, writing buf[(front + n) % 5] and doing n += 1. What is the final state?",
+    "options": [
+      "x is written at index 2, but n becomes 0, so the queue still reports empty and x is effectively lost",
+      "x is written at index 3 and n becomes 1, so the queue works normally",
+      "x is written at index 2 and n becomes 1, so x is the front item",
+      "An exception is raised, because n cannot be negative"
+    ],
+    "correct_index": 0,
+    "explanation": "The bad dequeue leaves front = 3 and n = -1. Enqueue then writes at (3 + (-1)) % 5 = 2 and sets n back to 0, so the queue looks empty while x sits in the array.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_016",
+    "topic": "Queue",
+    "subtopic": "Queue Introduction",
+    "difficulty": "hard",
+    "prompt": "A linked-list queue keeps head and tail pointers. Its dequeue sets head = head.next but never touches tail, and enqueue does 'if tail is None: head = tail = node, else: tail.next = node; tail = node'. What bug appears after the queue's only element is dequeued and a new item is enqueued?",
+    "options": [
+      "The new node overwrites the removed node's data, which turns the queue into a stack",
+      "Nothing goes wrong, because tail is only used for peeking at the back",
+      "Only a memory leak occurs; every operation still returns correct results",
+      "tail still points to the removed node, so the new node is attached to it and head stays None: the queue looks empty and the item is lost"
+    ],
+    "correct_index": 3,
+    "explanation": "A stale tail makes enqueue append to a detached node; head was set to None, so the structure never sees the new element. Dequeue must reset tail to None when the queue becomes empty.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_017",
+    "topic": "Queue",
+    "subtopic": "Applications",
+    "difficulty": "hard",
+    "prompt": "A producer thread generates tasks faster than a consumer can process them. Which design handles this safely?",
+    "options": [
+      "A bounded queue whose put blocks when full, so the producer slows to the consumer's rate and memory stays capped",
+      "A stack, because LIFO processing clears the backlog faster",
+      "A priority queue with random priorities, which balances both speeds",
+      "An unbounded queue, because it never blocks and no task is ever delayed"
+    ],
+    "correct_index": 0,
+    "explanation": "A bounded blocking queue provides backpressure. An unbounded queue just lets memory grow without limit.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_018",
+    "topic": "Queue",
+    "subtopic": "Enqueue",
+    "difficulty": "hard",
+    "prompt": "A dynamic-array queue starts with capacity 1 and doubles its capacity (copying every stored item) whenever an enqueue finds it full. How many item copies occur in total during 16 enqueues with no dequeues?",
+    "options": [
+      "31",
+      "8",
+      "16",
+      "15"
+    ],
+    "correct_index": 3,
+    "explanation": "Resizes happen when enqueuing the 2nd, 3rd, 5th and 9th items, copying 1 + 2 + 4 + 8 = 15 items. (The 17th enqueue, which would copy 16 more, is not reached.)",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_019",
+    "topic": "Queue",
+    "subtopic": "Deque",
+    "difficulty": "hard",
+    "prompt": "collections.deque in CPython is a doubly linked list of fixed-size blocks. What is the time complexity of reading d[i] for an index i near the middle of a deque of n elements?",
+    "options": [
+      "O(log n), because blocks are kept in a balanced tree",
+      "O(1), exactly like a list",
+      "O(1) amortized, because blocks are cached after the first access",
+      "O(n), because it must walk block by block from one end"
+    ],
+    "correct_index": 3,
+    "explanation": "Deques give O(1) at both ends but only linear-time indexing in the middle; use a list if random access matters.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_020",
+    "topic": "Queue",
+    "subtopic": "Enqueue",
+    "difficulty": "hard",
+    "prompt": "A priority queue is stored as a sorted array. n items with random priorities are enqueued one by one, each inserted at its correct position. What is the total time?",
+    "options": [
+      "O(n log n), because a sorted array behaves like a binary heap",
+      "O(n), because each insertion is a single write",
+      "O(n log n), because binary search finds each position",
+      "O(n²), because each enqueue must shift about half of the stored items to make room"
+    ],
+    "correct_index": 3,
+    "explanation": "Binary search finds the position in O(log n), but the array shift still costs O(n) per insertion, so n insertions cost O(n²). A binary heap achieves O(n log n).",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_021",
+    "topic": "Queue",
+    "subtopic": "Dequeue",
+    "difficulty": "hard",
+    "prompt": "A queue is built from two stacks (move ALL items from the input stack to the output stack only when the output stack is empty). This code counts the item transfers. What does it print?\nin_s, out_s, moves = [], [], 0\ndef deq():\n    global moves\n    if not out_s:\n        while in_s: out_s.append(in_s.pop()); moves += 1\n    return out_s.pop()\nin_s += [1, 2, 3]; deq(); in_s.append(4); [deq() for _ in range(3)]; print(moves)",
+    "options": [
+      "5",
+      "3",
+      "4",
+      "7"
+    ],
+    "correct_index": 2,
+    "explanation": "The first dequeue moves 3 items. Items 2 and 3 are then served from the output stack, and the final dequeue finds it empty and moves only item 4 (1 more), for a total of 4.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_022",
+    "topic": "Queue",
+    "subtopic": "Priority Queue",
+    "difficulty": "hard",
+    "prompt": "Which approach finds the k largest values of a stream of n numbers with the best time complexity?",
+    "options": [
+      "Sort the stream once, giving O(n) because only k values are needed",
+      "A max-heap of size k: push each value and pop the maximum when the size exceeds k, giving O(n log k)",
+      "A sorted list of size k maintained by shifting inserts, giving O(n log k)",
+      "A min-heap of size k: push each value and pop the minimum when the size exceeds k, giving O(n log k)"
+    ],
+    "correct_index": 3,
+    "explanation": "The min-heap's root is the smallest of the current top k, so it is the right element to evict. Each of the n steps costs O(log k).",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_023",
+    "topic": "Queue",
+    "subtopic": "Applications",
+    "difficulty": "hard",
+    "prompt": "Kahn's topological sort runs on a directed graph with 5 vertices and dequeues only 3 vertices before the queue becomes empty. What does this tell you?",
+    "options": [
+      "The graph is disconnected, so the remaining vertices need a second run",
+      "The input has duplicate edges, but a valid order still exists",
+      "The graph is a DAG and the remaining 2 vertices simply have no edges",
+      "The graph contains a cycle, so no valid topological order exists"
+    ],
+    "correct_index": 3,
+    "explanation": "Vertices on a cycle never reach in-degree 0, so fewer than V vertices are processed exactly when a cycle exists.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_024",
+    "topic": "Queue",
+    "subtopic": "Priority Queue",
+    "difficulty": "hard",
+    "prompt": "What happens when the second heappush executes?\nimport heapq\nh = []\nheapq.heappush(h, (1, {'a': 1}))\nheapq.heappush(h, (1, {'b': 2}))",
+    "options": [
+      "TypeError, because the priorities tie at 1 and Python then tries to compare the two dicts",
+      "The second item silently replaces the first because the priorities match",
+      "Both items are stored; ties automatically keep insertion order",
+      "ValueError, because a heap does not allow duplicate priorities"
+    ],
+    "correct_index": 0,
+    "explanation": "Tuples compare element by element; with equal first elements the dicts are compared, and dicts are unorderable. A tie-breaking counter in the tuple avoids this.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_025",
+    "topic": "Queue",
+    "subtopic": "Circular Queue",
+    "difficulty": "hard",
+    "prompt": "For a queue with a known, fixed maximum size, why might a circular array be preferred over a linked-list queue?",
+    "options": [
+      "Circular arrays allow removal from both ends, which linked lists cannot",
+      "Circular arrays never overflow, so no capacity check is ever needed",
+      "Contiguous storage avoids per-node allocation and pointer overhead and is cache-friendly, while enqueue and dequeue stay O(1)",
+      "Circular arrays have O(1) enqueue, whereas linked-list enqueue is always O(n)"
+    ],
+    "correct_index": 2,
+    "explanation": "A linked list with a tail pointer is also O(1), so the advantage is memory layout and lower overhead, at the price of a fixed capacity.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_026",
+    "topic": "Queue",
+    "subtopic": "Applications",
+    "difficulty": "hard",
+    "prompt": "This Josephus simulation (every 3rd person is removed from 5 people) prints what?\nfrom collections import deque\nq = deque(range(1, 6))\nwhile len(q) > 1:\n    q.rotate(-2)\n    q.popleft()\nprint(q[0])",
+    "options": [
+      "1",
+      "4",
+      "2",
+      "3"
+    ],
+    "correct_index": 1,
+    "explanation": "Removal order is 3, 1, 5, 2, leaving 4. rotate(-2) moves the two skipped people to the back, then popleft removes the third.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_027",
+    "topic": "Queue",
+    "subtopic": "Applications",
+    "difficulty": "hard",
+    "prompt": "What does this round-robin scheduling simulation print (each tuple is a process name and its remaining time, quantum = 3)?\nfrom collections import deque\nq = deque([('A', 5), ('B', 2), ('C', 4)])\nwhile q:\n    n, t = q.popleft()\n    print(n, end='')\n    if t > 3: q.append((n, t - 3))",
+    "options": [
+      "AABCC",
+      "ABCABC",
+      "ABCAC",
+      "ABCCA"
+    ],
+    "correct_index": 2,
+    "explanation": "A runs 3 and is requeued with 2, B finishes, C runs 3 and is requeued with 1, then A and C finish in queue order: A B C A C.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_028",
+    "topic": "Queue",
+    "subtopic": "Priority Queue",
+    "difficulty": "hard",
+    "prompt": "A running-median structure uses a max-heap for the smaller half and a min-heap for the larger half, with sizes differing by at most one. After inserting 5, 15, 1, 3 (in this order), which statement is true?",
+    "options": [
+      "The max-heap holds {1, 3}, the min-heap holds {5, 15}, and the median is 4",
+      "The max-heap holds {5, 15}, the min-heap holds {1, 3}, and the median is 10",
+      "The max-heap holds {1, 3}, the min-heap holds {5, 15}, and the median is 3",
+      "The max-heap holds {1, 3, 5}, the min-heap holds {15}, and the median is 5"
+    ],
+    "correct_index": 0,
+    "explanation": "Sorted data is 1, 3, 5, 15. The lower half {1,3} sits in the max-heap, the upper half {5,15} in the min-heap, and the median is (3+5)/2 = 4.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_029",
+    "topic": "Queue",
+    "subtopic": "Dequeue",
+    "difficulty": "hard",
+    "prompt": "What does this priority-queue dequeue sequence print?\nimport heapq\nh = []\nfor p, name in [(2, 'b'), (1, 'z'), (2, 'a'), (1, 'c')]: heapq.heappush(h, (p, name))\nprint([heapq.heappop(h)[1] for _ in range(3)])",
+    "options": [
+      "['z', 'c', 'a']",
+      "['z', 'c', 'b']",
+      "['c', 'z', 'a']",
+      "['c', 'z', 'b']"
+    ],
+    "correct_index": 2,
+    "explanation": "Tuples compare priority first, then the name, so ties are not FIFO: priority 1 yields 'c' before 'z', then priority 2 yields 'a' before 'b'.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_030",
+    "topic": "Queue",
+    "subtopic": "Dequeue",
+    "difficulty": "hard",
+    "prompt": "What does this circular-queue code print?\ncap, f, n = 3, 0, 0\nbuf = [None] * cap\ndef enq(x):\n    global n; buf[(f + n) % cap] = x; n += 1\ndef deq():\n    global f, n; v = buf[f]; f = (f + 1) % cap; n -= 1; return v\nenq('a'); enq('b'); deq(); enq('c'); enq('d'); print(deq(), deq(), buf)",
+    "options": [
+      "b c ['d', 'b', 'c']",
+      "a b ['a', 'b', 'c']",
+      "b d ['d', 'b', 'c']",
+      "b c ['d', None, None]"
+    ],
+    "correct_index": 0,
+    "explanation": "After deq() removes 'a', 'c' goes to index 2 and 'd' wraps to index 0. The next two dequeues return 'b' then 'c' (not 'd'), and dequeue only advances front, so the array keeps its stale contents.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_031",
+    "topic": "Queue",
+    "subtopic": "Deque",
+    "difficulty": "hard",
+    "prompt": "What does this code print?\nfrom collections import deque\nd = deque([0])\nd.extendleft([1, 2, 3])\nd.append(4)\nprint(d.popleft(), d[-1])",
+    "options": [
+      "1 4",
+      "1 0",
+      "3 4",
+      "3 0"
+    ],
+    "correct_index": 2,
+    "explanation": "extendleft appends each element on the left one at a time, reversing their order: deque becomes [3,2,1,0]; after append(4), popleft() gives 3 and d[-1] is 4.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_032",
+    "topic": "Queue",
+    "subtopic": "Priority Queue",
+    "difficulty": "hard",
+    "prompt": "What does this heapq code print?\nimport heapq\nh = []\nfor x in [6, 4, 7, 1, 3]: heapq.heappush(h, x)\nheapq.heappop(h)\nprint(h)",
+    "options": [
+      "[3, 6, 7, 4]",
+      "[4, 3, 7, 6]",
+      "[3, 4, 7, 6]",
+      "[3, 4, 6, 7]"
+    ],
+    "correct_index": 2,
+    "explanation": "After the pushes the heap is [1,3,7,6,4]. heappop moves the last element 4 to the root and sifts it down below 3, giving [3,4,7,6]. A heap array is not sorted.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_033",
+    "topic": "Queue",
+    "subtopic": "Circular Queue",
+    "difficulty": "hard",
+    "prompt": "A circular-buffer queue grows by a fixed 16 extra slots each time it fills (instead of doubling). What is the amortized cost per enqueue over n enqueues?",
+    "options": [
+      "O(1) per enqueue, as with any dynamic array",
+      "O(n) per enqueue, because about n/16 resizes each copy up to n items (O(n²) total)",
+      "O(log n) per enqueue",
+      "O(√n) per enqueue"
+    ],
+    "correct_index": 1,
+    "explanation": "Only geometric growth gives O(1) amortized. With constant additive growth the number of resizes is linear in n and each copy is linear, so the total is quadratic.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_034",
+    "topic": "Queue",
+    "subtopic": "Deque",
+    "difficulty": "hard",
+    "prompt": "What does this palindrome-style loop print?\nfrom collections import deque\nd = deque('abca')\nwhile len(d) > 1:\n    if d.popleft() != d.pop(): break\nprint(len(d))",
+    "options": [
+      "1",
+      "0",
+      "4",
+      "2"
+    ],
+    "correct_index": 1,
+    "explanation": "First pass pops 'a' and 'a' (equal). Second pass pops 'b' and 'c', removing both before the break; the deque is empty, so len is 0.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_035",
+    "topic": "Queue",
+    "subtopic": "Deque",
+    "difficulty": "hard",
+    "prompt": "What does this sliding-window code print?\nfrom collections import deque\na, k, dq, out = [1, 3, -1, -3, 5], 3, deque(), []\nfor i, x in enumerate(a):\n    while dq and a[dq[-1]] <= x: dq.pop()\n    dq.append(i)\n    if dq[0] <= i - k: dq.popleft()\n    if i >= k - 1: out.append(a[dq[0]])\nprint(out)",
+    "options": [
+      "[3, 3, 5]",
+      "[3, -1, 5]",
+      "[3, 3, 3]",
+      "[1, 3, 5]"
+    ],
+    "correct_index": 0,
+    "explanation": "The deque holds indices of decreasing values; the windows [1,3,-1], [3,-1,-3], [-1,-3,5] have maxima 3, 3, 5.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_036",
+    "topic": "Queue",
+    "subtopic": "Applications",
+    "difficulty": "hard",
+    "prompt": "A rate limiter keeps request timestamps in a deque. What does this code print?\nfrom collections import deque\nq, limit, win = deque(), 2, 10\ndef allow(t):\n    while q and q[0] <= t - win: q.popleft()\n    if len(q) < limit: q.append(t); return True\n    return False\nprint([allow(t) for t in [1, 2, 3, 11, 12]])",
+    "options": [
+      "[True, True, False, True, False]",
+      "[True, True, False, False, True]",
+      "[True, True, False, False, False]",
+      "[True, True, False, True, True]"
+    ],
+    "correct_index": 3,
+    "explanation": "At t=11 the timestamp 1 expires (1 <= 11-10), leaving one slot; at t=12 the timestamp 2 expires, leaving a slot again.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_037",
+    "topic": "Queue",
+    "subtopic": "Queue Introduction",
+    "difficulty": "hard",
+    "prompt": "A queue is built from two stacks: enqueue pushes onto an input stack, and dequeue pops from an output stack, moving ALL elements from input to output only when the output stack is empty. What is the amortized cost of each operation over n operations?",
+    "options": [
+      "O(log n) amortized, because each transfer halves the input stack",
+      "O(1) amortized, because each element is moved between the stacks at most once",
+      "O(n) amortized, because every dequeue may reverse the whole input stack",
+      "O(1) worst case per operation, because a transfer never costs more than constant time"
+    ],
+    "correct_index": 1,
+    "explanation": "Each element is pushed and popped at most twice in total (once per stack), so n operations cost O(n), i.e. O(1) amortized, although a single dequeue can cost O(n).",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_038",
+    "topic": "Queue",
+    "subtopic": "Circular Queue",
+    "difficulty": "hard",
+    "prompt": "A circular queue has capacity 64 and advances indices with i = (i + 1) & 63 rather than % 64. Why does this work, and what does it require?",
+    "options": [
+      "It works for any capacity; & is just a faster modulo",
+      "It works only when the queue is completely full",
+      "For a power-of-two capacity, AND with (capacity - 1) equals modulo capacity, so the capacity must be a power of two",
+      "It works only when the capacity is prime"
+    ],
+    "correct_index": 2,
+    "explanation": "Masking keeps the low log2(capacity) bits, which equals i mod capacity only when capacity is a power of two.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_039",
+    "topic": "Queue",
+    "subtopic": "Queue Introduction",
+    "difficulty": "hard",
+    "prompt": "A queue is implemented with a Python list and a head index: dequeue returns items[head] and does head += 1 (items are never deleted). Which problem does this cause in a long-running program that keeps enqueuing and dequeuing?",
+    "options": [
+      "Dequeue becomes O(n) because head must be recomputed each time",
+      "FIFO order breaks once head passes half of the list length",
+      "Memory grows without bound because dequeued slots are never reclaimed unless the list is periodically compacted",
+      "Enqueue becomes O(n) because append has to skip over dequeued slots"
+    ],
+    "correct_index": 2,
+    "explanation": "The operations stay O(1) and ordered, but the list keeps every item ever enqueued. Periodic compaction (or a deque) fixes this.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_hard_040",
+    "topic": "Queue",
+    "subtopic": "Queue Introduction",
+    "difficulty": "hard",
+    "prompt": "A program drains a Python list of n items by calling items.pop(0) until it is empty, doing nothing else. What is the total running time?",
+    "options": [
+      "O(n), because pop(0) is O(1) just like pop()",
+      "O(n log n), because the list rebalances itself after every removal",
+      "O(1) total, because pop(0) just advances an internal start pointer",
+      "O(n²), because each pop(0) shifts all remaining elements one position left"
+    ],
+    "correct_index": 3,
+    "explanation": "pop(0) costs O(remaining length), so the sum is n + (n-1) + ... + 1 = O(n²). collections.deque.popleft() avoids this.",
+    "source": "custom_mcq"
+  }
+]

@@ -1,0 +1,81 @@
+{
+    "student_id": "USER-1518ad74",
+    "name": "F6 Tester",
+    "level": "beginner",
+    "subject": "python_general",
+    "current_topic": "Queue",
+    "progress": [],
+    "engagement": "medium",
+    "last_score": 0.75,
+    "learning_history": [
+        {
+            "type": "pretest",
+            "topic": "Array",
+            "subtopic": "array_introduction",
+            "score": 0.5,
+            "question_count": 2
+        },
+        {
+            "type": "pretest",
+            "topic": "Array",
+            "subtopic": "array_introduction",
+            "score": 0.5,
+            "question_count": 2
+        },
+        {
+            "type": "pretest",
+            "topic": "Queue",
+            "subtopic": "queue_introduction",
+            "score": 0.75,
+            "question_count": 4
+        }
+    ],
+    "frustration_level": 0,
+    "engagement_score": 5,
+    "learning_style": "balanced",
+    "last_active": "2026-10-11T16:17:32.859351+00:00",
+    "accuracy_history": [],
+    "learning_gain_history": [],
+    "learning_gain": 0.0,
+    "normalized_learning_gain": 0.0,
+    "pretest_score": 0.75,
+    "posttest_score": null,
+    "assessment_scores": {
+        "Array": {
+            "array_introduction": {
+                "pretest_score": 0.5
+            }
+        },
+        "Queue": {
+            "queue_introduction": {
+                "pretest_score": 0.75
+            }
+        }
+    },
+    "assessment_history": [
+        {
+            "type": "pretest",
+            "topic": "Array",
+            "subtopic": "array_introduction",
+            "score": 0.5
+        },
+        {
+            "type": "pretest",
+            "topic": "Array",
+            "subtopic": "array_introduction",
+            "score": 0.5
+        },
+        {
+            "type": "pretest",
+            "topic": "Queue",
+            "subtopic": "queue_introduction",
+            "score": 0.75
+        }
+    ],
+    "knowledge_state": {
+        "concepts": {},
+        "version": 1
+    },
+    "knowledge_events": [],
+    "delivered_chunks": {}
+}

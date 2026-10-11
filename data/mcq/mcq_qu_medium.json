@@ -1,0 +1,642 @@
+[
+  {
+    "id": "mcq_qu_medium_001",
+    "topic": "Queue",
+    "subtopic": "Deque",
+    "difficulty": "medium",
+    "prompt": "Which pair of deque methods makes it behave as a stack (LIFO)?",
+    "options": [
+      "append and pop",
+      "append and popleft",
+      "appendleft and popleft only if the deque is empty",
+      "rotate and extend"
+    ],
+    "correct_index": 0,
+    "explanation": "Pushing and popping at the same end gives last-in, first-out order; append with popleft would give a queue.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_002",
+    "topic": "Queue",
+    "subtopic": "Deque",
+    "difficulty": "medium",
+    "prompt": "Which deque operation is NOT O(1)?",
+    "options": [
+      "Inserting an element in the middle with d.insert(i, x)",
+      "d.popleft()",
+      "d.appendleft(x)",
+      "d.append(x)"
+    ],
+    "correct_index": 0,
+    "explanation": "Only operations at the two ends are constant time; a middle insertion must reach that position and shift elements.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_003",
+    "topic": "Queue",
+    "subtopic": "Circular Queue",
+    "difficulty": "medium",
+    "prompt": "A circular queue of capacity 5 tracks front and count. If front = 4 and count = 3, which indexes hold the elements (front to rear)?",
+    "options": [
+      "4, 3, 2",
+      "0, 1, 2",
+      "4, 5, 6",
+      "4, 0, 1"
+    ],
+    "correct_index": 3,
+    "explanation": "Indexes are (front + k) % 5 for k = 0, 1, 2, giving 4, 0 and 1.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_004",
+    "topic": "Queue",
+    "subtopic": "Priority Queue",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\nimport heapq\nh = [(2, 'write'), (1, 'fix'), (3, 'test')]\nheapq.heapify(h)\nprint(heapq.heappop(h)[1])",
+    "options": [
+      "write",
+      "fix",
+      "(1, 'fix')",
+      "test"
+    ],
+    "correct_index": 1,
+    "explanation": "Tuples are compared by their first element, so (1, 'fix') comes out first; [1] extracts the task name.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_005",
+    "topic": "Queue",
+    "subtopic": "Priority Queue",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\nimport heapq\nh = []\nfor x in [5, 1, 3]: heapq.heappush(h, x)\nheapq.heappop(h)\nprint(h[0])",
+    "options": [
+      "3",
+      "1",
+      "5",
+      "IndexError"
+    ],
+    "correct_index": 0,
+    "explanation": "heappop removes 1, so the heap's smallest remaining item, h[0], is 3.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_006",
+    "topic": "Queue",
+    "subtopic": "Priority Queue",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\nimport heapq\nprint(heapq.nlargest(2, [5, 1, 9, 3]))",
+    "options": [
+      "[9, 5, 3]",
+      "[5, 9]",
+      "[1, 3]",
+      "[9, 5]"
+    ],
+    "correct_index": 3,
+    "explanation": "heapq.nlargest(2, ...) returns the two largest values in descending order.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_007",
+    "topic": "Queue",
+    "subtopic": "Dequeue",
+    "difficulty": "medium",
+    "prompt": "Starting from an empty queue the operations are: enqueue A, enqueue B, dequeue, enqueue C, dequeue, enqueue D. Which element is at the front now?",
+    "options": [
+      "B",
+      "C",
+      "A",
+      "D"
+    ],
+    "correct_index": 1,
+    "explanation": "A and B were dequeued in that order, leaving C at the front followed by D.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_008",
+    "topic": "Queue",
+    "subtopic": "Queue Introduction",
+    "difficulty": "medium",
+    "prompt": "What happens when q[0] is evaluated on an empty collections.deque?",
+    "options": [
+      "It blocks until an item arrives",
+      "It returns 0",
+      "An IndexError is raised",
+      "It returns None"
+    ],
+    "correct_index": 2,
+    "explanation": "A deque has no front element to read when it is empty, and indexing it raises IndexError.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_009",
+    "topic": "Queue",
+    "subtopic": "Deque",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\nfrom collections import deque\nd = deque()\nfor i in range(4):\n    (d.appendleft if i % 2 else d.append)(i)\nprint(list(d))",
+    "options": [
+      "[3, 2, 1, 0]",
+      "[3, 1, 0, 2]",
+      "[2, 0, 1, 3]",
+      "[0, 1, 2, 3]"
+    ],
+    "correct_index": 1,
+    "explanation": "Even i appends on the right and odd i prepends on the left, building [0] -> [1, 0] -> [1, 0, 2] -> [3, 1, 0, 2].",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_010",
+    "topic": "Queue",
+    "subtopic": "Dequeue",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\nfrom collections import deque\nq = deque([5, 6, 7])\nq.popleft()\nq.append(8)\nprint(q.popleft(), list(q))",
+    "options": [
+      "7 [6, 8]",
+      "5 [7, 8]",
+      "6 [8]",
+      "6 [7, 8]"
+    ],
+    "correct_index": 3,
+    "explanation": "After popleft removes 5 and 8 is appended, the next popleft returns 6, leaving [7, 8].",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_011",
+    "topic": "Queue",
+    "subtopic": "Dequeue",
+    "difficulty": "medium",
+    "prompt": "Draining a queue of n items with list.pop(0) versus deque.popleft() gives total costs of:",
+    "options": [
+      "O(n) for both",
+      "O(n²) for both",
+      "O(n²) for list.pop(0) and O(n) for deque.popleft()",
+      "O(n) for list.pop(0) and O(n²) for deque.popleft()"
+    ],
+    "correct_index": 2,
+    "explanation": "pop(0) shifts all remaining items each time, while popleft detaches the first block element in O(1).",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_012",
+    "topic": "Queue",
+    "subtopic": "Dequeue",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\nfrom collections import deque\nq, steps = deque([5]), 0\nwhile q:\n    x = q.popleft(); steps += 1\n    if x > 1: q.append(x - 2)\nprint(steps)",
+    "options": [
+      "4",
+      "3",
+      "2",
+      "1"
+    ],
+    "correct_index": 1,
+    "explanation": "The loop dequeues 5 (re-adds 3), then 3 (re-adds 1), then 1 (adds nothing), so there are 3 iterations.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_013",
+    "topic": "Queue",
+    "subtopic": "Applications",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\nfrom collections import deque\nw, out = deque(maxlen=3), []\nfor x in [3, 6, 9, 12]:\n    w.append(x); out.append(sum(w) / len(w))\nprint(out)",
+    "options": [
+      "[4.5, 6.0, 9.0]",
+      "[3.0, 6.0, 9.0, 12.0]",
+      "[3.0, 4.5, 6.0, 7.5]",
+      "[3.0, 4.5, 6.0, 9.0]"
+    ],
+    "correct_index": 3,
+    "explanation": "The deque keeps the last 3 values, so the averages are 3/1, (3+6)/2, (3+6+9)/3 and (6+9+12)/3.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_014",
+    "topic": "Queue",
+    "subtopic": "Dequeue",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\nfrom collections import deque\nq = deque('abc')\nx = q.popleft()\ny = q.popleft()\nprint(x + y, len(q))",
+    "options": [
+      "ab 3",
+      "ba 1",
+      "a 2",
+      "ab 1"
+    ],
+    "correct_index": 3,
+    "explanation": "Two dequeues return 'a' then 'b', and one element ('c') remains.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_015",
+    "topic": "Queue",
+    "subtopic": "Applications",
+    "difficulty": "medium",
+    "prompt": "Why would a message broker use a queue rather than a stack to hand out tasks?",
+    "options": [
+      "A stack would serve the newest tasks first, so older tasks could wait indefinitely",
+      "A stack cannot be implemented with arrays",
+      "A stack cannot store messages",
+      "A queue is always faster than a stack"
+    ],
+    "correct_index": 0,
+    "explanation": "FIFO guarantees fairness: the oldest waiting task is served next.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_016",
+    "topic": "Queue",
+    "subtopic": "Deque",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\nfrom collections import deque\nd = deque([1, 2, 3, 4])\nd.rotate(-1)\nprint(d.popleft(), d.pop())",
+    "options": [
+      "2 1",
+      "1 4",
+      "2 4",
+      "1 2"
+    ],
+    "correct_index": 0,
+    "explanation": "rotate(-1) moves the left element to the right end, giving [2, 3, 4, 1]; popleft then returns 2 and pop returns 1.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_017",
+    "topic": "Queue",
+    "subtopic": "Queue Introduction",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\nfrom collections import deque\nq = deque([1, 2, 3])\ns = [1, 2, 3]\nprint(q.popleft(), s.pop())",
+    "options": [
+      "3 3",
+      "1 1",
+      "1 3",
+      "3 1"
+    ],
+    "correct_index": 2,
+    "explanation": "The queue's popleft returns the oldest item (1), while the list's pop returns the newest (3).",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_018",
+    "topic": "Queue",
+    "subtopic": "Deque",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\nfrom collections import deque\nd = deque([1, 2, 3])\nd.extend([4, 5])\nd.popleft(); d.pop()\nprint(list(d))",
+    "options": [
+      "[1, 2, 3, 4]",
+      "[2, 3, 4]",
+      "[3, 4, 5]",
+      "[2, 3, 4, 5]"
+    ],
+    "correct_index": 1,
+    "explanation": "extend adds 4 and 5 on the right, popleft removes 1 and pop removes 5, leaving [2, 3, 4].",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_019",
+    "topic": "Queue",
+    "subtopic": "Priority Queue",
+    "difficulty": "medium",
+    "prompt": "n items are inserted into a priority queue and then all n are removed in priority order. Which comparison is correct?",
+    "options": [
+      "Both take O(n log n)",
+      "A binary heap takes O(n log n), whereas an unsorted list takes O(n²)",
+      "Both take O(n²)",
+      "A binary heap takes O(n²), whereas an unsorted list takes O(n log n)"
+    ],
+    "correct_index": 1,
+    "explanation": "Each heap operation is O(log n), while an unsorted list needs an O(n) scan to find the best item on every removal.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_020",
+    "topic": "Queue",
+    "subtopic": "Circular Queue",
+    "difficulty": "medium",
+    "prompt": "What is the main drawback of a fixed-size circular queue compared with a linked-list queue?",
+    "options": [
+      "Enqueue becomes O(n)",
+      "Dequeue becomes O(n)",
+      "The capacity must be chosen in advance, so an enqueue can fail when the queue is full",
+      "It cannot preserve FIFO order"
+    ],
+    "correct_index": 2,
+    "explanation": "The array has a fixed number of slots, while a linked list grows one node at a time.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_021",
+    "topic": "Queue",
+    "subtopic": "Queue Introduction",
+    "difficulty": "medium",
+    "prompt": "Which statement about the queue abstract data type is correct?",
+    "options": [
+      "It can only be implemented with a linked list",
+      "It must allow insertion at any position",
+      "It requires its elements to be sorted",
+      "It is defined by its FIFO behaviour, so it can be implemented with an array, a linked list or other structures"
+    ],
+    "correct_index": 3,
+    "explanation": "An ADT specifies behaviour, not representation.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_022",
+    "topic": "Queue",
+    "subtopic": "Circular Queue",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\nrear = 0\nfor _ in range(7):\n    rear = (rear + 1) % 4\nprint(rear)",
+    "options": [
+      "0",
+      "7",
+      "3",
+      "4"
+    ],
+    "correct_index": 2,
+    "explanation": "The index wraps modulo 4, so after 7 steps rear = 7 % 4 = 3.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_023",
+    "topic": "Queue",
+    "subtopic": "Enqueue",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\ncap, q = 3, []\nfor x in range(5):\n    if len(q) < cap: q.append(x)\nprint(q)",
+    "options": [
+      "[3, 4]",
+      "[0, 1, 2]",
+      "[0, 1, 2, 3, 4]",
+      "[2, 3, 4]"
+    ],
+    "correct_index": 1,
+    "explanation": "Once the queue holds 3 items, further enqueues are rejected by the length check.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_024",
+    "topic": "Queue",
+    "subtopic": "Enqueue",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\nfrom collections import deque\nq = deque([1])\nr = q.append(2)\nprint(r, list(q))",
+    "options": [
+      "None [2]",
+      "2 [1, 2]",
+      "[1, 2] [1, 2]",
+      "None [1, 2]"
+    ],
+    "correct_index": 3,
+    "explanation": "deque.append modifies the deque in place and returns None.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_025",
+    "topic": "Queue",
+    "subtopic": "Priority Queue",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\nimport heapq\nh = []\nfor x in [4, 9, 2]: heapq.heappush(h, -x)\nprint(-heapq.heappop(h))",
+    "options": [
+      "2",
+      "4",
+      "-9",
+      "9"
+    ],
+    "correct_index": 3,
+    "explanation": "Pushing negated values turns heapq's min-heap into a max-heap; negating the popped -9 gives 9.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_026",
+    "topic": "Queue",
+    "subtopic": "Applications",
+    "difficulty": "medium",
+    "prompt": "Why is a queue placed between a producer and a consumer in a message-processing system?",
+    "options": [
+      "It sorts messages by size",
+      "It lets the consumer always read the newest message first",
+      "It removes messages the consumer cannot process quickly",
+      "It buffers messages so the two sides can run at different speeds while preserving arrival order"
+    ],
+    "correct_index": 3,
+    "explanation": "The queue decouples the producer's and consumer's timing and keeps FIFO order.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_027",
+    "topic": "Queue",
+    "subtopic": "Circular Queue",
+    "difficulty": "medium",
+    "prompt": "A circular queue of capacity 6 is tracked with a count and is full. Then 2 dequeues and 1 enqueue happen. What is its size?",
+    "options": [
+      "5",
+      "4",
+      "6",
+      "3"
+    ],
+    "correct_index": 0,
+    "explanation": "Size = 6 - 2 + 1 = 5.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_028",
+    "topic": "Queue",
+    "subtopic": "Deque",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\nfrom collections import deque\nd = deque([1, 2, 3], maxlen=3)\nd.append(4)\nd.appendleft(0)\nprint(list(d))",
+    "options": [
+      "[0, 2, 3]",
+      "[0, 1, 2, 3]",
+      "[1, 2, 3]",
+      "[2, 3, 4]"
+    ],
+    "correct_index": 0,
+    "explanation": "With maxlen=3, append(4) drops 1 from the left; appendleft(0) then drops 4 from the right, giving [0, 2, 3].",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_029",
+    "topic": "Queue",
+    "subtopic": "Circular Queue",
+    "difficulty": "medium",
+    "prompt": "A circular queue of capacity 5 uses only front and rear indexes and wastes one slot to tell full from empty. How many items can it hold at most?",
+    "options": [
+      "4",
+      "5",
+      "6",
+      "3"
+    ],
+    "correct_index": 0,
+    "explanation": "With one slot always kept empty, a queue with N slots stores at most N - 1 items.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_030",
+    "topic": "Queue",
+    "subtopic": "Queue Introduction",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\nfrom collections import deque\nq = deque()\nfor i in range(4):\n    q.append(i)\n    if i % 2: q.popleft()\nprint(list(q))",
+    "options": [
+      "[0, 1, 2, 3]",
+      "[1, 3]",
+      "[2, 3]",
+      "[3]"
+    ],
+    "correct_index": 2,
+    "explanation": "Odd values of i trigger a dequeue: after i=1 the queue is [1], and after i=3 it is [2, 3].",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_031",
+    "topic": "Queue",
+    "subtopic": "Enqueue",
+    "difficulty": "medium",
+    "prompt": "A queue is built from two stacks. Enqueue pushes onto the input stack. What is the cost of enqueue?",
+    "options": [
+      "O(n²)",
+      "O(n)",
+      "O(1)",
+      "O(log n)"
+    ],
+    "correct_index": 2,
+    "explanation": "Pushing onto a stack is O(1); the reversal work is done later, only when the output stack is empty.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_032",
+    "topic": "Queue",
+    "subtopic": "Enqueue",
+    "difficulty": "medium",
+    "prompt": "A dynamic-array queue doubles its capacity when full. Why is enqueue still considered O(1) amortized?",
+    "options": [
+      "Resizing is delayed until the queue is empty",
+      "Resizing never copies any elements",
+      "Resizes are rare, and their copying cost is spread over the many cheap enqueues between them",
+      "Every enqueue copies exactly one element"
+    ],
+    "correct_index": 2,
+    "explanation": "Doubling means the total copying over n enqueues is O(n), i.e. O(1) per enqueue on average.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_033",
+    "topic": "Queue",
+    "subtopic": "Priority Queue",
+    "difficulty": "medium",
+    "prompt": "For a binary-heap priority queue with n items, which costs are correct?",
+    "options": [
+      "Insert O(1), remove-min O(1), peek-min O(1)",
+      "Insert O(n), remove-min O(1), peek-min O(1)",
+      "Insert O(log n), remove-min O(n), peek-min O(log n)",
+      "Insert O(log n), remove-min O(log n), peek-min O(1)"
+    ],
+    "correct_index": 3,
+    "explanation": "Insert and remove-min sift along one root-to-leaf path; the minimum sits at the root.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_034",
+    "topic": "Queue",
+    "subtopic": "Applications",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\nfrom collections import deque\ng = {'A': ['C', 'B'], 'B': ['D'], 'C': ['D', 'E'], 'D': [], 'E': []}\nq, seen, out = deque('A'), {'A'}, ''\nwhile q:\n    u = q.popleft(); out += u\n    for v in g[u]:\n        if v not in seen: seen.add(v); q.append(v)\nprint(out)",
+    "options": [
+      "ABDCE",
+      "ABCDE",
+      "ACBDE",
+      "ACBED"
+    ],
+    "correct_index": 2,
+    "explanation": "BFS visits A, then its neighbours in listed order (C, B), then C's new neighbours D and E; B's neighbour D is already seen.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_035",
+    "topic": "Queue",
+    "subtopic": "Dequeue",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\nfrom collections import deque\nq = deque()\ntry: q.popleft()\nexcept IndexError: print('empty')",
+    "options": [
+      "None",
+      "empty",
+      "It crashes without printing",
+      "0"
+    ],
+    "correct_index": 1,
+    "explanation": "popleft on an empty deque raises IndexError, which the except block catches.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_036",
+    "topic": "Queue",
+    "subtopic": "Enqueue",
+    "difficulty": "medium",
+    "prompt": "A linked-list queue keeps only a head pointer. How long does enqueue take, and how is it fixed?",
+    "options": [
+      "O(1), since new nodes are always added at the head",
+      "O(log n), since the list can be binary searched",
+      "O(n), since the tail must be found by walking the list; keeping a tail pointer makes it O(1)",
+      "O(n), and it cannot be improved"
+    ],
+    "correct_index": 2,
+    "explanation": "Without a tail pointer the walk to the last node costs O(n); storing the tail removes it.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_037",
+    "topic": "Queue",
+    "subtopic": "Queue Introduction",
+    "difficulty": "medium",
+    "prompt": "Compared with an array-based queue, what is a trade-off of a linked-list queue?",
+    "options": [
+      "It gives O(1) access to the k-th element",
+      "It has no fixed capacity and O(1) enqueue and dequeue, but each element carries extra pointer memory",
+      "It needs no extra memory per element but has a fixed capacity",
+      "It makes dequeue O(n) because the head must be found"
+    ],
+    "correct_index": 1,
+    "explanation": "Linked nodes can grow freely and are updated at the ends in O(1), but every node stores a pointer and random access is not available.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_038",
+    "topic": "Queue",
+    "subtopic": "Circular Queue",
+    "difficulty": "medium",
+    "prompt": "What does this code print?\nbuf, f, n = [None] * 3, 0, 0\nfor x in 'abcd':\n    if n < 3: buf[(f + n) % 3] = x; n += 1\n    else: buf[f] = x; f = (f + 1) % 3\nprint(buf, f)",
+    "options": [
+      "['d', 'b', 'c'] 1",
+      "['a', 'b', 'd'] 1",
+      "['a', 'b', 'c'] 0",
+      "['d', 'b', 'c'] 0"
+    ],
+    "correct_index": 0,
+    "explanation": "When the buffer is full, the oldest item is overwritten: 'd' replaces 'a' at index 0 and front advances to 1.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_039",
+    "topic": "Queue",
+    "subtopic": "Applications",
+    "difficulty": "medium",
+    "prompt": "A cache of size 3 uses a FIFO eviction policy and currently holds A, B, C (A is the oldest). Item D is inserted. Which item is evicted?",
+    "options": [
+      "C",
+      "A",
+      "D",
+      "B"
+    ],
+    "correct_index": 1,
+    "explanation": "FIFO evicts the item that has been in the cache the longest, which is A.",
+    "source": "custom_mcq"
+  },
+  {
+    "id": "mcq_qu_medium_040",
+    "topic": "Queue",
+    "subtopic": "Applications",
+    "difficulty": "medium",
+    "prompt": "A printer prints jobs in arrival order. J1 is printing when J2 and J3 are waiting, and then J4 arrives. In which order do the jobs finish?",
+    "options": [
+      "J1, J2, J3, J4",
+      "J1, J3, J2, J4",
+      "J4, J1, J2, J3",
+      "J1, J4, J3, J2"
+    ],
+    "correct_index": 0,
+    "explanation": "FIFO order: a late arrival always waits behind everything already queued.",
+    "source": "custom_mcq"
+  }
+]

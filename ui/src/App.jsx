@@ -117,33 +117,38 @@ function QuizSection({ topic, subtopic, open, onBatchComplete, onToast, onMoveFu
   const { accessToken } = useAuth()
   const [questions, setQuestions] = useState([])
   const [idx, setIdx] = useState(0)
-  const [selectedAnswer, setSelectedAnswer] = useState('')
+  // selectedIndex: integer 0-3 for MCQ, or option text string for LLM questions
+  const [selectedIndex, setSelectedIndex] = useState(null)
   const [answered, setAnswered] = useState([])
   const [feedbackVisible, setFeedbackVisible] = useState(false)
+  // serverFeedback: {correct: bool, explanation: str} returned by /quiz/mcq/submit
+  const [serverFeedback, setServerFeedback] = useState(null)
   const [summary, setSummary] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
   const [adaptiveMessage, setAdaptiveMessage] = useState('')
 
   const loadQuiz = async () => {
-    if (!topic || !subtopic) return
+    if (!topic) return  // Only require topic, subtopic is optional (practice is topic-level)
     setLoading(true)
     setSummary(null)
     setAnswered([])
     setIdx(0)
-    setSelectedAnswer('')
+    setSelectedIndex(null)
     setFeedbackVisible(false)
+    setServerFeedback(null)
     setAdaptiveMessage('')
     const res = await fetch(`${API}/quiz/generate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-      body: JSON.stringify({ topic, subtopic }),
+      body: JSON.stringify({ topic, subtopic: subtopic || topic }),  // Use topic as fallback
     })
     const data = await res.json()
+    console.log('Practice quiz response:', data)  // Debug logging
     setQuestions(data.questions || [])
     setLoading(false)
   }
 
-  // Issue #4: only load quiz when the section is explicitly opened (not auto).
   useEffect(() => {
     if (!open) return
     loadQuiz()
@@ -163,42 +168,73 @@ function QuizSection({ topic, subtopic, open, onBatchComplete, onToast, onMoveFu
     </div>
   )
 
-  const isCorrect = question && normalize(selectedAnswer) === normalize(question.correct_answer)
+  // Detect MCQ bank question (has .id from bank, question_type='mcq', no correct_answer)
+  const isMCQ = question && question.question_type === 'mcq' && !question.correct_answer
 
-  const submitCurrent = () => {
-    if (!selectedAnswer || !question) return
-    const next = [...answered, {
-      question: question.question,
-      selected_answer: selectedAnswer,
-      correct_answer: question.correct_answer,
-      correct: isCorrect,
-    }]
-    setAnswered(next)
-    setFeedbackVisible(true)
+  // ── Submit one answer ───────────────────────────────────────────────────────
+  const submitCurrent = async () => {
+    if (!question) return
+    if (isMCQ) {
+      if (selectedIndex === null) return
+      setSubmitting(true)
+      try {
+        const res = await fetch(`${API}/quiz/mcq/submit`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+          body: JSON.stringify({ question_id: question.id, chosen_index: selectedIndex, context: 'practice' }),
+        })
+        const data = await res.json()
+        setServerFeedback(data)
+        setAnswered(prev => [...prev, { question_id: question.id, chosen_index: selectedIndex, correct: data.correct }])
+        setFeedbackVisible(true)
+      } finally {
+        setSubmitting(false)
+      }
+    } else {
+      // Legacy LLM path: local text comparison
+      if (!selectedIndex && selectedIndex !== 0) return
+      const selectedText = typeof selectedIndex === 'string' ? selectedIndex : (question.options || [])[selectedIndex] || ''
+      const isCorrect = normalize(selectedText) === normalize(question.correct_answer)
+      setAnswered(prev => [...prev, {
+        question: question.question,
+        selected_answer: selectedText,
+        correct_answer: question.correct_answer,
+        correct: isCorrect,
+      }])
+      setFeedbackVisible(true)
+    }
   }
 
+  // ── After last question: submit batch for mastery update ────────────────────
   const submitBatch = async (finalAnswers) => {
-    const correctCount = finalAnswers.filter((a) => a.correct).length
+    const correctCount = finalAnswers.filter(a => a.correct).length
     const score = finalAnswers.length ? correctCount / finalAnswers.length : 0
-    const res = await fetch(`${API}/quiz/submit`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-      body: JSON.stringify({ topic, subtopic, score, answers: finalAnswers }),
-    })
-    const data = await res.json()
 
-    const finalSummary = {
-      correctCount,
-      total: finalAnswers.length,
-      score,
-      passed: score >= UNLOCK_THRESHOLD,
-      server: data,
+    if (isMCQ || (questions[0] && questions[0].question_type === 'mcq')) {
+      // MCQ path: send pre-computed score to existing /quiz/submit endpoint
+      const res = await fetch(`${API}/quiz/submit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+        body: JSON.stringify({ topic, subtopic, score, answers: [] }),
+      })
+      const data = await res.json()
+      setSummary({ correctCount, total: finalAnswers.length, score, passed: score >= UNLOCK_THRESHOLD, server: data })
+      if (data.adaptive_message) setAdaptiveMessage(data.adaptive_message)
+      onBatchComplete?.({ correctCount, total: finalAnswers.length, score, passed: score >= UNLOCK_THRESHOLD })
+      onToast?.(`Quiz submitted · ${Math.round(score * 100)}%`)
+    } else {
+      // Legacy LLM path: send full answer objects
+      const res = await fetch(`${API}/quiz/submit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+        body: JSON.stringify({ topic, subtopic, score, answers: finalAnswers }),
+      })
+      const data = await res.json()
+      setSummary({ correctCount, total: finalAnswers.length, score, passed: score >= UNLOCK_THRESHOLD, server: data })
+      if (data.adaptive_message) setAdaptiveMessage(data.adaptive_message)
+      onBatchComplete?.({ correctCount, total: finalAnswers.length, score, passed: score >= UNLOCK_THRESHOLD })
+      onToast?.(`Quiz submitted · ${Math.round(score * 100)}%`)
     }
-    setSummary(finalSummary)
-    // Issue #1: show adaptive feedback message from backend.
-    if (data.adaptive_message) setAdaptiveMessage(data.adaptive_message)
-    onBatchComplete?.(finalSummary)
-    onToast?.(`Quiz submitted · ${Math.round(score * 100)}%`)
   }
 
   const nextQuestion = async () => {
@@ -207,7 +243,8 @@ function QuizSection({ topic, subtopic, open, onBatchComplete, onToast, onMoveFu
       return
     }
     setIdx(idx + 1)
-    setSelectedAnswer('')
+    setSelectedIndex(null)
+    setServerFeedback(null)
     setFeedbackVisible(false)
   }
 
@@ -218,7 +255,7 @@ function QuizSection({ topic, subtopic, open, onBatchComplete, onToast, onMoveFu
         ? 'Solid progress. Let us continue.'
         : 'Let us reinforce this before moving on.'
     return (
-          <div className="mt-4 rounded-2xl border border-slate-800 bg-slate-900 p-4">
+      <div className="mt-4 rounded-2xl border border-slate-800 bg-slate-900 p-4">
         <div className="flex items-center gap-4">
           <ScoreRing score={summary.score} />
           <div>
@@ -228,7 +265,6 @@ function QuizSection({ topic, subtopic, open, onBatchComplete, onToast, onMoveFu
             <p className="mt-1 text-sm text-slate-300">{msg}</p>
           </div>
         </div>
-        {/* Issue #1: adaptive message shown after quiz */}
         {adaptiveMessage && (
           <div className="mt-3 rounded-lg border border-indigo-500/30 bg-indigo-950/20 px-3 py-2 text-xs text-indigo-300">
             <TrendingUp size={12} className="mr-1 inline" />
@@ -276,18 +312,28 @@ function QuizSection({ topic, subtopic, open, onBatchComplete, onToast, onMoveFu
       <p className="mb-3 text-sm text-gray-100">{question.question}</p>
       <div className="space-y-2">
         {(question.options || []).map((op, i) => {
-          const showCorrect = feedbackVisible && normalize(op) === normalize(question.correct_answer)
-          const showWrong = feedbackVisible && normalize(op) === normalize(selectedAnswer) && !isCorrect
+          // MCQ bank: highlight driven entirely by server response
+          const showCorrect = isMCQ
+            ? feedbackVisible && serverFeedback?.correct && i === selectedIndex
+            : feedbackVisible && normalize(op) === normalize(question.correct_answer)
+          const showWrong = isMCQ
+            ? feedbackVisible && !serverFeedback?.correct && i === selectedIndex
+            : feedbackVisible && normalize(op) === normalize(
+                typeof selectedIndex === 'string' ? selectedIndex : (question.options || [])[selectedIndex] || ''
+              ) && normalize(op) !== normalize(question.correct_answer)
+          const isSelected = isMCQ ? i === selectedIndex : normalize(op) === normalize(
+            typeof selectedIndex === 'string' ? selectedIndex : (question.options || [])[selectedIndex] || ''
+          )
           return (
             <button
               key={`${op}-${i}`}
               id={`quiz-option-${i}`}
-              disabled={feedbackVisible}
-              onClick={() => setSelectedAnswer(op)}
+              disabled={feedbackVisible || submitting}
+              onClick={() => setSelectedIndex(isMCQ ? i : op)}
               className={`w-full rounded-xl border p-3 text-left text-sm transition-all duration-300 ${
                 showCorrect ? 'border-emerald-400 bg-emerald-900' :
                 showWrong ? 'border-red-400 bg-red-900' :
-                normalize(selectedAnswer) === normalize(op) ? 'border-indigo-400 bg-indigo-950' :
+                isSelected ? 'border-indigo-400 bg-indigo-950' :
                 'border-slate-700 hover:border-indigo-400'
               } animate-[fadein_280ms_ease-out]`}
               style={{ animationDelay: `${i * 70}ms` }}
@@ -302,12 +348,10 @@ function QuizSection({ topic, subtopic, open, onBatchComplete, onToast, onMoveFu
         })}
       </div>
 
-
-
-
+      {/* Explanation: from server response for MCQ, from question object for LLM */}
       {feedbackVisible && (
         <p className="mt-3 rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-300">
-          {question.explanation}
+          {isMCQ ? serverFeedback?.explanation : question.explanation}
         </p>
       )}
 
@@ -316,10 +360,10 @@ function QuizSection({ topic, subtopic, open, onBatchComplete, onToast, onMoveFu
           <button
             id="quiz-submit-btn"
             onClick={submitCurrent}
-            disabled={!selectedAnswer}
+            disabled={selectedIndex === null || submitting}
             className="rounded-lg bg-indigo-500 px-3 py-2 text-xs font-semibold text-white disabled:opacity-50 hover:bg-indigo-400 transition"
           >
-            Submit Answer
+            {submitting ? 'Checking…' : 'Submit Answer'}
           </button>
         ) : (
           <button
@@ -341,11 +385,14 @@ function AssessmentSection({ topic, subtopic, mode, open, onComplete, onToast })
   const { accessToken } = useAuth()
   const [questions, setQuestions] = useState([])
   const [idx, setIdx] = useState(0)
-  const [selectedAnswer, setSelectedAnswer] = useState('')
-  const [answered, setAnswered] = useState([])
+  const [selectedIndex, setSelectedIndex] = useState(null)   // integer 0-3
+  const [answered, setAnswered] = useState([])               // [{question_id, chosen_index, correct}]
   const [feedbackVisible, setFeedbackVisible] = useState(false)
+  // serverFeedback: {correct: bool, explanation: str} from /quiz/mcq/submit
+  const [serverFeedback, setServerFeedback] = useState(null)
   const [summary, setSummary] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
 
   const endpoint = mode === 'posttest' ? '/quiz/posttest' : '/quiz/pretest'
   const title = mode === 'posttest' ? 'Complete Assessment' : 'Start Learning Assessment'
@@ -361,9 +408,10 @@ function AssessmentSection({ topic, subtopic, mode, open, onComplete, onToast })
     const data = await res.json()
     setQuestions(data.questions || [])
     setIdx(0)
-    setSelectedAnswer('')
+    setSelectedIndex(null)
     setAnswered([])
     setFeedbackVisible(false)
+    setServerFeedback(null)
     setSummary(null)
     setLoading(false)
   }
@@ -381,35 +429,58 @@ function AssessmentSection({ topic, subtopic, mode, open, onComplete, onToast })
   )
 
   const question = questions[idx]
-  if (!question && !summary) return (
-    <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4 text-sm text-slate-400">
-      No assessment available.
+
+  // "No questions available" — skip path unchanged
+  if (!question && !summary && questions.length === 0) return (
+    <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6 text-center space-y-3">
+      <p className="text-sm font-semibold text-slate-300">No assessment items for this subtopic yet</p>
+      <p className="text-xs text-slate-400">
+        MCQ questions for <span className="text-indigo-300">{subtopic || topic}</span> have not been
+        added to the bank yet. You can skip straight to Study.
+      </p>
+      <button
+        id="assessment-skip-btn"
+        onClick={() => onComplete?.({ skipped: true, reason: 'no_questions_available' })}
+        className="rounded-lg bg-indigo-500 px-4 py-2 text-xs font-semibold text-white hover:bg-indigo-400 transition"
+      >
+        Continue to Study &rarr;
+      </button>
     </div>
   )
+  if (!question && !summary) return null
 
-  const isCorrect = question && normalize(selectedAnswer) === normalize(question.correct_answer)
-
-  const submitCurrent = () => {
-    if (!selectedAnswer || !question) return
-    setAnswered([...answered, {
-      question: question.question,
-      selected_answer: selectedAnswer,
-      correct_answer: question.correct_answer,
-      correct: isCorrect,
-    }])
-    setFeedbackVisible(true)
+  // ── Submit one MCQ answer server-side ──────────────────────────────────────
+  const submitCurrent = async () => {
+    if (selectedIndex === null || !question) return
+    setSubmitting(true)
+    try {
+      const res = await fetch(`${API}/quiz/mcq/submit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+        body: JSON.stringify({ question_id: question.id, chosen_index: selectedIndex, context: mode }),
+      })
+      const data = await res.json()
+      setServerFeedback(data)
+      setAnswered(prev => [...prev, { question_id: question.id, chosen_index: selectedIndex, correct: data.correct }])
+      setFeedbackVisible(true)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
+  // ── After last question: send score to pretest/posttest for mastery update ─
   const submitAssessment = async (finalAnswers) => {
+    const correctCount = finalAnswers.filter(a => a.correct).length
+    const score = finalAnswers.length ? correctCount / finalAnswers.length : 0
     const res = await fetch(`${API}${endpoint}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-      body: JSON.stringify({ topic, subtopic, answers: finalAnswers }),
+      body: JSON.stringify({ topic, subtopic, mcq_score: score, mcq_total: finalAnswers.length }),
     })
     const data = await res.json()
     setSummary(data)
     onComplete?.(data)
-    onToast?.(`${title} submitted · ${Math.round((data.score || 0) * 100)}%`)
+    onToast?.(`${title} submitted · ${Math.round((data.score || score) * 100)}%`)
   }
 
   const nextQuestion = async () => {
@@ -418,7 +489,8 @@ function AssessmentSection({ topic, subtopic, mode, open, onComplete, onToast })
       return
     }
     setIdx(idx + 1)
-    setSelectedAnswer('')
+    setSelectedIndex(null)
+    setServerFeedback(null)
     setFeedbackVisible(false)
   }
 
@@ -450,45 +522,59 @@ function AssessmentSection({ topic, subtopic, mode, open, onComplete, onToast })
         <h3 className="text-sm font-semibold text-indigo-300">{title}</h3>
         <span className="text-xs text-slate-400">Question {idx + 1} of {questions.length}</span>
       </div>
+      {/* Progress dots */}
+      <div className="mb-3 flex gap-1.5">
+        {questions.map((_, i) => (
+          <span
+            key={i}
+            className={`h-2 w-2 rounded-full ${i < answered.length ? 'bg-indigo-400' : 'border border-indigo-400/60 bg-transparent'}`}
+          />
+        ))}
+      </div>
       <p className="mb-3 text-sm text-slate-100">{question.question}</p>
       <div className="space-y-2">
         {(question.options || []).map((op, i) => {
-          const showCorrect = feedbackVisible && normalize(op) === normalize(question.correct_answer)
-          const showWrong = feedbackVisible && normalize(op) === normalize(selectedAnswer) && !isCorrect
+          // Highlight driven entirely by server response — no client-side correct_answer
+          const showCorrect = feedbackVisible && serverFeedback?.correct && i === selectedIndex
+          const showWrong   = feedbackVisible && !serverFeedback?.correct && i === selectedIndex
+          const isSelected  = i === selectedIndex
           return (
             <button
               key={`${op}-${i}`}
               id={`assessment-option-${i}`}
-              disabled={feedbackVisible}
-              onClick={() => setSelectedAnswer(op)}
+              disabled={feedbackVisible || submitting}
+              onClick={() => setSelectedIndex(i)}
               className={`w-full rounded-xl border p-3 text-left text-sm transition ${
                 showCorrect ? 'border-emerald-400 bg-emerald-900' :
-                showWrong ? 'border-red-400 bg-red-900' :
-                normalize(selectedAnswer) === normalize(op) ? 'border-indigo-400 bg-indigo-950' :
+                showWrong   ? 'border-red-400 bg-red-900' :
+                isSelected  ? 'border-indigo-400 bg-indigo-950' :
                 'border-slate-700 hover:border-indigo-400'
               }`}
             >
               <span className="inline-flex items-center gap-2">
                 <span>{op}</span>
                 {showCorrect && <Check size={14} className="text-emerald-300" />}
-                {showWrong && <X size={14} className="text-red-300" />}
+                {showWrong   && <X    size={14} className="text-red-300" />}
               </span>
             </button>
           )
         })}
       </div>
-      {feedbackVisible && (
-        <p className="mt-3 text-sm text-slate-300">{question.explanation}</p>
+      {/* Explanation from server — only shown after submit */}
+      {feedbackVisible && serverFeedback?.explanation && (
+        <p className="mt-3 rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-300">
+          {serverFeedback.explanation}
+        </p>
       )}
       <div className="mt-3">
         {!feedbackVisible ? (
           <button
             id="assessment-submit-btn"
             onClick={submitCurrent}
-            disabled={!selectedAnswer}
+            disabled={selectedIndex === null || submitting}
             className="rounded-lg bg-indigo-500 px-3 py-2 text-xs font-semibold text-white disabled:opacity-50 hover:bg-indigo-400 transition"
           >
-            Submit Answer
+            {submitting ? 'Checking…' : 'Submit Answer'}
           </button>
         ) : (
           <button
@@ -733,7 +819,9 @@ export default function App() {
     setCurrentSubtopic(subtopicId)
     setTopicComplete(false)
     setQuizOpen(false)
+    setAssessmentOpen(false)  // Close assessment when switching topics/subtopics
     setContentReady(false)
+    setMessages([])  // Clear messages to prevent showing old topic content
   }
 
   const handleMoveFurther = async () => {
@@ -771,26 +859,35 @@ export default function App() {
   const status = (studentState?.macro_decision?.action || 'active').replaceAll('_', ' ')
   const progressPct = Math.max(0, Math.min(100, (score / 0.85) * 100))
 
-  // Per-topic pretest / posttest tracking — check assessment_scores keyed by topic
-  const topicAssessmentScores = useMemo(() => {
+  // Per-subtopic pretest / posttest tracking — check assessment_scores keyed by topic + subtopic
+  const currentSubtopicAssessment = useMemo(() => {
+    if (!selectedTopic || !currentSubtopic) return { pretestDone: false, posttestDone: false, pretestScore: null, posttestScore: null }
+    
     const scores = studentState?.assessment_scores || {}
-    // Flatten: for each topic find if pretest_score or posttest_score exists in any subtopic entry
-    const result = {}
-    for (const [topic, subtopicMap] of Object.entries(scores)) {
-      let pretestDone = false
-      let posttestDone = false
-      for (const entry of Object.values(subtopicMap)) {
-        if (entry?.pretest_score !== null && entry?.pretest_score !== undefined) pretestDone = true
-        if (entry?.posttest_score !== null && entry?.posttest_score !== undefined) posttestDone = true
-      }
-      result[topic] = { pretestDone, posttestDone }
+    const topicMap = scores[selectedTopic] || {}
+    const subtopicEntry = topicMap[currentSubtopic] || {}
+    
+    return {
+      pretestDone: subtopicEntry?.pretest_score !== null && subtopicEntry?.pretest_score !== undefined,
+      posttestDone: subtopicEntry?.posttest_score !== null && subtopicEntry?.posttest_score !== undefined,
+      pretestScore: subtopicEntry?.pretest_score || null,
+      posttestScore: subtopicEntry?.posttest_score || null,
     }
-    return result
-  }, [studentState])
+  }, [studentState, selectedTopic, currentSubtopic])
 
-  const pretestDoneForTopic = !!(selectedTopic && topicAssessmentScores[selectedTopic]?.pretestDone)
-  const posttestDoneForTopic = !!(selectedTopic && topicAssessmentScores[selectedTopic]?.posttestDone)
+  const pretestDoneForTopic = currentSubtopicAssessment.pretestDone
+  const posttestDoneForTopic = currentSubtopicAssessment.posttestDone
+  
+  // Allow retaking pretest - show "Retake Pre-Test" button if already completed
+  const canRetakePretest = pretestDoneForTopic && currentSubtopicAssessment.pretestScore !== null
 
+  // Check if all subtopics of current topic have been practiced (for post-test eligibility)
+  const currentTopicData = topics.find(t => t.name === selectedTopic)
+  const allSubtopicsPracticed = (currentTopicData?.subtopics || []).length > 0 &&
+    (currentTopicData?.subtopics || []).every(sub => sub.passed || sub.attempts > 0)
+  
+  // Show post-test when: pre-test done, all subtopics practiced, and post-test not yet taken
+  const showPostTest = pretestDoneForTopic && allSubtopicsPracticed && !posttestDoneForTopic
 
   return (
     <div className="h-screen overflow-hidden bg-[#0a0a16] font-[Inter,system-ui] text-slate-100">
@@ -880,7 +977,7 @@ export default function App() {
               {selectedTopic && (
                 <div className="mt-1 flex items-center gap-1.5 text-[10px] text-slate-500">
                   <span className={pretestDoneForTopic ? 'text-emerald-400 font-semibold' : 'text-amber-400 font-semibold'}>
-                    1. Pre-Test{pretestDoneForTopic ? ' ✓' : ''}
+                    1. Pre-Test{pretestDoneForTopic ? ' ✓' : ''}{canRetakePretest ? ' (retake available)' : ''}
                   </span>
                   <span>→</span>
                   <span className={contentReady || messages.some(m => m.role === 'tutor' && m.text) ? 'text-indigo-400 font-semibold' : 'text-slate-600'}>
@@ -896,7 +993,7 @@ export default function App() {
               )}
             </div>
             <div className="flex flex-wrap gap-2 items-center">
-              {/* Step 1: Pre-Test — always show if topic selected & pretest not done */}
+              {/* Step 1: Pre-Test — show if pretest not done */}
               {selectedTopic && !pretestDoneForTopic && (
                 <button
                   id="pretest-btn"
@@ -907,12 +1004,25 @@ export default function App() {
                   📋 Take Pre-Test
                 </button>
               )}
-              {/* Pretest done badge */}
+              
+              {/* Pretest done badge with score and retake option */}
               {selectedTopic && pretestDoneForTopic && (
-                <span className="rounded-lg border border-emerald-600/50 bg-emerald-950/30 px-3 py-2 text-xs text-emerald-400 font-medium">
-                  ✓ Pre-Test Done
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="rounded-lg border border-emerald-600/50 bg-emerald-950/30 px-3 py-2 text-xs text-emerald-400 font-medium">
+                    ✓ Pre-Test Done {currentSubtopicAssessment.pretestScore !== null && `(${Math.round(currentSubtopicAssessment.pretestScore * 100)}%)`}
+                  </span>
+                  <button
+                    id="retake-pretest-btn"
+                    onClick={() => openAssessment('pretest')}
+                    disabled={streaming}
+                    className="rounded-lg border border-slate-600 bg-slate-800/50 px-3 py-2 text-xs text-slate-300 disabled:opacity-50 hover:bg-slate-700/50 transition"
+                    title="Retake pre-test to improve your score and get adaptive content"
+                  >
+                    🔄 Retake
+                  </button>
+                </div>
               )}
+              
               {/* Step 2: Study content — show after pretest */}
               {selectedTopic && pretestDoneForTopic && (
                 <button
@@ -945,6 +1055,17 @@ export default function App() {
                   className="rounded-lg border border-indigo-500 px-4 py-2 text-xs font-semibold text-indigo-300 disabled:opacity-50 hover:bg-indigo-950 transition"
                 >
                   🎯 Practice Quiz
+                </button>
+              )}
+              {/* Step 4: Post-Test — shows when all subtopics practiced */}
+              {showPostTest && (
+                <button
+                  id="posttest-btn-ready"
+                  onClick={() => openAssessment('posttest')}
+                  disabled={streaming}
+                  className="flex items-center gap-1.5 rounded-lg border border-emerald-500 bg-emerald-950/40 px-4 py-2 text-xs font-semibold text-emerald-300 disabled:opacity-50 hover:bg-emerald-900/50 transition"
+                >
+                  📋 Take Post-Test
                 </button>
               )}
             </div>
